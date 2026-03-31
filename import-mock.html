@@ -1,0 +1,1797 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ラクミー タイムレコード - インポート機能モック v2</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif; background: #f5f5f5; color: #333; }
+  .app { display: flex; min-height: 100vh; }
+
+  /* Sidebar */
+  .sidebar { width: 220px; background: #fff; border-right: 1px solid #e5e5e5; position: fixed; height: 100vh; display: flex; flex-direction: column; justify-content: space-between; }
+  .sidebar-top { padding: 16px 12px; }
+  .logo { display: flex; align-items: center; gap: 6px; margin-bottom: 20px; padding: 0 4px; }
+  .logo-badge { background: #2ec4a0; color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 3px; font-weight: 700; }
+  .logo-text { font-size: 13px; font-weight: 600; }
+  .nav a { display: flex; align-items: center; gap: 8px; padding: 9px 12px; border-radius: 8px; text-decoration: none; color: #666; font-size: 13px; margin-bottom: 1px; }
+  .nav a:hover { background: #f5f5f5; }
+  .nav a.active { background: #eefaf6; color: #2ec4a0; font-weight: 600; }
+  .nav-sep { height: 1px; background: #eee; margin: 10px 8px; }
+  .sidebar-bottom { padding: 12px; border-top: 1px solid #eee; display: flex; align-items: center; gap: 8px; font-size: 12px; }
+  .avatar-sm { width: 30px; height: 30px; background: #e8e8e8; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+
+  /* Main */
+  .main { margin-left: 220px; flex: 1; }
+  .page-header { padding: 24px 32px 0; }
+  .page-title { font-size: 20px; font-weight: 700; }
+  .content { padding: 20px 32px 40px; }
+
+  /* Screen */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ===== TOP PAGE ===== */
+  .import-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px; }
+  .import-card { background: #fff; border: 2px solid #e8e8e8; border-radius: 14px; padding: 32px 24px; cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden; }
+  .import-card:hover { border-color: #2ec4a0; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.06); }
+  .import-card h3 { font-size: 16px; margin-bottom: 6px; }
+  .import-card p { font-size: 12px; color: #999; line-height: 1.6; }
+  .import-card .ic-icon { font-size: 36px; margin-bottom: 14px; }
+  .import-card .ic-steps { margin-top: 14px; display: flex; gap: 6px; }
+  .import-card .ic-step { font-size: 11px; background: #f0f0f0; padding: 3px 10px; border-radius: 20px; color: #888; }
+  .import-card .ic-arrow { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); font-size: 20px; color: #ccc; }
+
+  /* History */
+  .history-section { margin-top: 32px; }
+  .history-title { font-size: 14px; font-weight: 600; color: #888; margin-bottom: 12px; }
+  .history-list { background: #fff; border-radius: 10px; border: 1px solid #e8e8e8; overflow: hidden; }
+  .history-row { display: flex; align-items: center; padding: 12px 16px; border-bottom: 1px solid #f0f0f0; font-size: 13px; gap: 12px; }
+  .history-row:last-child { border-bottom: none; }
+  .history-row:hover { background: #fafafa; }
+  .history-badge { font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 600; white-space: nowrap; }
+  .badge-tpl { background: #eefaf6; color: #2ec4a0; }
+  .badge-kot { background: #e8f0fe; color: #1a73e8; }
+  .badge-jc { background: #fff0e8; color: #ff6b35; }
+  .history-file { flex: 1; }
+  .history-date { color: #999; font-size: 12px; }
+  .history-result { font-size: 12px; font-weight: 600; }
+  .result-ok { color: #2ec4a0; }
+  .result-warn { color: #f59e0b; }
+
+  /* ===== TEMPLATE FLOW ===== */
+  .flow-steps { display: flex; align-items: center; gap: 0; margin-bottom: 28px; background: #fff; border-radius: 10px; padding: 16px 20px; border: 1px solid #e8e8e8; }
+  .fs { display: flex; align-items: center; gap: 8px; }
+  .fs-num { width: 26px; height: 26px; border-radius: 50%; background: #e0e0e0; color: #aaa; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .fs-label { font-size: 13px; color: #aaa; }
+  .fs.active .fs-num { background: #2ec4a0; color: #fff; }
+  .fs.active .fs-label { color: #333; font-weight: 600; }
+  .fs.done .fs-num { background: #2ec4a0; color: #fff; }
+  .fs.done .fs-label { color: #2ec4a0; }
+  .fs-line { width: 32px; height: 2px; background: #e0e0e0; margin: 0 8px; }
+  .fs-line.done { background: #2ec4a0; }
+
+  /* Upload box */
+  .upload-box { background: #fff; border: 2px dashed #d0d0d0; border-radius: 14px; padding: 40px; text-align: center; cursor: pointer; transition: all 0.2s; margin-bottom: 16px; }
+  .upload-box:hover { border-color: #2ec4a0; background: #fdfffe; }
+  .upload-box.uploaded { border: 2px solid #2ec4a0; background: #f7fdfb; }
+  .ub-icon { font-size: 40px; margin-bottom: 10px; color: #ccc; }
+  .ub-text { font-size: 14px; color: #888; }
+  .ub-btn { display: inline-block; margin-top: 12px; background: #2ec4a0; color: #fff; padding: 8px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; }
+  .ub-hint { font-size: 11px; color: #bbb; margin-top: 8px; }
+  .uploaded-info { display: flex; align-items: center; justify-content: center; gap: 12px; }
+  .uploaded-info .ui-icon { font-size: 28px; }
+  .uploaded-info .ui-name { font-weight: 600; font-size: 14px; }
+  .uploaded-info .ui-meta { font-size: 12px; color: #888; }
+
+  /* White card */
+  .wcard { background: #fff; border-radius: 12px; border: 1px solid #e8e8e8; padding: 20px; margin-bottom: 16px; }
+  .wcard-title { font-size: 14px; font-weight: 700; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .wcard-title .num { background: #2ec4a0; color: #fff; width: 22px; height: 22px; border-radius: 50%; font-size: 11px; display: flex; align-items: center; justify-content: center; }
+
+  /* Template selector */
+  .tpl-sel { display: flex; gap: 12px; }
+  .tpl-item { flex: 1; border: 2px solid #e8e8e8; border-radius: 10px; padding: 18px; cursor: pointer; transition: all 0.15s; position: relative; }
+  .tpl-item:hover { border-color: #b8ead9; }
+  .tpl-item.selected { border-color: #2ec4a0; background: #f7fdfb; }
+  .tpl-item .check { position: absolute; top: 10px; right: 10px; width: 20px; height: 20px; border: 2px solid #ddd; border-radius: 50%; }
+  .tpl-item.selected .check { border-color: #2ec4a0; background: #2ec4a0; }
+  .tpl-item.selected .check::after { content: '✓'; color: #fff; font-size: 12px; display: flex; align-items: center; justify-content: center; height: 100%; }
+  .tpl-item h4 { font-size: 14px; margin-bottom: 4px; }
+  .tpl-item p { font-size: 11px; color: #999; line-height: 1.5; }
+  .tpl-item .dl-link { display: inline-block; margin-top: 8px; font-size: 12px; color: #2ec4a0; font-weight: 600; text-decoration: underline; }
+
+  /* SaaS selector */
+  .saas-sel { display: flex; gap: 12px; margin-bottom: 14px; }
+  .saas-item { flex: 1; border: 2px solid #e8e8e8; border-radius: 10px; padding: 16px; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 12px; }
+  .saas-item:hover { border-color: #b8ead9; }
+  .saas-item.selected { border-color: #2ec4a0; background: #f7fdfb; }
+  .saas-logo { width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: #fff; flex-shrink: 0; }
+  .saas-logo.kot { background: #1a73e8; }
+  .saas-logo.jc { background: #ff6b35; }
+  .saas-item h4 { font-size: 14px; }
+  .saas-item p { font-size: 11px; color: #999; }
+
+  /* Data source pills */
+  .source-pills { display: flex; gap: 8px; flex-wrap: wrap; }
+  .source-pill { padding: 8px 16px; border: 2px solid #e8e8e8; border-radius: 8px; font-size: 12px; cursor: pointer; transition: all 0.15s; background: #fff; }
+  .source-pill:hover { border-color: #b8ead9; }
+  .source-pill.selected { border-color: #2ec4a0; background: #2ec4a0; color: #fff; font-weight: 600; }
+
+  /* Settings inline */
+  .settings-inline { display: flex; gap: 12px; margin-top: 12px; }
+  .si-item { flex: 1; }
+  .si-item label { display: block; font-size: 11px; color: #888; margin-bottom: 4px; font-weight: 600; }
+  .si-item select, .si-item input[type="number"] { width: 100%; padding: 7px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 12px; background: #fff; }
+
+  /* Mapping table */
+  .map-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .map-table th { text-align: left; padding: 8px 10px; background: #f8f8f8; font-size: 11px; color: #888; font-weight: 600; border-bottom: 1px solid #eee; }
+  .map-table td { padding: 8px 10px; border-bottom: 1px solid #f3f3f3; vertical-align: middle; }
+  .map-table tr:hover { background: #fafafa; }
+  .map-table select { padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; width: 100%; }
+  .map-ok { color: #2ec4a0; font-weight: 700; font-size: 14px; }
+  .map-ng { color: #e74c3c; font-weight: 700; font-size: 14px; }
+  .map-label { font-weight: 600; }
+  .map-req { color: #e74c3c; margin-left: 2px; }
+  .map-preview { color: #bbb; font-size: 11px; }
+  .map-auto { font-size: 10px; background: #eefaf6; color: #2ec4a0; padding: 1px 6px; border-radius: 3px; font-weight: 600; }
+  .map-manual { font-size: 10px; background: #fff3e0; color: #f59e0b; padding: 1px 6px; border-radius: 3px; font-weight: 600; }
+  .map-none { font-size: 10px; background: #fef2f2; color: #e74c3c; padding: 1px 6px; border-radius: 3px; font-weight: 600; }
+
+  /* Preview summary */
+  .pv-summary { display: flex; gap: 12px; margin-bottom: 16px; }
+  .pv-box { flex: 1; text-align: center; padding: 14px; border-radius: 10px; }
+  .pv-box .num { font-size: 24px; font-weight: 700; }
+  .pv-box .lbl { font-size: 11px; color: #666; margin-top: 2px; }
+  .pv-total { background: #f5f5f5; }
+  .pv-new { background: #eefaf6; }
+  .pv-new .num { color: #2ec4a0; }
+  .pv-upd { background: #fff8ed; }
+  .pv-upd .num { color: #f59e0b; }
+  .pv-err { background: #fef2f2; }
+  .pv-err .num { color: #e74c3c; }
+
+  /* Preview table */
+  .pv-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .pv-table th { text-align: left; padding: 8px 10px; background: #f0faf7; font-size: 11px; color: #555; font-weight: 600; border-bottom: 2px solid #c5ede0; }
+  .pv-table td { padding: 7px 10px; border-bottom: 1px solid #f0f0f0; }
+  .pv-table tr:hover { background: #fafafa; }
+  .st-new { color: #2ec4a0; font-weight: 600; }
+  .st-upd { color: #f59e0b; font-weight: 600; }
+  .st-err { color: #e74c3c; font-weight: 600; }
+  .st-skip { color: #999; }
+  .default-val { color: #bbb; font-style: italic; }
+
+  /* Alert */
+  .alert { padding: 10px 14px; border-radius: 8px; font-size: 12px; margin-bottom: 14px; display: flex; gap: 8px; align-items: flex-start; line-height: 1.6; }
+  .alert-info { background: #eefaf6; border: 1px solid #c5ede0; color: #15735a; }
+  .alert-warn { background: #fff8ed; border: 1px solid #fde68a; color: #92400e; }
+  .alert-err { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+
+  /* Result */
+  .result-center { text-align: center; padding: 40px 20px; }
+  .result-center .r-icon { font-size: 56px; margin-bottom: 12px; }
+  .result-center h2 { font-size: 18px; margin-bottom: 6px; }
+  .result-center p { font-size: 13px; color: #888; margin-bottom: 20px; }
+  .result-detail { background: #f8f8f8; border-radius: 10px; padding: 16px 20px; max-width: 360px; margin: 0 auto 20px; text-align: left; }
+  .rd-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; }
+  .rd-row + .rd-row { border-top: 1px solid #eee; }
+  .rd-val { font-weight: 600; }
+  .rd-green { color: #2ec4a0; }
+  .rd-yellow { color: #f59e0b; }
+  .rd-red { color: #e74c3c; }
+
+  /* Buttons */
+  .btn { padding: 9px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: all 0.15s; }
+  .btn-primary { background: #2ec4a0; color: #fff; }
+  .btn-primary:hover { background: #26a88a; }
+  .btn-ghost { background: none; color: #888; border: 1px solid #ddd; }
+  .btn-ghost:hover { background: #f5f5f5; }
+  .btn-outline-g { background: none; color: #2ec4a0; border: 1px solid #2ec4a0; }
+  .btn-outline-g:hover { background: #eefaf6; }
+  .btn-group { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
+  .btn-icon { display: inline-flex; align-items: center; gap: 4px; }
+
+  /* Saved format */
+  .sf-row { display: flex; align-items: center; padding: 10px 14px; border-bottom: 1px solid #f0f0f0; gap: 10px; cursor: pointer; }
+  .sf-row:hover { background: #fafafa; }
+  .sf-row:last-child { border-bottom: none; }
+  .sf-name { font-size: 13px; font-weight: 600; flex: 1; }
+  .sf-date { font-size: 11px; color: #bbb; }
+  .sf-use { font-size: 12px; color: #2ec4a0; font-weight: 600; }
+
+  /* Default value section */
+  .dv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+  .dv-item label { display: block; font-size: 11px; color: #888; margin-bottom: 4px; }
+  .dv-item select, .dv-item input { width: 100%; padding: 7px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 12px; }
+
+  /* Save format checkbox */
+  .save-fmt { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: #f8f8f8; border-radius: 8px; margin-top: 12px; font-size: 12px; }
+  .save-fmt input[type="checkbox"] { accent-color: #2ec4a0; }
+  .save-fmt input[type="text"] { border: 1px solid #ddd; border-radius: 4px; padding: 4px 8px; font-size: 12px; margin-left: 8px; width: 200px; }
+
+  /* Tabs simple */
+  .stabs { display: flex; gap: 0; border-bottom: 2px solid #eee; margin-bottom: 14px; }
+  .stab { padding: 8px 16px; font-size: 12px; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; color: #aaa; }
+  .stab:hover { color: #666; }
+  .stab.active { color: #2ec4a0; border-bottom-color: #2ec4a0; font-weight: 600; }
+
+  /* Duplicate handling */
+  .dup-sel { display: flex; gap: 8px; }
+  .dup-opt { padding: 8px 16px; border: 1px solid #ddd; border-radius: 6px; font-size: 12px; cursor: pointer; }
+  .dup-opt:hover { border-color: #b8ead9; }
+  .dup-opt.selected { border-color: #2ec4a0; background: #eefaf6; color: #2ec4a0; font-weight: 600; }
+
+  /* Map panels */
+  .map-panel { display: none; margin-bottom: 8px; }
+  .map-panel.visible { display: block; }
+  .map-section-header { font-size: 15px; font-weight: 700; padding: 14px 0 10px; margin-top: 8px; border-bottom: 2px solid #e8e8e8; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .map-section-divider { height: 2px; background: linear-gradient(to right, #2ec4a0, transparent); margin: 24px 0; }
+
+  /* Source check */
+  .source-check.checked { border-color: #2ec4a0 !important; background: #f7fdfb !important; }
+
+  /* Page nav (for demo) */
+  .demo-nav { position: fixed; bottom: 16px; right: 16px; background: #222; color: #fff; padding: 14px 16px; border-radius: 10px; font-size: 11px; z-index: 100; box-shadow: 0 4px 20px rgba(0,0,0,0.3); width: 260px; }
+  .demo-nav h4 { font-size: 11px; color: #888; margin-bottom: 8px; }
+  .demo-nav button { display: block; width: 100%; text-align: left; background: none; border: none; color: #aaa; padding: 4px 0; cursor: pointer; font-size: 11px; }
+  .demo-nav button:hover { color: #2ec4a0; }
+  .demo-nav button.current { color: #2ec4a0; font-weight: 600; }
+  .demo-nav .dn-sep { height: 1px; background: #444; margin: 6px 0; }
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- Sidebar -->
+<nav class="sidebar">
+  <div class="sidebar-top">
+    <div class="logo"><span class="logo-badge">ラクミー</span><span class="logo-text">タイムレコード</span></div>
+    <div class="nav">
+      <a href="#">🕐 打刻記録</a>
+      <a href="#">📅 勤務時間集計</a>
+      <a href="#">💴 給与</a>
+      <a href="#">⬇ エクスポート</a>
+      <a href="#" class="active">⬆ インポート</a>
+      <div class="nav-sep"></div>
+      <a href="#">📊 経営管理 ↗</a>
+      <div class="nav-sep"></div>
+      <a href="#">👤 従業員</a>
+      <a href="#">👥 雇用区分</a>
+      <a href="#">🏠 店舗情報</a>
+      <a href="#">🏷 業態・ブランド</a>
+      <a href="#">🔑 管理者</a>
+      <a href="#">🏢 会社情報</a>
+      <a href="#">🔗 外部連携</a>
+    </div>
+  </div>
+  <div class="sidebar-bottom"><div class="avatar-sm">👤</div><div><div style="font-weight:600">筒井</div><div style="color:#999;font-size:11px">オーナー</div></div></div>
+</nav>
+
+<div class="main">
+
+<!-- ==================== -->
+<!-- SCREEN: トップ -->
+<!-- ==================== -->
+<div class="screen active" id="s-top">
+  <div class="page-header"><h1 class="page-title">インポート</h1></div>
+  <div class="content">
+    <div class="import-cards">
+      <div class="import-card" onclick="go('s-tpl1')">
+        <div class="ic-icon">📄</div>
+        <h3>テンプレートで取り込み</h3>
+        <p>ラクミー専用テンプレートにデータを入力してインポート。初期セットアップに最適。</p>
+        <div class="ic-steps">
+          <span class="ic-step">① 設定マスタ</span>
+          <span class="ic-step">② 従業員データ</span>
+        </div>
+        <div class="ic-arrow">→</div>
+      </div>
+      <div class="import-card" onclick="go('s-saas1')">
+        <div class="ic-icon">🔄</div>
+        <h3>外部勤怠SaaSから取り込み</h3>
+        <p>キングオブタイム・ジョブカンのCSVデータを列マッピングしてインポート。</p>
+        <div class="ic-steps">
+          <span class="ic-step">KoT</span>
+          <span class="ic-step">ジョブカン</span>
+        </div>
+        <div class="ic-arrow">→</div>
+      </div>
+    </div>
+
+    <div class="history-section">
+      <div class="history-title">最近のインポート</div>
+      <div class="history-list">
+        <div class="history-row">
+          <span class="history-badge badge-tpl">テンプレート</span>
+          <span class="history-file">①設定マスタ_20260331.tsv</span>
+          <span class="history-date">2026/03/31 14:20</span>
+          <span class="history-result result-ok">✓ 成功 7件</span>
+        </div>
+        <div class="history-row">
+          <span class="history-badge badge-kot">KoT</span>
+          <span class="history-file">employee_info_202603.csv</span>
+          <span class="history-date">2026/03/28 10:15</span>
+          <span class="history-result result-ok">✓ 成功 15件</span>
+        </div>
+        <div class="history-row">
+          <span class="history-badge badge-jc">Jobcan</span>
+          <span class="history-file">staff-info-202603.csv</span>
+          <span class="history-date">2026/03/25 09:30</span>
+          <span class="history-result result-warn">⚠ 一部エラー</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== -->
+<!-- TEMPLATE: STEP 1 - 選択＆アップロード（統合） -->
+<!-- ==================== -->
+<div class="screen" id="s-tpl1">
+  <div class="page-header"><h1 class="page-title">テンプレートで取り込み</h1></div>
+  <div class="content">
+
+    <div class="flow-steps">
+      <div class="fs active"><span class="fs-num">1</span><span class="fs-label">アップロード</span></div>
+      <div class="fs-line"></div>
+      <div class="fs"><span class="fs-num">2</span><span class="fs-label">確認・実行</span></div>
+      <div class="fs-line"></div>
+      <div class="fs"><span class="fs-num">3</span><span class="fs-label">完了</span></div>
+    </div>
+
+    <div class="wcard">
+      <div class="wcard-title"><span class="num">1</span> テンプレートを選択（複数選択可）</div>
+      <div class="alert alert-info" style="margin-bottom:12px;">初期セットアップの場合は両方選択してください。①②を同時にインポートできます。</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <label style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:2px solid #e8e8e8;border-radius:8px;cursor:pointer;transition:all 0.15s;" class="source-check checked" data-tpl="master" onclick="toggleCheck(this)">
+          <input type="checkbox" checked style="accent-color:#2ec4a0;width:16px;height:16px;margin-top:2px;">
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:600;">① 設定マスタ</div>
+            <div style="font-size:11px;color:#888;">業態・ブランド、店舗、雇用区分をまとめて登録（10列）</div>
+          </div>
+          <a class="dl-link" href="#" onclick="event.stopPropagation();" style="font-size:11px;">⬇ テンプレートDL</a>
+        </label>
+        <label style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:2px solid #e8e8e8;border-radius:8px;cursor:pointer;transition:all 0.15s;" class="source-check checked" data-tpl="employee" onclick="toggleCheck(this)">
+          <input type="checkbox" checked style="accent-color:#2ec4a0;width:16px;height:16px;margin-top:2px;">
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:600;">② 従業員データ</div>
+            <div style="font-size:11px;color:#888;">従業員情報を登録、①の設定マスタと紐付け（8列）</div>
+          </div>
+          <a class="dl-link" href="#" onclick="event.stopPropagation();" style="font-size:11px;">⬇ テンプレートDL</a>
+        </label>
+      </div>
+    </div>
+
+    <div class="wcard">
+      <div class="wcard-title"><span class="num">2</span> ファイルをアップロード</div>
+
+      <!-- 順序ガイド（2つ選択時のみ表示） -->
+      <div id="tpl-upload-order-guide" style="margin-bottom:14px;">
+        <div style="background:#f8f8f8;border-radius:8px;padding:12px 16px;">
+          <div style="font-size:12px;font-weight:700;margin-bottom:8px;">アップロード順序</div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="background:#1a73e8;color:#fff;padding:2px 10px;border-radius:4px;font-size:10px;font-weight:700;">1st</span>
+            <span style="font-size:12px;">① 設定マスタ</span>
+            <span style="font-size:14px;color:#ccc;">→</span>
+            <span style="background:#f59e0b;color:#fff;padding:2px 10px;border-radius:4px;font-size:10px;font-weight:700;">2nd</span>
+            <span style="font-size:12px;">② 従業員データ</span>
+          </div>
+          <div style="font-size:11px;color:#888;margin-top:6px;">設定マスタを先にアップロードし、従業員データで紐付けます。</div>
+        </div>
+      </div>
+
+      <!-- アップロード対象ラベル -->
+      <div id="tpl-up-current-label" style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <span id="tpl-up-current-badge" style="background:#1a73e8;color:#fff;padding:2px 10px;border-radius:4px;font-size:10px;font-weight:700;">1st</span>
+        <span style="font-size:13px;font-weight:600;" id="tpl-up-current-name">① 設定マスタ</span>
+        <span style="font-size:11px;color:#1a73e8;font-weight:600;" id="tpl-up-current-hint">をアップロードしてください</span>
+      </div>
+      <!-- 1つ選択時のラベル -->
+      <div id="tpl-up-single-label" style="display:none;margin-bottom:8px;">
+        <span style="font-size:13px;font-weight:600;" id="tpl-up-single-name">① 設定マスタ</span>
+        <span style="font-size:11px;color:#888;">をアップロードしてください</span>
+      </div>
+
+      <!-- アップロード口（常に1つ） -->
+      <div id="tpl-up-dropzone" class="upload-box" style="padding:24px;">
+        <div class="ub-icon" style="font-size:28px;">📁</div>
+        <div class="ub-text" style="font-size:13px;">ファイルをドラッグ＆ドロップ</div>
+        <div class="ub-btn" style="font-size:12px;padding:6px 16px;" onclick="demoTplUpload()">ファイルを選択</div>
+        <div class="ub-hint">TSV / CSV（最大10MB）</div>
+      </div>
+
+      <!-- アップロード済みファイル一覧 -->
+      <div id="tpl-up-files" style="display:none;margin-top:10px;">
+        <div id="tpl-up-file1" style="display:none;padding:10px 14px;background:#f7fdfb;border:1px solid #c5ede0;border-radius:8px;margin-bottom:6px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="background:#1a73e8;color:#fff;padding:1px 8px;border-radius:3px;font-size:9px;font-weight:700;">1st</span>
+            <span style="font-size:12px;">📄</span>
+            <span style="font-size:12px;font-weight:600;">設定マスタ_20260331.tsv</span>
+            <span style="font-size:11px;color:#888;">2.4 KB · 5行</span>
+            <span style="font-size:11px;color:#2ec4a0;font-weight:600;margin-left:auto;">✓ 完了</span>
+          </div>
+        </div>
+        <div id="tpl-up-file2" style="display:none;padding:10px 14px;background:#f7fdfb;border:1px solid #c5ede0;border-radius:8px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="background:#f59e0b;color:#fff;padding:1px 8px;border-radius:3px;font-size:9px;font-weight:700;">2nd</span>
+            <span style="font-size:12px;">📄</span>
+            <span style="font-size:12px;font-weight:600;">従業員データ_20260331.tsv</span>
+            <span style="font-size:11px;color:#888;">3.1 KB · 8行</span>
+            <span style="font-size:11px;color:#2ec4a0;font-weight:600;margin-left:auto;">✓ 完了</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-group">
+      <button class="btn btn-ghost" onclick="go('s-top')">キャンセル</button>
+      <button class="btn btn-primary" onclick="go('s-tpl2')">確認画面へ →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== -->
+<!-- TEMPLATE: STEP 2 - 確認（統合） -->
+<!-- ==================== -->
+<div class="screen" id="s-tpl2">
+  <div class="page-header"><h1 class="page-title">テンプレートで取り込み</h1></div>
+  <div class="content">
+
+    <div class="flow-steps">
+      <div class="fs done"><span class="fs-num">✓</span><span class="fs-label">アップロード</span></div>
+      <div class="fs-line done"></div>
+      <div class="fs active"><span class="fs-num">2</span><span class="fs-label">確認・実行</span></div>
+      <div class="fs-line"></div>
+      <div class="fs"><span class="fs-num">3</span><span class="fs-label">完了</span></div>
+    </div>
+
+    <!-- 設定マスタ確認セクション -->
+    <div id="tpl-confirm-master">
+    <div class="map-section-header"><span style="background:#2ec4a0;color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;">①</span> 設定マスタ</div>
+    <div class="alert alert-info">内部仕分け結果: <strong>業態・ブランド 2件</strong> ・ <strong>店舗 2件</strong> ・ <strong>雇用区分 3件</strong> を新規登録します。</div>
+
+    <div class="pv-summary">
+      <div class="pv-box pv-total"><div class="num">5</div><div class="lbl">データ行数</div></div>
+      <div class="pv-box pv-new"><div class="num">5</div><div class="lbl">新規登録</div></div>
+      <div class="pv-box pv-upd"><div class="num">0</div><div class="lbl">更新</div></div>
+      <div class="pv-box pv-err"><div class="num">0</div><div class="lbl">エラー</div></div>
+    </div>
+
+    <div class="wcard" style="padding:0;overflow:hidden;">
+      <div class="stabs" style="padding: 0 14px;">
+        <div class="stab active" onclick="switchMasterTab(this,0)">業態・ブランド (2)</div>
+        <div class="stab" onclick="switchMasterTab(this,1)">店舗 (2)</div>
+        <div class="stab" onclick="switchMasterTab(this,2)">雇用区分 (3)</div>
+      </div>
+      <!-- 業態・ブランド -->
+      <table class="pv-table master-tab-content" id="master-tab-0">
+        <thead><tr><th style="width:60px">状態</th><th>業態・ブランド名</th></tr></thead>
+        <tbody>
+          <tr><td class="st-new">● 新規</td><td>居酒屋</td></tr>
+          <tr><td class="st-new">● 新規</td><td>カフェ</td></tr>
+        </tbody>
+      </table>
+      <!-- 店舗 -->
+      <table class="pv-table master-tab-content" id="master-tab-1" style="display:none;">
+        <thead><tr><th style="width:60px">状態</th><th>店舗名</th><th>業態・ブランド</th><th>郵便番号</th><th>住所</th></tr></thead>
+        <tbody>
+          <tr><td class="st-new">● 新規</td><td>渋谷店</td><td>居酒屋</td><td>150-0002</td><td>東京都渋谷区渋谷1-1-1</td></tr>
+          <tr><td class="st-new">● 新規</td><td>新宿店</td><td>カフェ</td><td>160-0022</td><td>東京都新宿区新宿3-3-3</td></tr>
+        </tbody>
+      </table>
+      <!-- 雇用区分 -->
+      <table class="pv-table master-tab-content" id="master-tab-2" style="display:none;">
+        <thead><tr><th style="width:60px">状態</th><th>雇用区分名</th><th>雇用区分コード</th><th>給与体系</th><th>金額</th><th>月次契約労働時間</th><th>月みなし残業時間</th></tr></thead>
+        <tbody>
+          <tr><td class="st-new">● 新規</td><td>正社員A</td><td>EMP-TYPE-001</td><td>月給</td><td>¥200,000</td><td>160</td><td>20</td></tr>
+          <tr><td class="st-new">● 新規</td><td>パートB</td><td>EMP-TYPE-002</td><td>時給</td><td>¥1,200</td><td>-</td><td>-</td></tr>
+          <tr><td class="st-new">● 新規</td><td>日給スタッフC</td><td>EMP-TYPE-003</td><td>日給</td><td>¥10,000</td><td>8</td><td>-</td></tr>
+        </tbody>
+      </table>
+    </div>
+    </div>
+
+    <!-- 従業員データ確認セクション -->
+    <div id="tpl-confirm-employee">
+    <div class="map-section-header" style="margin-top:24px;"><span style="background:#2ec4a0;color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;">②</span> 従業員データ</div>
+    <div class="alert alert-info">② 従業員データ: <strong>8件</strong>のデータを検出しました。</div>
+
+    <div class="pv-summary">
+      <div class="pv-box pv-total"><div class="num">8</div><div class="lbl">データ行数</div></div>
+      <div class="pv-box pv-new"><div class="num">6</div><div class="lbl">新規登録</div></div>
+      <div class="pv-box pv-upd"><div class="num">1</div><div class="lbl">更新</div></div>
+      <div class="pv-box pv-err"><div class="num">1</div><div class="lbl">エラー</div></div>
+    </div>
+
+    <div class="wcard" style="padding:0;overflow-x:auto;">
+      <div class="stabs" style="padding:0 14px;">
+        <div class="stab active">すべて (8)</div>
+        <div class="stab" style="color:#e74c3c">エラー (1)</div>
+      </div>
+      <table class="pv-table">
+        <thead>
+          <tr><th>行</th><th>状態</th><th>従業員名</th><th>電話番号</th><th>メール</th><th>雇用区分</th><th>店舗</th><th>交通費単位</th><th>交通費</th><th>備考</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>2</td><td class="st-new">● 新規</td><td>山田太郎</td><td>090-1234-5678</td><td>yamada@example.com</td><td>正社員A</td><td>渋谷店</td><td>月額</td><td>¥30,000</td><td></td></tr>
+          <tr><td>3</td><td class="st-new">● 新規</td><td>佐藤花子</td><td>080-9876-5432</td><td>sato@example.com</td><td>正社員A</td><td>渋谷店</td><td>月額</td><td>¥50,000</td><td></td></tr>
+          <tr><td>4</td><td class="st-new">● 新規</td><td>田中一郎</td><td>070-1111-2222</td><td>tanaka@example.com</td><td>パートB</td><td>渋谷店</td><td>日額</td><td>¥500</td><td></td></tr>
+          <tr><td>5</td><td class="st-new">● 新規</td><td>鈴木次郎</td><td>090-5555-6666</td><td>suzuki@example.com</td><td>正社員A</td><td>新宿店</td><td>月額</td><td>¥30,000</td><td></td></tr>
+          <tr><td>6</td><td class="st-new">● 新規</td><td>高橋美咲</td><td>080-7777-8888</td><td>takahashi@example.com</td><td>日給スタッフC</td><td>新宿店</td><td>日額</td><td>¥800</td><td></td></tr>
+          <tr><td>7</td><td class="st-new">● 新規</td><td>渡辺健太</td><td>090-3333-4444</td><td>watanabe@example.com</td><td>パートB</td><td>渋谷店</td><td>日額</td><td>¥500</td><td></td></tr>
+          <tr><td>8</td><td class="st-upd">● 更新</td><td>中村由美</td><td>080-2222-3333</td><td>nakamura@example.com</td><td>正社員A</td><td>渋谷店</td><td>月額</td><td>¥40,000</td><td>交通費を変更</td></tr>
+          <tr><td>9</td><td class="st-err">✗ エラー</td><td>小林誠</td><td>070-9999-0000</td><td>kobayashi@example.com</td><td style="color:#e74c3c">アルバイトD</td><td>渋谷店</td><td>日額</td><td>¥400</td><td style="color:#e74c3c;font-size:11px">雇用区分「アルバイトD」が未登録</td></tr>
+        </tbody>
+      </table>
+    </div>
+    </div>
+
+    <div class="wcard">
+      <div class="wcard-title" style="margin-bottom:8px">重複時の処理</div>
+      <div class="dup-sel">
+        <div class="dup-opt selected" onclick="selDup(this)">スキップ（既存を保持）</div>
+        <div class="dup-opt" onclick="selDup(this)">上書き更新</div>
+      </div>
+    </div>
+
+    <div class="btn-group">
+      <button class="btn btn-ghost" onclick="go('s-tpl1')">← 戻る</button>
+      <button class="btn btn-primary" onclick="go('s-tpl3')">エラー行を除いてインポート実行</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== -->
+<!-- TEMPLATE: STEP 3 - 完了（統合） -->
+<!-- ==================== -->
+<div class="screen" id="s-tpl3">
+  <div class="page-header"><h1 class="page-title">テンプレートで取り込み</h1></div>
+  <div class="content">
+
+    <div class="flow-steps">
+      <div class="fs done"><span class="fs-num">✓</span><span class="fs-label">アップロード</span></div>
+      <div class="fs-line done"></div>
+      <div class="fs done"><span class="fs-num">✓</span><span class="fs-label">確認・実行</span></div>
+      <div class="fs-line done"></div>
+      <div class="fs active"><span class="fs-num">3</span><span class="fs-label">完了</span></div>
+    </div>
+
+    <div class="wcard">
+      <div class="result-center">
+        <div class="r-icon">✅</div>
+        <h2>インポート完了</h2>
+        <p>設定マスタ・従業員データが正常に登録されました</p>
+        <div class="result-detail">
+          <div style="font-size:11px;font-weight:600;color:#888;padding-bottom:4px;">① 設定マスタ</div>
+          <div class="rd-row"><span>業態・ブランド</span><span class="rd-val rd-green">2件 登録</span></div>
+          <div class="rd-row"><span>店舗情報</span><span class="rd-val rd-green">2件 登録</span></div>
+          <div class="rd-row"><span>雇用区分</span><span class="rd-val rd-green">3件 登録</span></div>
+          <div style="font-size:11px;font-weight:600;color:#888;padding:8px 0 4px;border-top:2px solid #e0e0e0;margin-top:8px;">② 従業員データ</div>
+          <div class="rd-row"><span>新規登録</span><span class="rd-val rd-green">6件</span></div>
+          <div class="rd-row"><span>更新</span><span class="rd-val rd-yellow">1件</span></div>
+          <div class="rd-row"><span>エラー（スキップ）</span><span class="rd-val rd-red">1件</span></div>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:center;">
+          <button class="btn btn-primary">従業員一覧を確認 →</button>
+          <button class="btn btn-ghost" onclick="go('s-top')">トップへ戻る</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== -->
+<!-- SAAS: STEP 1 - 選択＆アップロード -->
+<!-- ==================== -->
+<div class="screen" id="s-saas1">
+  <div class="page-header"><h1 class="page-title">外部勤怠SaaSから取り込み</h1></div>
+  <div class="content">
+
+    <div class="flow-steps">
+      <div class="fs active"><span class="fs-num">1</span><span class="fs-label">選択・アップロード</span></div>
+      <div class="fs-line"></div>
+      <div class="fs"><span class="fs-num">2</span><span class="fs-label">プレビュー・確認</span></div>
+      <div class="fs-line"></div>
+      <div class="fs"><span class="fs-num">3</span><span class="fs-label">完了</span></div>
+    </div>
+
+    <div class="wcard">
+      <div class="wcard-title"><span class="num">1</span> 連携元サービス</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:stretch;" id="saas-list">
+        <div class="saas-item selected" onclick="selSaasMain(this,'kot')" data-saas="kot" style="flex:1;min-width:180px;">
+          <div class="saas-logo kot">KoT</div>
+          <div><h4>キングオブタイム</h4><p>勤怠管理 / 人事労務</p></div>
+        </div>
+        <div class="saas-item" onclick="selSaasMain(this,'jc')" data-saas="jc" style="flex:1;min-width:180px;">
+          <div class="saas-logo jc">JC</div>
+          <div><h4>ジョブカン</h4><p>勤怠管理 / 給与計算</p></div>
+        </div>
+        <div class="saas-item" onclick="selSaasMain(this,'other')" data-saas="other" style="flex:1;min-width:180px;border-style:dashed;">
+          <div class="saas-logo" style="background:#999;font-size:20px;">+</div>
+          <div><h4 style="color:#888;">その他のサービス</h4><p>お問い合わせください</p></div>
+        </div>
+      </div>
+      <div id="saas-other-form" style="display:none;margin-top:12px;padding:20px;background:#f8f8f8;border-radius:8px;text-align:center;">
+        <div style="font-size:14px;font-weight:600;margin-bottom:8px;">別サービスからのインポートをご希望の場合</div>
+        <div style="font-size:13px;color:#888;line-height:1.6;">営業またはカスタマーサポートにお問い合わせください。<br>お客様のご利用サービスに合わせたインポート設定を対応いたします。</div>
+      </div>
+    </div>
+
+    <div class="wcard" id="saas-section-sources">
+      <div class="wcard-title"><span class="num">2</span> 取り込むデータソース（複数選択可）</div>
+      <div class="alert alert-info" style="margin-bottom:12px;" id="saas-source-hint">設定データは基本1ファイル、給与データがあれば2ファイルまで取り込めます。内部で自動仕分けして各設定テーブルに登録します。</div>
+
+      <!-- KoT用 -->
+      <div id="source-kot">
+        <div style="font-size:12px;font-weight:600;color:#1a73e8;margin-bottom:10px;">キングオブタイム データソース</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <label style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:2px solid #e8e8e8;border-radius:8px;cursor:pointer;transition:all 0.15s;" class="source-check checked" data-map="map-kot-emp" onclick="toggleCheck(this)">
+            <input type="checkbox" checked style="accent-color:#2ec4a0;width:16px;height:16px;margin-top:2px;">
+            <div style="flex:1;">
+              <div style="font-size:13px;font-weight:600;">従業員データ（employee_info）</div>
+              <div style="font-size:11px;color:#888;">勤怠管理 → 従業員データエクスポート</div>
+              <div style="font-size:11px;color:#2ec4a0;font-weight:600;margin-top:2px;">基本（必須）</div>
+            </div>
+            <span class="tpl-badge" style="font-size:10px;">設定データ</span>
+          </label>
+          <label style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:2px solid #e8e8e8;border-radius:8px;cursor:pointer;transition:all 0.15s;" class="source-check" data-map="map-kot-hr" onclick="toggleCheck(this)">
+            <input type="checkbox" style="accent-color:#2ec4a0;width:16px;height:16px;margin-top:2px;">
+            <div style="flex:1;">
+              <div style="font-size:13px;font-weight:600;">従業員一覧エクスポート（hr_）</div>
+              <div style="font-size:11px;color:#888;">人事労務 → 従業員一覧エクスポート（給与・契約種別を含む）</div>
+              <div style="font-size:11px;color:#f59e0b;font-weight:600;margin-top:2px;">任意（給与データ補完）</div>
+            </div>
+            <span class="tpl-badge" style="font-size:10px;">給与データ</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Jobcan用 -->
+      <div id="source-jc" style="display:none;">
+        <div style="font-size:12px;font-weight:600;color:#ff6b35;margin-bottom:10px;">ジョブカン データソース</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <label style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:2px solid #e8e8e8;border-radius:8px;cursor:pointer;transition:all 0.15s;" class="source-check checked" data-map="map-jc-staff" onclick="toggleCheck(this)">
+            <input type="checkbox" checked style="accent-color:#2ec4a0;width:16px;height:16px;margin-top:2px;">
+            <div style="flex:1;">
+              <div style="font-size:13px;font-weight:600;">スタッフ情報ダウンロード（staff-info-）</div>
+              <div style="font-size:11px;color:#888;">勤怠管理 → スタッフ情報ダウンロード</div>
+              <div style="font-size:11px;color:#2ec4a0;font-weight:600;margin-top:2px;">基本（必須）</div>
+            </div>
+            <span class="tpl-badge" style="font-size:10px;">設定データ</span>
+          </label>
+          <label style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:2px solid #e8e8e8;border-radius:8px;cursor:pointer;transition:all 0.15s;" class="source-check" data-map="map-jc-emp" onclick="toggleCheck(this)">
+            <input type="checkbox" style="accent-color:#2ec4a0;width:16px;height:16px;margin-top:2px;">
+            <div style="flex:1;">
+              <div style="font-size:13px;font-weight:600;">従業員データダウンロード（jobcan_employees）</div>
+              <div style="font-size:11px;color:#888;">給与計算 → 従業員データダウンロード（給与形態・基本給を含む）</div>
+              <div style="font-size:11px;color:#f59e0b;font-weight:600;margin-top:2px;">任意（給与データ補完）</div>
+            </div>
+            <span class="tpl-badge" style="font-size:10px;">給与データ</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- その他用 -->
+      <div id="source-other" style="display:none;">
+        <div style="font-size:12px;font-weight:600;color:#999;margin-bottom:10px;">カスタム データソース</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <label style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:2px solid #e8e8e8;border-radius:8px;cursor:pointer;transition:all 0.15s;" class="source-check checked" data-map="map-other" onclick="toggleCheck(this)">
+            <input type="checkbox" checked style="accent-color:#2ec4a0;width:16px;height:16px;margin-top:2px;">
+            <div style="flex:1;">
+              <div style="font-size:13px;font-weight:600;">CSVファイル</div>
+              <div style="font-size:11px;color:#888;">列マッピングを手動で設定します</div>
+            </div>
+            <span class="tpl-badge" style="font-size:10px;">カスタム</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="wcard" id="saas-section-upload">
+      <div class="wcard-title"><span class="num">3</span> ファイルをアップロード</div>
+
+      <!-- アップロード順序ガイド（2ソース選択時のみ表示） -->
+      <div id="saas-upload-order-guide" style="display:none;margin-bottom:14px;">
+        <div style="background:#f8f8f8;border-radius:8px;padding:12px 16px;">
+          <div style="font-size:12px;font-weight:700;margin-bottom:8px;">アップロード順序</div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="background:#1a73e8;color:#fff;padding:2px 10px;border-radius:4px;font-size:10px;font-weight:700;flex-shrink:0;">1st</span>
+            <span style="font-size:12px;" id="saas-order-name1">従業員データ（employee_info）</span>
+            <span style="font-size:14px;color:#ccc;flex-shrink:0;">→</span>
+            <span style="background:#f59e0b;color:#fff;padding:2px 10px;border-radius:4px;font-size:10px;font-weight:700;flex-shrink:0;">2nd</span>
+            <span style="font-size:12px;" id="saas-order-name2">従業員一覧エクスポート（hr_）</span>
+          </div>
+          <div style="font-size:11px;color:#888;margin-top:6px;">設定データを先にアップロードし、給与データで補完します。順序が異なるとエラーになります。</div>
+        </div>
+      </div>
+
+      <!-- 単一アップロード口 -->
+      <div id="saas-upload-area">
+
+        <!-- 現在アップロード待ちのデータソース表示（2ソース選択時） -->
+        <div id="saas-up-current-label" style="display:none;margin-bottom:8px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span id="saas-up-current-badge" style="background:#1a73e8;color:#fff;padding:2px 10px;border-radius:4px;font-size:10px;font-weight:700;">1st</span>
+            <span style="font-size:13px;font-weight:600;" id="saas-up-current-name">従業員データ（employee_info）</span>
+            <span style="font-size:11px;color:#1a73e8;font-weight:600;" id="saas-up-current-hint">をアップロードしてください</span>
+          </div>
+        </div>
+
+        <!-- アップロード口（常に1つ） -->
+        <div id="saas-up-dropzone" class="upload-box" style="padding:24px;">
+          <div class="ub-icon" style="font-size:28px;">📁</div>
+          <div class="ub-text" style="font-size:13px;">ファイルをドラッグ＆ドロップ</div>
+          <div class="ub-btn" style="font-size:12px;padding:6px 16px;" onclick="demoUploadFile()">ファイルを選択</div>
+          <div class="ub-hint">CSV / TSV（最大10MB）</div>
+        </div>
+
+        <!-- アップロード済みファイル一覧 -->
+        <div id="saas-up-files" style="display:none;margin-top:10px;">
+          <div id="saas-up-file1" style="display:none;padding:10px 14px;background:#f7fdfb;border:1px solid #c5ede0;border-radius:8px;margin-bottom:6px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="background:#1a73e8;color:#fff;padding:1px 8px;border-radius:3px;font-size:9px;font-weight:700;">1st</span>
+              <span style="font-size:12px;">📄</span>
+              <span style="font-size:12px;font-weight:600;" id="saas-up-file1-name">employee_info_202603.csv</span>
+              <span style="font-size:11px;color:#888;">4.2 KB · 15行</span>
+              <span style="font-size:11px;color:#2ec4a0;font-weight:600;margin-left:auto;">✓ 完了</span>
+            </div>
+          </div>
+          <div id="saas-up-file2" style="display:none;padding:10px 14px;background:#f7fdfb;border:1px solid #c5ede0;border-radius:8px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="background:#f59e0b;color:#fff;padding:1px 8px;border-radius:3px;font-size:9px;font-weight:700;">2nd</span>
+              <span style="font-size:12px;">📄</span>
+              <span style="font-size:12px;font-weight:600;" id="saas-up-file2-name">hr_export_202603.csv</span>
+              <span style="font-size:11px;color:#888;">2.8 KB · 15行</span>
+              <span style="font-size:11px;color:#2ec4a0;font-weight:600;margin-left:auto;">✓ 完了</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- エラー: 間違ったファイル -->
+        <div id="saas-up-error" style="display:none;">
+          <div class="alert alert-err" style="margin-top:8px;">
+            <strong>アップロード順序エラー:</strong> 先に「<span id="saas-up-error-name">従業員データ（employee_info）</span>」をアップロードしてください。
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="btn-group" id="saas-section-buttons">
+      <button class="btn btn-ghost" onclick="go('s-top')">キャンセル</button>
+      <button class="btn btn-outline-g" onclick="go('s-saas-settings')">取り込み設定</button>
+      <button class="btn btn-primary" onclick="go('s-saas-preview')" id="saas-next-btn">次へ: プレビュー →</button>
+    </div>
+    <div class="alert alert-info" style="margin-top:12px;" id="saas-mapping-hint">
+      マッピング未設定の場合は<a href="#" onclick="go('s-saas2');return false;" style="color:#1a73e8;font-weight:600;">初回マッピング設定</a>を先に行ってください。設定済みの場合はそのままプレビューへ進めます。
+    </div>
+  </div>
+</div>
+
+<!-- ==================== -->
+<!-- SAAS: 取り込み設定画面 -->
+<!-- ==================== -->
+<div class="screen" id="s-saas-settings">
+  <div class="page-header"><h1 class="page-title">取り込み設定</h1></div>
+  <div class="content">
+
+    <div class="alert alert-info">データソースごとにファイル読み取り設定・列マッピングを管理します。</div>
+
+    <!-- データソース1 -->
+    <div class="wcard settings-source" id="settings-source-1">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="settings-source-badge" style="background:#1a73e8;color:#fff;padding:2px 10px;border-radius:4px;font-size:10px;font-weight:700;">1st</span>
+          <span style="font-size:14px;font-weight:700;" class="settings-source-name">従業員データ（employee_info）</span>
+          <span class="tpl-badge" style="font-size:10px;">設定データ</span>
+        </div>
+        <span style="font-size:11px;color:#2ec4a0;font-weight:600;">✓ マッピング設定済み</span>
+      </div>
+
+      <div style="font-size:12px;font-weight:600;margin-bottom:8px;color:#888;">ファイル読み取り設定</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-bottom:14px;">
+        <div class="si-item"><label>文字コード</label><select><option>Shift_JIS</option><option>UTF-8</option></select></div>
+        <div class="si-item"><label>区切り文字</label><select><option>カンマ (CSV)</option><option>タブ (TSV)</option></select></div>
+        <div class="si-item"><label>ヘッダー行</label><input type="number" value="1"></div>
+        <div class="si-item"><label>データ開始行</label><input type="number" value="2"></div>
+      </div>
+
+      <div style="font-size:12px;font-weight:600;margin-bottom:8px;color:#888;">列マッピング（抜粋）</div>
+      <div style="background:#f8f8f8;border-radius:6px;padding:10px 14px;font-size:11px;line-height:1.8;">
+        <div>名前 ← <strong>姓 + 名（結合）</strong></div>
+        <div>従業員コード ← <strong>従業員コード</strong></div>
+        <div>雇用区分名 ← <strong>区分</strong></div>
+        <div>店舗名 ← <strong>店舗名</strong></div>
+        <div style="color:#e74c3c;">電話番号 ← 該当列なし / メールアドレス ← 該当列なし / 交通費単位 ← 該当列なし / 交通費 ← 該当列なし</div>
+        <div style="margin-top:4px;"><a href="#" onclick="go('s-saas-map-edit-1');return false;" style="color:#1a73e8;font-weight:600;">マッピングを編集 →</a></div>
+      </div>
+    </div>
+
+    <!-- データソース2 -->
+    <div class="wcard settings-source" id="settings-source-2">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="settings-source-badge" style="background:#f59e0b;color:#fff;padding:2px 10px;border-radius:4px;font-size:10px;font-weight:700;">2nd</span>
+          <span style="font-size:14px;font-weight:700;" class="settings-source-name">従業員一覧エクスポート（hr_）</span>
+          <span class="tpl-badge" style="font-size:10px;">給与データ</span>
+        </div>
+        <span style="font-size:11px;color:#2ec4a0;font-weight:600;">✓ マッピング設定済み</span>
+      </div>
+
+      <div style="font-size:12px;font-weight:600;margin-bottom:8px;color:#888;">ファイル読み取り設定</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-bottom:14px;">
+        <div class="si-item"><label>文字コード</label><select><option>Shift_JIS</option><option>UTF-8</option></select></div>
+        <div class="si-item"><label>区切り文字</label><select><option>カンマ (CSV)</option><option>タブ (TSV)</option></select></div>
+        <div class="si-item"><label>ヘッダー行</label><input type="number" value="1"></div>
+        <div class="si-item"><label>データ開始行</label><input type="number" value="2"></div>
+      </div>
+
+      <div style="font-size:12px;font-weight:600;margin-bottom:8px;color:#888;">列マッピング（抜粋）</div>
+      <div style="background:#f8f8f8;border-radius:6px;padding:10px 14px;font-size:11px;line-height:1.8;">
+        <div>従業員コード ← <strong>個人.従業員コード</strong></div>
+        <div>給与体系 ← <strong>個人.契約種別</strong></div>
+        <div>金額（月給） ← <strong>給与.日給月給制.給与.基本給</strong></div>
+        <div>通勤手当 ← <strong>給与.日給制.給与.非課税通勤手当</strong></div>
+        <div style="margin-top:4px;"><a href="#" onclick="go('s-saas-map-edit-2');return false;" style="color:#1a73e8;font-weight:600;">マッピングを編集 →</a></div>
+      </div>
+    </div>
+
+    <!-- 設定の保存 -->
+    <div class="wcard">
+      <div class="wcard-title" style="margin-bottom:10px;">設定を保存</div>
+      <div style="display:flex;gap:10px;align-items:flex-end;">
+        <div style="flex:1;">
+          <label style="font-size:11px;color:#888;display:block;margin-bottom:4px;">設定名</label>
+          <input type="text" value="KoT 従業員+給与インポート" placeholder="設定名を入力" style="width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-size:13px;">
+        </div>
+        <button class="btn btn-primary" style="font-size:13px;" onclick="demoSaveSettings()">名前を付けて保存</button>
+      </div>
+      <div id="settings-save-done" style="display:none;margin-top:8px;font-size:11px;color:#2ec4a0;font-weight:600;">✓ 保存しました</div>
+    </div>
+
+    <!-- 設定履歴一覧 -->
+    <div class="wcard">
+      <div class="wcard-title" style="margin-bottom:10px;">設定履歴一覧</div>
+      <div style="border:1px solid #eee;border-radius:8px;overflow:hidden;">
+        <table style="width:100%;font-size:12px;border-collapse:collapse;">
+          <thead>
+            <tr style="background:#f8f8f8;">
+              <th style="text-align:left;padding:8px 10px;font-weight:600;">設定名</th>
+              <th style="text-align:left;padding:8px 10px;font-weight:600;">サービス</th>
+              <th style="text-align:left;padding:8px 10px;font-weight:600;">データソース</th>
+              <th style="text-align:left;padding:8px 10px;font-weight:600;">保存日</th>
+              <th style="text-align:left;padding:8px 10px;font-weight:600;">操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="background:#f7fdfb;">
+              <td style="padding:8px 10px;border-bottom:1px solid #eee;font-weight:600;">KoT 従業員+給与インポート</td>
+              <td style="padding:8px 10px;border-bottom:1px solid #eee;"><span class="history-badge badge-kot" style="font-size:10px">KoT</span></td>
+              <td style="padding:8px 10px;border-bottom:1px solid #eee;font-size:11px;">employee_info + hr_</td>
+              <td style="padding:8px 10px;border-bottom:1px solid #eee;">2026/03/31</td>
+              <td style="padding:8px 10px;border-bottom:1px solid #eee;">
+                <span style="color:#2ec4a0;font-weight:600;font-size:11px;">✓ 使用中</span>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:8px 10px;border-bottom:1px solid #eee;font-weight:600;">KoT 従業員のみ</td>
+              <td style="padding:8px 10px;border-bottom:1px solid #eee;"><span class="history-badge badge-kot" style="font-size:10px">KoT</span></td>
+              <td style="padding:8px 10px;border-bottom:1px solid #eee;font-size:11px;">employee_info</td>
+              <td style="padding:8px 10px;border-bottom:1px solid #eee;">2026/03/28</td>
+              <td style="padding:8px 10px;border-bottom:1px solid #eee;">
+                <button class="btn btn-ghost" style="font-size:10px;padding:3px 8px;" onclick="alert('この設定を読み込みます')">読み込む</button>
+                <button class="btn btn-ghost" style="font-size:10px;padding:3px 8px;color:#e74c3c;" onclick="alert('この設定を削除します')">削除</button>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:8px 10px;font-weight:600;">Jobcan スタッフ情報</td>
+              <td style="padding:8px 10px;"><span class="history-badge badge-jc" style="font-size:10px">JC</span></td>
+              <td style="padding:8px 10px;font-size:11px;">staff-info-</td>
+              <td style="padding:8px 10px;">2026/03/20</td>
+              <td style="padding:8px 10px;">
+                <button class="btn btn-ghost" style="font-size:10px;padding:3px 8px;" onclick="alert('この設定を読み込みます')">読み込む</button>
+                <button class="btn btn-ghost" style="font-size:10px;padding:3px 8px;color:#e74c3c;" onclick="alert('この設定を削除します')">削除</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="btn-group">
+      <button class="btn btn-ghost" onclick="go('s-saas1')">← 戻る</button>
+      <button class="btn btn-primary" onclick="go('s-saas1')">保存して戻る</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== -->
+<!-- SAAS: マッピング編集 - employee_info -->
+<!-- ==================== -->
+<div class="screen" id="s-saas-map-edit-1">
+  <div class="page-header"><h1 class="page-title">マッピング編集</h1></div>
+  <div class="content">
+
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+      <span style="background:#1a73e8;color:#fff;padding:2px 10px;border-radius:4px;font-size:10px;font-weight:700;">1st</span>
+      <span style="font-size:16px;font-weight:700;">従業員データ（employee_info）</span>
+      <span class="tpl-badge" style="font-size:10px;">設定データ</span>
+    </div>
+
+    <div class="wcard" style="padding:0;overflow-x:auto;">
+      <table class="map-table">
+        <thead><tr><th style="width:30px"></th><th>ラクミー項目</th><th></th><th>employee_info の列</th><th>プレビュー</th><th></th></tr></thead>
+        <tbody>
+          <tr><td class="map-ok">✓</td><td><span class="map-label">名前</span><span class="map-req">*</span></td><td style="color:#ccc">←</td><td><select><option selected>姓 + 名（結合）</option><option>姓</option><option>名</option><option>-- 割当なし --</option></select></td><td class="map-preview">山田 太郎</td><td><span class="map-auto">自動</span></td></tr>
+          <tr><td class="map-ng">✗</td><td><span class="map-label">電話番号</span><span class="map-req">*</span></td><td style="color:#ccc">←</td><td><select style="color:#e74c3c"><option>-- 該当列なし --</option></select></td><td class="map-preview" style="color:#e74c3c">マッピング不可</td><td><span class="map-none">不可</span></td></tr>
+          <tr><td class="map-ng">✗</td><td><span class="map-label">メールアドレス</span><span class="map-req">*</span></td><td style="color:#ccc">←</td><td><select style="color:#e74c3c"><option>-- 該当列なし --</option></select></td><td class="map-preview" style="color:#e74c3c">マッピング不可</td><td><span class="map-none">不可</span></td></tr>
+          <tr><td class="map-ok">✓</td><td><span class="map-label">従業員コード</span></td><td style="color:#ccc">←</td><td><select><option selected>従業員コード</option><option>雇用区分コード</option><option>所属コード</option><option>-- 割当なし --</option></select></td><td class="map-preview">EMP-001</td><td><span class="map-auto">自動</span></td></tr>
+          <tr><td class="map-ok">✓</td><td><span class="map-label">雇用区分名</span><span class="map-req">*</span></td><td style="color:#ccc">←</td><td><select><option selected>区分</option><option>雇用区分コード</option><option>-- 割当なし --</option></select></td><td class="map-preview">正社員</td><td><span class="map-auto">自動</span></td></tr>
+          <tr><td class="map-ok">✓</td><td><span class="map-label">店舗名</span></td><td style="color:#ccc">←</td><td><select><option selected>店舗名</option><option>所属コード</option><option>-- 割当なし --</option></select></td><td class="map-preview">渋谷店</td><td><span class="map-auto">自動</span></td></tr>
+          <tr><td class="map-ng">✗</td><td><span class="map-label">交通費単位</span><span class="map-req">*</span></td><td style="color:#ccc">←</td><td><select style="color:#e74c3c"><option>-- 該当列なし --</option></select></td><td class="map-preview" style="color:#e74c3c">マッピング不可</td><td><span class="map-none">不可</span></td></tr>
+          <tr><td class="map-ng">✗</td><td><span class="map-label">交通費</span><span class="map-req">*</span></td><td style="color:#ccc">←</td><td><select style="color:#e74c3c"><option>-- 該当列なし --</option></select></td><td class="map-preview" style="color:#e74c3c">マッピング不可</td><td><span class="map-none">不可</span></td></tr>
+          <tr><td class="map-ok">✓</td><td><span class="map-label">金額（雇用区分）</span></td><td style="color:#ccc">←</td><td><select><option selected>総支給額（正社員）</option><option>-- 割当なし --</option></select></td><td class="map-preview">¥200,000</td><td><span class="map-auto">自動</span></td></tr>
+          <tr><td class="map-ok">✓</td><td><span class="map-label">月次契約労働時間</span></td><td style="color:#ccc">←</td><td><select><option selected>所定労働時間（正社員）</option><option>-- 割当なし --</option></select></td><td class="map-preview">160</td><td><span class="map-auto">自動</span></td></tr>
+          <tr><td class="map-ok">✓</td><td><span class="map-label">月みなし残業時間</span></td><td style="color:#ccc">←</td><td><select><option selected>みなし残業時間（正社員）</option><option>-- 割当なし --</option></select></td><td class="map-preview">20</td><td><span class="map-auto">自動</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="btn-group">
+      <button class="btn btn-ghost" onclick="go('s-saas-settings')">← 取り込み設定に戻る</button>
+      <button class="btn btn-primary" onclick="go('s-saas-settings')">保存して戻る</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== -->
+<!-- SAAS: マッピング編集 - hr_ -->
+<!-- ==================== -->
+<div class="screen" id="s-saas-map-edit-2">
+  <div class="page-header"><h1 class="page-title">マッピング編集</h1></div>
+  <div class="content">
+
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+      <span style="background:#f59e0b;color:#fff;padding:2px 10px;border-radius:4px;font-size:10px;font-weight:700;">2nd</span>
+      <span style="font-size:16px;font-weight:700;">従業員一覧エクスポート（hr_）</span>
+      <span class="tpl-badge" style="font-size:10px;">給与データ</span>
+    </div>
+
+    <div class="wcard" style="padding:0;overflow-x:auto;">
+      <table class="map-table">
+        <thead><tr><th style="width:30px"></th><th>ラクミー項目</th><th></th><th>hr_ の列</th><th>プレビュー</th><th></th></tr></thead>
+        <tbody>
+          <tr><td class="map-ok">✓</td><td><span class="map-label">従業員コード</span><span class="map-req">*</span></td><td style="color:#ccc">←</td><td><select><option selected>個人.従業員コード</option><option>-- 割当なし --</option></select></td><td class="map-preview">EMP-001</td><td><span class="map-auto">自動</span></td></tr>
+          <tr><td class="map-ok">✓</td><td><span class="map-label">給与体系</span></td><td style="color:#ccc">←</td><td><select><option selected>個人.契約種別</option><option>-- 割当なし --</option></select></td><td class="map-preview">月給</td><td><span class="map-auto">自動</span></td></tr>
+          <tr><td class="map-ok">✓</td><td><span class="map-label">金額（月給）</span></td><td style="color:#ccc">←</td><td><select><option selected>給与.日給月給制.給与.基本給</option><option>-- 割当なし --</option></select></td><td class="map-preview">¥200,000</td><td><span class="map-auto">自動</span></td></tr>
+          <tr><td class="map-ok">✓</td><td><span class="map-label">金額（時給）</span></td><td style="color:#ccc">←</td><td><select><option selected>給与.時給制.給与.基本給</option><option>-- 割当なし --</option></select></td><td class="map-preview">¥1,200</td><td><span class="map-auto">自動</span></td></tr>
+          <tr><td class="map-ok">✓</td><td><span class="map-label">通勤手当（月給）</span></td><td style="color:#ccc">←</td><td><select><option selected>給与.日給制.給与.非課税通勤手当</option><option>-- 割当なし --</option></select></td><td class="map-preview">¥30,000</td><td><span class="map-auto">自動</span></td></tr>
+          <tr><td class="map-ok">✓</td><td><span class="map-label">通勤手当（時給）</span></td><td style="color:#ccc">←</td><td><select><option selected>給与.時給制.給与.非課税通勤手当</option><option>-- 割当なし --</option></select></td><td class="map-preview">¥500</td><td><span class="map-auto">自動</span></td></tr>
+          <tr><td class="map-ok">✓</td><td><span class="map-label">所属（店舗）</span></td><td style="color:#ccc">←</td><td><select><option selected>部署</option><option>-- 割当なし --</option></select></td><td class="map-preview">渋谷店</td><td><span class="map-auto">自動</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="alert alert-info" style="margin-top:12px;">従業員コードをキーとして、employee_info のデータに給与情報を補完・統合します。</div>
+
+    <div class="btn-group">
+      <button class="btn btn-ghost" onclick="go('s-saas-settings')">← 取り込み設定に戻る</button>
+      <button class="btn btn-primary" onclick="go('s-saas-settings')">保存して戻る</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== -->
+<!-- SAAS: STEP 2 - 初回マッピング設定 -->
+<!-- ==================== -->
+<div class="screen" id="s-saas2">
+  <div class="page-header"><h1 class="page-title">初回マッピング設定</h1></div>
+  <div class="content">
+
+    <div class="alert alert-info" style="margin-bottom:16px;">初回のみこの画面でマッピングを設定します。設定後は「取り込み設定」画面から編集できます。</div>
+
+    <!-- ===== KoT employee_info マッピング ===== -->
+    <div class="map-panel" id="map-kot-emp">
+      <div class="map-section-header"><span class="history-badge badge-kot">KoT</span> 従業員データ（employee_info）のマッピング</div>
+      <div class="alert alert-info">プリセットが自動適用されました。必要に応じて変更できます。</div>
+      <div class="wcard" style="padding:0;overflow-x:auto;">
+        <table class="map-table">
+          <thead><tr><th style="width:30px"></th><th>ラクミー項目</th><th></th><th>KoT employee_info の列</th><th>プレビュー</th><th></th></tr></thead>
+          <tbody>
+            <tr><td class="map-ok">✓</td><td><span class="map-label">名前</span><span class="map-req">*</span></td><td style="color:#ccc">←</td><td><select><option selected>姓 + 名（結合）</option><option>姓</option><option>名</option><option>従業員コード</option><option>-- 割当なし --</option></select></td><td class="map-preview">山田 太郎</td><td><span class="map-auto">自動</span></td></tr>
+            <tr><td class="map-ng">✗</td><td><span class="map-label">電話番号</span><span class="map-req">*</span></td><td style="color:#ccc">←</td><td><select style="color:#e74c3c"><option>-- 該当列なし --</option></select></td><td class="map-preview" style="color:#e74c3c">マッピング不可</td><td><span class="map-none">不可</span></td></tr>
+            <tr><td class="map-ng">✗</td><td><span class="map-label">メールアドレス</span><span class="map-req">*</span></td><td style="color:#ccc">←</td><td><select style="color:#e74c3c"><option>-- 該当列なし --</option></select></td><td class="map-preview" style="color:#e74c3c">マッピング不可</td><td><span class="map-none">不可</span></td></tr>
+            <tr><td class="map-ok">✓</td><td><span class="map-label">従業員コード</span></td><td style="color:#ccc">←</td><td><select><option selected>従業員コード</option><option>雇用区分コード</option><option>所属コード</option><option>-- 割当なし --</option></select></td><td class="map-preview">EMP-001</td><td><span class="map-auto">自動</span></td></tr>
+            <tr><td class="map-ok">✓</td><td><span class="map-label">雇用区分名</span><span class="map-req">*</span></td><td style="color:#ccc">←</td><td><select><option selected>区分</option><option>雇用区分コード</option><option>-- 割当なし --</option></select></td><td class="map-preview">正社員</td><td><span class="map-auto">自動</span></td></tr>
+            <tr><td class="map-ok">✓</td><td><span class="map-label">店舗名</span></td><td style="color:#ccc">←</td><td><select><option selected>店舗名</option><option>所属コード</option><option>-- 割当なし --</option></select></td><td class="map-preview">渋谷店</td><td><span class="map-auto">自動</span></td></tr>
+            <tr><td class="map-ng">✗</td><td><span class="map-label">交通費単位</span><span class="map-req">*</span></td><td style="color:#ccc">←</td><td><select style="color:#e74c3c"><option>-- 該当列なし --</option></select></td><td class="map-preview" style="color:#e74c3c">マッピング不可</td><td><span class="map-none">不可</span></td></tr>
+            <tr><td class="map-ng">✗</td><td><span class="map-label">交通費</span><span class="map-req">*</span></td><td style="color:#ccc">←</td><td><select style="color:#e74c3c"><option>-- 該当列なし --</option></select></td><td class="map-preview" style="color:#e74c3c">マッピング不可</td><td><span class="map-none">不可</span></td></tr>
+            <tr><td class="map-ok">✓</td><td><span class="map-label">金額（雇用区分）</span></td><td style="color:#ccc">←</td><td><select><option selected>総支給額（正社員）</option><option>-- 割当なし --</option></select></td><td class="map-preview">¥200,000</td><td><span class="map-auto">自動</span></td></tr>
+            <tr><td class="map-ok">✓</td><td><span class="map-label">月次契約労働時間</span></td><td style="color:#ccc">←</td><td><select><option selected>所定労働時間（正社員）</option><option>-- 割当なし --</option></select></td><td class="map-preview">160</td><td><span class="map-auto">自動</span></td></tr>
+            <tr><td class="map-ok">✓</td><td><span class="map-label">月みなし残業時間</span></td><td style="color:#ccc">←</td><td><select><option selected>みなし残業時間（正社員）</option><option>-- 割当なし --</option></select></td><td class="map-preview">20</td><td><span class="map-auto">自動</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="wcard">
+        <div class="wcard-title" style="margin-bottom:6px;">マッピングできない項目のデフォルト値</div>
+        <div class="alert alert-warn" style="margin-bottom:10px;">KoT従業員データに存在しない項目です。デフォルト値を設定するか、インポート後に個別編集してください。</div>
+        <div class="dv-grid">
+          <div class="dv-item"><label>電話番号</label><input type="text" value="" placeholder="インポート後に個別入力"></div>
+          <div class="dv-item"><label>メールアドレス</label><input type="text" value="" placeholder="インポート後に個別入力"></div>
+          <div class="dv-item"><label>交通費単位</label><select><option>月額</option><option>日額</option><option>-- 後で個別設定 --</option></select></div>
+          <div class="dv-item"><label>交通費</label><input type="text" value="0" placeholder="金額"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== KoT hr_ マッピング ===== -->
+    <div class="map-panel" id="map-kot-hr">
+      <div class="map-section-header"><span class="history-badge badge-kot">KoT</span> 従業員一覧エクスポート（hr_）のマッピング</div>
+      <div class="alert alert-info">給与・契約種別の補完データです。従業員コードで employee_info と統合されます。</div>
+      <div class="wcard" style="padding:0;overflow-x:auto;">
+        <table class="map-table">
+          <thead><tr><th style="width:30px"></th><th>ラクミー項目</th><th></th><th>KoT hr_ の列</th><th>プレビュー</th><th></th></tr></thead>
+          <tbody>
+            <tr><td class="map-ok">✓</td><td><span class="map-label">従業員コード</span><span class="map-req">*</span></td><td style="color:#ccc">←</td><td><select><option selected>個人.従業員コード</option><option>-- 割当なし --</option></select></td><td class="map-preview">EMP-001</td><td><span class="map-auto">自動</span></td></tr>
+            <tr><td class="map-ok">✓</td><td><span class="map-label">給与体系</span></td><td style="color:#ccc">←</td><td><select><option selected>個人.契約種別</option><option>-- 割当なし --</option></select></td><td class="map-preview">月給</td><td><span class="map-auto">自動</span></td></tr>
+            <tr><td class="map-ok">✓</td><td><span class="map-label">金額（月給）</span></td><td style="color:#ccc">←</td><td><select><option selected>給与.日給月給制.給与.基本給</option><option>-- 割当なし --</option></select></td><td class="map-preview">¥200,000</td><td><span class="map-auto">自動</span></td></tr>
+            <tr><td class="map-ok">✓</td><td><span class="map-label">金額（時給）</span></td><td style="color:#ccc">←</td><td><select><option selected>給与.時給制.給与.基本給</option><option>-- 割当なし --</option></select></td><td class="map-preview">¥1,200</td><td><span class="map-auto">自動</span></td></tr>
+            <tr><td class="map-ok">✓</td><td><span class="map-label">通勤手当（月給）</span></td><td style="color:#ccc">←</td><td><select><option selected>給与.日給制.給与.非課税通勤手当</option><option>-- 割当なし --</option></select></td><td class="map-preview">¥30,000</td><td><span class="map-auto">自動</span></td></tr>
+            <tr><td class="map-ok">✓</td><td><span class="map-label">通勤手当（時給）</span></td><td style="color:#ccc">←</td><td><select><option selected>給与.時給制.給与.非課税通勤手当</option><option>-- 割当なし --</option></select></td><td class="map-preview">¥500</td><td><span class="map-auto">自動</span></td></tr>
+            <tr><td class="map-ok">✓</td><td><span class="map-label">所属（店舗）</span></td><td style="color:#ccc">←</td><td><select><option selected>部署</option><option>-- 割当なし --</option></select></td><td class="map-preview">渋谷店</td><td><span class="map-auto">自動</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="alert alert-info" style="margin-top:12px;">従業員コードをキーとして、employee_info のデータに給与情報を補完・統合します。</div>
+    </div>
+
+    <!-- ===== Jobcan staff-info- マッピング ===== -->
+    <div class="map-panel" id="map-jc-staff">
+      <div class="map-section-header"><span class="history-badge badge-jc">JC</span> スタッフ情報ダウンロード（staff-info-）のマッピング</div>
+      <div class="alert alert-info">プリセットが自動適用されました。必要に応じて変更できます。</div>
+      <div class="wcard" style="padding:0;overflow-x:auto;">
+        <table class="map-table">
+          <thead><tr><th style="width:30px"></th><th>ラクミー項目</th><th></th><th>Jobcan staff-info- の列</th><th>プレビュー</th><th></th></tr></thead>
+          <tbody>
+            <tr><td class="map-ok">✓</td><td><span class="map-label">名前</span><span class="map-req">*</span></td><td style="color:#ccc">←</td><td><select><option selected>姓名</option><option>姓 + 名（結合）</option><option>姓</option><option>名</option><option>-- 割当なし --</option></select></td><td class="map-preview">山田太郎</td><td><span class="map-auto">自動</span></td></tr>
+            <tr><td class="map-ok">✓</td><td><span class="map-label">電話番号</span><span class="map-req">*</span></td><td style="color:#ccc">←</td><td><select><option selected>電話番号</option><option>-- 割当なし --</option></select></td><td class="map-preview">090-1234-5678</td><td><span class="map-auto">自動</span></td></tr>
+            <tr><td class="map-ok">✓</td><td><span class="map-label">メールアドレス</span><span class="map-req">*</span></td><td style="color:#ccc">←</td><td><select><option selected>メールアドレス</option><option>-- 割当なし --</option></select></td><td class="map-preview">yamada@example.com</td><td><span class="map-auto">自動</span></td></tr>
+            <tr><td class="map-ok">✓</td><td><span class="map-label">従業員コード</span></td><td style="color:#ccc">←</td><td><select><option selected>スタッフコード</option><option>-- 割当なし --</option></select></td><td class="map-preview">STF-001</td><td><span class="map-auto">自動</span></td></tr>
+            <tr><td class="map-ok">✓</td><td><span class="map-label">雇用区分名</span><span class="map-req">*</span></td><td style="color:#ccc">←</td><td><select><option selected>スタッフ種別</option><option>-- 割当なし --</option></select></td><td class="map-preview">正社員</td><td><span class="map-auto">自動</span></td></tr>
+            <tr><td class="map-ok">✓</td><td><span class="map-label">店舗名</span></td><td style="color:#ccc">←</td><td><select><option selected>サブグループ</option><option>メイングループ</option><option>-- 割当なし --</option></select></td><td class="map-preview">渋谷店</td><td><span class="map-auto">自動</span></td></tr>
+            <tr><td class="map-ng">✗</td><td><span class="map-label">交通費単位</span><span class="map-req">*</span></td><td style="color:#ccc">←</td><td><select style="color:#e74c3c"><option>-- 該当列なし --</option></select></td><td class="map-preview" style="color:#e74c3c">マッピング不可</td><td><span class="map-none">不可</span></td></tr>
+            <tr><td class="map-ok">✓</td><td><span class="map-label">交通費</span></td><td style="color:#ccc">←</td><td><select><option selected>交通費</option><option>-- 割当なし --</option></select></td><td class="map-preview">¥30,000</td><td><span class="map-auto">自動</span></td></tr>
+            <tr><td class="map-ok">✓</td><td><span class="map-label">金額（時給）</span></td><td style="color:#ccc">←</td><td><select><option selected>時給</option><option>-- 割当なし --</option></select></td><td class="map-preview">¥1,200</td><td><span class="map-auto">自動</span></td></tr>
+            <tr><td class="map-ok">✓</td><td><span class="map-label">月次契約労働時間</span></td><td style="color:#ccc">←</td><td><select><option selected>所定労働時間</option><option>-- 割当なし --</option></select></td><td class="map-preview">160</td><td><span class="map-auto">自動</span></td></tr>
+            <tr><td class="map-ok">✓</td><td><span class="map-label">月みなし残業時間</span></td><td style="color:#ccc">←</td><td><select><option selected>みなし残業</option><option>-- 割当なし --</option></select></td><td class="map-preview">20</td><td><span class="map-auto">自動</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="wcard">
+        <div class="wcard-title" style="margin-bottom:6px;">マッピングできない項目のデフォルト値</div>
+        <div class="alert alert-warn" style="margin-bottom:10px;">Jobcanスタッフ情報に存在しない項目です。</div>
+        <div class="dv-grid" style="grid-template-columns:1fr;">
+          <div class="dv-item"><label>交通費単位</label><select><option>月額</option><option>日額</option><option>-- 後で個別設定 --</option></select></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== Jobcan jobcan_employees マッピング ===== -->
+    <div class="map-panel" id="map-jc-emp">
+      <div class="map-section-header"><span class="history-badge badge-jc">JC</span> 従業員データダウンロード（jobcan_employees）のマッピング</div>
+      <div class="alert alert-info">給与形態・基本給の補完データです。スタッフコードで staff-info- と統合されます。</div>
+      <div class="wcard" style="padding:0;overflow-x:auto;">
+        <table class="map-table">
+          <thead><tr><th style="width:30px"></th><th>ラクミー項目</th><th></th><th>Jobcan jobcan_employees の列</th><th>プレビュー</th><th></th></tr></thead>
+          <tbody>
+            <tr><td class="map-ok">✓</td><td><span class="map-label">従業員コード</span><span class="map-req">*</span></td><td style="color:#ccc">←</td><td><select><option selected>スタッフコード</option><option>-- 割当なし --</option></select></td><td class="map-preview">STF-001</td><td><span class="map-auto">自動</span></td></tr>
+            <tr><td class="map-ok">✓</td><td><span class="map-label">雇用区分コード</span></td><td style="color:#ccc">←</td><td><select><option selected>雇用形態コード</option><option>-- 割当なし --</option></select></td><td class="map-preview">EMP-T-001</td><td><span class="map-auto">自動</span></td></tr>
+            <tr><td class="map-ok">✓</td><td><span class="map-label">雇用区分名</span></td><td style="color:#ccc">←</td><td><select><option selected>雇用形態</option><option>-- 割当なし --</option></select></td><td class="map-preview">正社員</td><td><span class="map-auto">自動</span></td></tr>
+            <tr><td class="map-ok">✓</td><td><span class="map-label">給与体系</span></td><td style="color:#ccc">←</td><td><select><option selected>給与形態</option><option>-- 割当なし --</option></select></td><td class="map-preview">月給</td><td><span class="map-auto">自動</span></td></tr>
+            <tr><td class="map-ok">✓</td><td><span class="map-label">金額（基本給）</span></td><td style="color:#ccc">←</td><td><select><option selected>基本給</option><option>-- 割当なし --</option></select></td><td class="map-preview">¥200,000</td><td><span class="map-auto">自動</span></td></tr>
+            <tr><td class="map-ok">✓</td><td><span class="map-label">通勤手当（定期代）</span></td><td style="color:#ccc">←</td><td><select><option selected>定期代</option><option>-- 割当なし --</option></select></td><td class="map-preview">¥15,000</td><td><span class="map-auto">自動</span></td></tr>
+            <tr><td class="map-ok">✓</td><td><span class="map-label">店舗名</span></td><td style="color:#ccc">←</td><td><select><option selected>グループ</option><option>グループコード</option><option>-- 割当なし --</option></select></td><td class="map-preview">渋谷店</td><td><span class="map-auto">自動</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="alert alert-info" style="margin-top:12px;">スタッフコードをキーとして、staff-info- のデータに給与情報を補完・統合します。</div>
+    </div>
+
+    <!-- ===== カスタム マッピング ===== -->
+    <div class="map-panel" id="map-other">
+      <div class="map-section-header"><span class="history-badge" style="background:#eee;color:#888;">他</span> カスタムCSVのマッピング</div>
+      <div class="alert alert-warn">プリセットはありません。各ラクミー項目に対応するCSVの列を手動で選択してください。</div>
+      <div class="wcard" style="padding:0;overflow-x:auto;">
+        <table class="map-table">
+          <thead><tr><th style="width:30px"></th><th>ラクミー項目</th><th></th><th>CSVの列（手動選択）</th><th>プレビュー</th><th></th></tr></thead>
+          <tbody>
+            <tr><td class="map-ng">?</td><td><span class="map-label">名前</span><span class="map-req">*</span></td><td style="color:#ccc">←</td><td><select><option>-- 選択してください --</option><option>列A: 社員番号</option><option>列B: 氏名</option><option>列C: 部署</option><option>列D: メール</option><option>列E: 電話</option><option>列F: 雇用形態</option><option>列G: 基本給</option></select></td><td class="map-preview">-</td><td><span class="map-manual">手動</span></td></tr>
+            <tr><td class="map-ng">?</td><td><span class="map-label">電話番号</span><span class="map-req">*</span></td><td style="color:#ccc">←</td><td><select><option>-- 選択してください --</option><option>列A: 社員番号</option><option>列B: 氏名</option><option>列C: 部署</option><option>列D: メール</option><option>列E: 電話</option><option>列F: 雇用形態</option><option>列G: 基本給</option></select></td><td class="map-preview">-</td><td><span class="map-manual">手動</span></td></tr>
+            <tr><td class="map-ng">?</td><td><span class="map-label">メールアドレス</span><span class="map-req">*</span></td><td style="color:#ccc">←</td><td><select><option>-- 選択してください --</option><option>列A: 社員番号</option><option>列B: 氏名</option><option>列C: 部署</option><option>列D: メール</option><option>列E: 電話</option><option>列F: 雇用形態</option><option>列G: 基本給</option></select></td><td class="map-preview">-</td><td><span class="map-manual">手動</span></td></tr>
+            <tr><td class="map-ng">?</td><td><span class="map-label">従業員コード</span></td><td style="color:#ccc">←</td><td><select><option>-- 選択してください --</option><option>列A: 社員番号</option><option>列B: 氏名</option><option>列C: 部署</option><option>列D: メール</option><option>列E: 電話</option><option>列F: 雇用形態</option><option>列G: 基本給</option></select></td><td class="map-preview">-</td><td><span class="map-manual">手動</span></td></tr>
+            <tr><td class="map-ng">?</td><td><span class="map-label">雇用区分名</span><span class="map-req">*</span></td><td style="color:#ccc">←</td><td><select><option>-- 選択してください --</option><option>列A: 社員番号</option><option>列B: 氏名</option><option>列C: 部署</option><option>列D: メール</option><option>列E: 電話</option><option>列F: 雇用形態</option><option>列G: 基本給</option></select></td><td class="map-preview">-</td><td><span class="map-manual">手動</span></td></tr>
+            <tr><td class="map-ng">?</td><td><span class="map-label">交通費単位</span><span class="map-req">*</span></td><td style="color:#ccc">←</td><td><select><option>-- 選択してください --</option><option>列A: 社員番号</option><option>列B: 氏名</option><option>列C: 部署</option><option>列D: メール</option><option>列E: 電話</option><option>列F: 雇用形態</option><option>列G: 基本給</option><option>-- 該当列なし --</option></select></td><td class="map-preview">-</td><td><span class="map-manual">手動</span></td></tr>
+            <tr><td class="map-ng">?</td><td><span class="map-label">交通費</span><span class="map-req">*</span></td><td style="color:#ccc">←</td><td><select><option>-- 選択してください --</option><option>列A: 社員番号</option><option>列B: 氏名</option><option>列C: 部署</option><option>列D: メール</option><option>列E: 電話</option><option>列F: 雇用形態</option><option>列G: 基本給</option><option>-- 該当列なし --</option></select></td><td class="map-preview">-</td><td><span class="map-manual">手動</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="save-fmt">
+      <input type="checkbox" checked> このマッピングを保存する
+      <input type="text" value="KoT 従業員インポート" placeholder="フォーマット名">
+    </div>
+
+    <div class="btn-group">
+      <button class="btn btn-ghost" onclick="go('s-saas1')">← 戻る</button>
+      <button class="btn btn-primary" onclick="go('s-saas-preview')">マッピングを保存してプレビューへ →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== -->
+<!-- SAAS: プレビュー・確認（通常フロー） -->
+<!-- ==================== -->
+<div class="screen" id="s-saas-preview">
+  <div class="page-header"><h1 class="page-title">外部勤怠SaaSから取り込み</h1></div>
+  <div class="content">
+
+    <div class="flow-steps">
+      <div class="fs done"><span class="fs-num">✓</span><span class="fs-label">選択・アップロード</span></div>
+      <div class="fs-line done"></div>
+      <div class="fs active"><span class="fs-num">2</span><span class="fs-label">プレビュー・確認</span></div>
+      <div class="fs-line"></div>
+      <div class="fs"><span class="fs-num">3</span><span class="fs-label">完了</span></div>
+    </div>
+
+    <!-- 取り込みデータプレビュー -->
+    <div class="pv-summary">
+      <div class="pv-box pv-total"><div class="num">15</div><div class="lbl">データ行数</div></div>
+      <div class="pv-box pv-new"><div class="num">12</div><div class="lbl">新規登録</div></div>
+      <div class="pv-box pv-upd"><div class="num">2</div><div class="lbl">更新</div></div>
+      <div class="pv-box pv-err"><div class="num">1</div><div class="lbl">エラー</div></div>
+    </div>
+
+    <!-- データソース別タブ -->
+    <div class="wcard" style="padding:0;overflow-x:auto;">
+      <div class="stabs" style="padding:0 14px;">
+        <div class="stab active" onclick="switchSaasPreviewTab(this,0)">統合プレビュー (15)</div>
+        <div class="stab" onclick="switchSaasPreviewTab(this,1)">1st: employee_info (15)</div>
+        <div class="stab" onclick="switchSaasPreviewTab(this,2)">2nd: hr_ 補完 (15)</div>
+        <div class="stab" style="color:#e74c3c" onclick="switchSaasPreviewTab(this,3)">エラー (1)</div>
+      </div>
+
+      <!-- 統合プレビュー -->
+      <table class="pv-table saas-pv-tab" id="saas-pv-0">
+        <thead>
+          <tr>
+            <th>行</th><th>状態</th><th>名前</th><th>従業員コード</th><th>雇用区分</th><th>店舗</th>
+            <th style="background:#e8f0fe;">給与体系<br><span style="font-size:9px;color:#1a73e8;">2nd補完</span></th>
+            <th>金額</th>
+            <th style="background:#e8f0fe;">通勤手当<br><span style="font-size:9px;color:#1a73e8;">2nd補完</span></th>
+            <th>備考</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>2</td><td class="st-new">● 新規</td><td>山田太郎</td><td>EMP-001</td><td>正社員</td><td>渋谷店</td><td style="background:#f5f8ff;">月給</td><td>¥200,000</td><td style="background:#f5f8ff;">¥30,000</td><td></td></tr>
+          <tr><td>3</td><td class="st-new">● 新規</td><td>佐藤花子</td><td>EMP-002</td><td>正社員</td><td>渋谷店</td><td style="background:#f5f8ff;">月給</td><td>¥200,000</td><td style="background:#f5f8ff;">¥50,000</td><td></td></tr>
+          <tr><td>4</td><td class="st-new">● 新規</td><td>田中一郎</td><td>EMP-003</td><td>パート</td><td>渋谷店</td><td style="background:#f5f8ff;">時給</td><td>¥1,200</td><td style="background:#f5f8ff;">¥500</td><td></td></tr>
+          <tr><td>5</td><td class="st-upd">● 更新</td><td>鈴木次郎</td><td>EMP-004</td><td>正社員</td><td>新宿店</td><td style="background:#f5f8ff;">月給</td><td>¥200,000</td><td style="background:#f5f8ff;">¥30,000</td><td>雇用区分を変更</td></tr>
+          <tr><td>6</td><td class="st-upd">● 更新</td><td>高橋美咲</td><td>EMP-005</td><td>パート</td><td>新宿店</td><td style="background:#f5f8ff;">時給</td><td>¥1,200</td><td style="background:#f5f8ff;">¥500</td><td>店舗を変更</td></tr>
+          <tr><td>7</td><td class="st-err">✗ エラー</td><td>-</td><td>EMP-006</td><td style="color:#e74c3c">契約社員</td><td>渋谷店</td><td>-</td><td>-</td><td>-</td><td style="color:#e74c3c;font-size:11px">雇用区分「契約社員」が未登録</td></tr>
+        </tbody>
+      </table>
+
+      <!-- 1st: employee_info のみ -->
+      <table class="pv-table saas-pv-tab" id="saas-pv-1" style="display:none;">
+        <thead>
+          <tr><th>行</th><th>状態</th><th>名前</th><th>従業員コード</th><th>雇用区分</th><th>店舗</th><th>金額</th><th>月次契約労働時間</th><th>月みなし残業</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>2</td><td class="st-new">● 新規</td><td>山田太郎</td><td>EMP-001</td><td>正社員</td><td>渋谷店</td><td>¥200,000</td><td>160</td><td>20</td></tr>
+          <tr><td>3</td><td class="st-new">● 新規</td><td>佐藤花子</td><td>EMP-002</td><td>正社員</td><td>渋谷店</td><td>¥200,000</td><td>160</td><td>20</td></tr>
+          <tr><td>4</td><td class="st-new">● 新規</td><td>田中一郎</td><td>EMP-003</td><td>パート</td><td>渋谷店</td><td>¥1,200</td><td>-</td><td>-</td></tr>
+          <tr><td>5</td><td class="st-upd">● 更新</td><td>鈴木次郎</td><td>EMP-004</td><td>正社員</td><td>新宿店</td><td>¥200,000</td><td>160</td><td>20</td></tr>
+          <tr><td>6</td><td class="st-upd">● 更新</td><td>高橋美咲</td><td>EMP-005</td><td>パート</td><td>新宿店</td><td>¥1,200</td><td>-</td><td>-</td></tr>
+          <tr><td>7</td><td class="st-err">✗ エラー</td><td>-</td><td>EMP-006</td><td style="color:#e74c3c">契約社員</td><td>渋谷店</td><td>-</td><td>-</td><td>-</td></tr>
+        </tbody>
+      </table>
+
+      <!-- 2nd: hr_ 補完データ -->
+      <table class="pv-table saas-pv-tab" id="saas-pv-2" style="display:none;">
+        <thead>
+          <tr><th>従業員コード</th><th>マッチ</th><th>給与体系</th><th>金額（月給）</th><th>金額（時給）</th><th>通勤手当（月給）</th><th>通勤手当（時給）</th><th>所属</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>EMP-001</td><td class="st-new" style="color:#2ec4a0;">✓ 一致</td><td>月給</td><td>¥200,000</td><td>-</td><td>¥30,000</td><td>-</td><td>渋谷店</td></tr>
+          <tr><td>EMP-002</td><td class="st-new" style="color:#2ec4a0;">✓ 一致</td><td>月給</td><td>¥200,000</td><td>-</td><td>¥50,000</td><td>-</td><td>渋谷店</td></tr>
+          <tr><td>EMP-003</td><td class="st-new" style="color:#2ec4a0;">✓ 一致</td><td>時給</td><td>-</td><td>¥1,200</td><td>-</td><td>¥500</td><td>渋谷店</td></tr>
+          <tr><td>EMP-004</td><td class="st-new" style="color:#2ec4a0;">✓ 一致</td><td>月給</td><td>¥200,000</td><td>-</td><td>¥30,000</td><td>-</td><td>新宿店</td></tr>
+          <tr><td>EMP-005</td><td class="st-new" style="color:#2ec4a0;">✓ 一致</td><td>時給</td><td>-</td><td>¥1,200</td><td>-</td><td>¥500</td><td>新宿店</td></tr>
+          <tr><td>EMP-006</td><td style="color:#e74c3c;font-weight:600;">✗ 1stにエラー</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
+        </tbody>
+      </table>
+
+      <!-- エラーのみ -->
+      <table class="pv-table saas-pv-tab" id="saas-pv-3" style="display:none;">
+        <thead>
+          <tr><th>行</th><th>状態</th><th>名前</th><th>従業員コード</th><th>雇用区分</th><th>店舗</th><th>エラー内容</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>7</td><td class="st-err">✗ エラー</td><td>-</td><td>EMP-006</td><td style="color:#e74c3c">契約社員</td><td>渋谷店</td><td style="color:#e74c3c">雇用区分「契約社員」が未登録</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- マッピングされなかった項目 -->
+    <div class="wcard" style="border-color:#fde68a;">
+      <div class="wcard-title" style="color:#92400e;">マッピングされなかった項目</div>
+      <div class="alert alert-warn" style="margin-bottom:12px;">以下の項目はCSVに対応する列がありません。デフォルト値でインポートし、完了後に補完テンプレートで一括補完できます。</div>
+      <table style="width:100%;font-size:12px;border-collapse:collapse;">
+        <thead>
+          <tr style="background:#fff8ed;">
+            <th style="text-align:left;padding:8px 10px;font-weight:600;color:#92400e;border-bottom:1px solid #fde68a;">未マップ項目</th>
+            <th style="text-align:left;padding:8px 10px;font-weight:600;color:#92400e;border-bottom:1px solid #fde68a;">必須</th>
+            <th style="text-align:left;padding:8px 10px;font-weight:600;color:#92400e;border-bottom:1px solid #fde68a;">インポート時のデフォルト値</th>
+            <th style="text-align:left;padding:8px 10px;font-weight:600;color:#92400e;border-bottom:1px solid #fde68a;">補完方法</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;font-weight:600;">電話番号</td><td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;color:#e74c3c;">★ 必須</td><td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;color:#888;">空欄</td><td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;font-size:11px;" rowspan="4" style="vertical-align:top;">
+            <div style="font-size:11px;line-height:1.6;padding:8px 10px;">
+              <div style="margin-bottom:4px;">完了画面で<strong>補完用テンプレート</strong>をダウンロードし、不足データを入力後、テンプレートインポート（②従業員データ・上書き更新）で一括補完できます。</div>
+            </div>
+          </td></tr>
+          <tr><td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;font-weight:600;">メールアドレス</td><td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;color:#e74c3c;">★ 必須</td><td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;color:#888;">空欄</td></tr>
+          <tr><td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;font-weight:600;">交通費単位</td><td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;color:#e74c3c;">★ 必須</td><td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;"><select style="padding:4px 8px;border:1px solid #ddd;border-radius:4px;font-size:11px;"><option>月額</option><option>日額</option></select></td></tr>
+          <tr><td style="padding:8px 10px;font-weight:600;">交通費</td><td style="padding:8px 10px;color:#e74c3c;">★ 必須</td><td style="padding:8px 10px;"><input type="text" value="0" style="padding:4px 8px;border:1px solid #ddd;border-radius:4px;font-size:11px;width:80px;"></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="wcard">
+      <div class="wcard-title" style="margin-bottom:8px">重複時の処理</div>
+      <div class="dup-sel">
+        <div class="dup-opt selected" onclick="selDup(this)">上書き更新</div>
+        <div class="dup-opt" onclick="selDup(this)">スキップ（既存を保持）</div>
+      </div>
+    </div>
+
+    <div class="btn-group">
+      <button class="btn btn-ghost" onclick="go('s-saas1')">← 戻る</button>
+      <button class="btn btn-primary" onclick="go('s-saas4')">エラー行を除いてインポート実行（14件）</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== -->
+<!-- SAAS: STEP 3 - 確認（旧、マッピング経由用 → リダイレクト） -->
+<!-- ==================== -->
+<div class="screen" id="s-saas3">
+  <div class="page-header"><h1 class="page-title">外部勤怠SaaSから取り込み</h1></div>
+  <div class="content">
+
+    <div class="flow-steps">
+      <div class="fs done"><span class="fs-num">✓</span><span class="fs-label">アップロード</span></div>
+      <div class="fs-line done"></div>
+      <div class="fs done"><span class="fs-num">✓</span><span class="fs-label">マッピング</span></div>
+      <div class="fs-line done"></div>
+      <div class="fs active"><span class="fs-num">3</span><span class="fs-label">確認・実行</span></div>
+      <div class="fs-line"></div>
+      <div class="fs"><span class="fs-num">4</span><span class="fs-label">完了</span></div>
+    </div>
+
+    <div class="pv-summary">
+      <div class="pv-box pv-total"><div class="num">15</div><div class="lbl">データ行数</div></div>
+      <div class="pv-box pv-new"><div class="num">12</div><div class="lbl">新規登録</div></div>
+      <div class="pv-box pv-upd"><div class="num">2</div><div class="lbl">更新</div></div>
+      <div class="pv-box pv-err"><div class="num">1</div><div class="lbl">エラー</div></div>
+    </div>
+
+    <div class="alert alert-warn">電話番号・メールアドレスはインポート後に従業員画面から個別入力が必要です。交通費は全員「月額 ¥0」で登録されます。</div>
+
+    <div class="wcard" style="padding:0;overflow-x:auto;">
+      <div class="stabs" style="padding:0 14px;">
+        <div class="stab active">すべて (15)</div>
+        <div class="stab" style="color:#e74c3c">エラー (1)</div>
+      </div>
+      <table class="pv-table">
+        <thead>
+          <tr><th>行</th><th>状態</th><th>名前</th><th>従業員コード</th><th>雇用区分</th><th>交通費単位</th><th>交通費</th><th>備考</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>2</td><td class="st-new">● 新規</td><td>山田太郎</td><td>EMP-001</td><td>正社員</td><td class="default-val">月額</td><td class="default-val">¥0</td><td></td></tr>
+          <tr><td>3</td><td class="st-new">● 新規</td><td>佐藤花子</td><td>EMP-002</td><td>パート</td><td class="default-val">月額</td><td class="default-val">¥0</td><td></td></tr>
+          <tr><td>4</td><td class="st-upd">● 更新</td><td>田中一郎</td><td>EMP-003</td><td>正社員</td><td>月額</td><td>¥30,000</td><td>雇用区分を変更</td></tr>
+          <tr><td>5</td><td class="st-upd">● 更新</td><td>鈴木次郎</td><td>EMP-004</td><td>正社員</td><td>月額</td><td>¥50,000</td><td>名前を変更</td></tr>
+          <tr><td>6</td><td class="st-err">✗ エラー</td><td>-</td><td>EMP-005</td><td style="color:#e74c3c">契約社員</td><td>-</td><td>-</td><td style="color:#e74c3c;font-size:11px">雇用区分「契約社員」が未登録</td></tr>
+          <tr><td>7</td><td class="st-new">● 新規</td><td>高橋美咲</td><td>EMP-006</td><td>パート</td><td class="default-val">月額</td><td class="default-val">¥0</td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="wcard">
+      <div class="wcard-title" style="margin-bottom:8px">重複時の処理</div>
+      <div class="dup-sel">
+        <div class="dup-opt selected" onclick="selDup(this)">上書き更新</div>
+        <div class="dup-opt" onclick="selDup(this)">スキップ（既存を保持）</div>
+      </div>
+    </div>
+
+    <div class="btn-group">
+      <button class="btn btn-ghost" onclick="go('s-saas2')">← 戻る</button>
+      <button class="btn btn-primary" onclick="go('s-saas4')">エラー行を除いてインポート実行（14件）</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== -->
+<!-- SAAS: STEP 4 - 完了 -->
+<!-- ==================== -->
+<div class="screen" id="s-saas4">
+  <div class="page-header"><h1 class="page-title">外部勤怠SaaSから取り込み</h1></div>
+  <div class="content">
+
+    <div class="flow-steps">
+      <div class="fs done"><span class="fs-num">✓</span><span class="fs-label">選択・アップロード</span></div>
+      <div class="fs-line done"></div>
+      <div class="fs done"><span class="fs-num">✓</span><span class="fs-label">プレビュー・確認</span></div>
+      <div class="fs-line done"></div>
+      <div class="fs active"><span class="fs-num">3</span><span class="fs-label">完了</span></div>
+    </div>
+
+    <div class="wcard">
+      <div class="result-center">
+        <div class="r-icon">✅</div>
+        <h2>インポート完了</h2>
+        <p>KoT 従業員データのインポートが完了しました</p>
+        <div class="result-detail">
+          <div class="rd-row"><span>新規登録</span><span class="rd-val rd-green">12件</span></div>
+          <div class="rd-row"><span>更新</span><span class="rd-val rd-yellow">2件</span></div>
+          <div class="rd-row"><span>エラー（スキップ）</span><span class="rd-val rd-red">1件</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 未入力項目の補完セクション -->
+    <div class="wcard" style="border-color:#fde68a;">
+      <div class="wcard-title" style="color:#92400e;">未入力項目がある従業員: 14名</div>
+      <div class="alert alert-warn" style="margin-bottom:14px;">以下の項目がインポートデータに含まれていなかったため、補完が必要です。</div>
+
+      <table style="width:100%;font-size:12px;border-collapse:collapse;margin-bottom:14px;">
+        <thead>
+          <tr style="background:#fff8ed;">
+            <th style="text-align:left;padding:8px 10px;font-weight:600;color:#92400e;border-bottom:1px solid #fde68a;">未入力項目</th>
+            <th style="text-align:left;padding:8px 10px;font-weight:600;color:#92400e;border-bottom:1px solid #fde68a;">必須</th>
+            <th style="text-align:left;padding:8px 10px;font-weight:600;color:#92400e;border-bottom:1px solid #fde68a;">該当人数</th>
+            <th style="text-align:left;padding:8px 10px;font-weight:600;color:#92400e;border-bottom:1px solid #fde68a;">現在の状態</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;font-weight:600;">電話番号</td><td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;color:#e74c3c;">★ 必須</td><td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;">14名</td><td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;color:#e74c3c;">未入力</td></tr>
+          <tr><td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;font-weight:600;">メールアドレス</td><td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;color:#e74c3c;">★ 必須</td><td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;">14名</td><td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;color:#e74c3c;">未入力</td></tr>
+          <tr><td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;font-weight:600;">交通費単位</td><td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;color:#e74c3c;">★ 必須</td><td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;">14名</td><td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;color:#888;">デフォルト「月額」適用済み</td></tr>
+          <tr><td style="padding:8px 10px;font-weight:600;">交通費</td><td style="padding:8px 10px;color:#e74c3c;">★ 必須</td><td style="padding:8px 10px;">12名</td><td style="padding:8px 10px;color:#888;">デフォルト「¥0」適用済み</td></tr>
+        </tbody>
+      </table>
+
+      <div style="font-size:13px;font-weight:600;margin-bottom:10px;">補完方法を選択してください</div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:240px;border:2px solid #e8e8e8;border-radius:10px;padding:16px;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor='#2ec4a0'" onmouseout="this.style.borderColor='#e8e8e8'">
+          <div style="font-size:14px;font-weight:700;margin-bottom:4px;">一括補完（CSV取り込み）</div>
+          <div style="font-size:11px;color:#888;line-height:1.5;margin-bottom:10px;">補完用テンプレートをダウンロードし、不足データを入力してインポートします。従業員コードをキーに既存データを上書き更新します。</div>
+          <div style="font-size:11px;color:#888;margin-bottom:8px;">対象: 電話番号 / メールアドレス / 交通費単位 / 交通費</div>
+          <button class="btn btn-outline-g" style="font-size:12px;padding:6px 14px;" onclick="downloadHokanTemplate()">⬇ 補完用テンプレートをダウンロード</button>
+          <div id="hokan-done" style="display:none;margin-top:8px;">
+            <div style="font-size:11px;color:#2ec4a0;font-weight:600;margin-bottom:6px;">✓ ダウンロード完了</div>
+            <div style="font-size:11px;color:#888;line-height:1.5;">入力後、テンプレートインポートの「② 従業員データ」で<br>重複時の処理を「上書き更新」にしてインポートしてください。</div>
+            <button class="btn btn-primary" style="font-size:12px;padding:6px 14px;margin-top:8px;" onclick="goTplWithEmployeeSelected()">テンプレートインポートへ →</button>
+          </div>
+        </div>
+        <div style="flex:1;min-width:240px;border:2px solid #e8e8e8;border-radius:10px;padding:16px;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor='#2ec4a0'" onmouseout="this.style.borderColor='#e8e8e8'">
+          <div style="font-size:14px;font-weight:700;margin-bottom:4px;">個別編集（従業員画面）</div>
+          <div style="font-size:11px;color:#888;line-height:1.5;margin-bottom:10px;">従業員一覧画面から各従業員を個別に編集します。少人数の場合に適しています。</div>
+          <div style="font-size:11px;color:#888;margin-bottom:8px;">未入力項目がある従業員をフィルター表示できます。</div>
+          <button class="btn btn-outline-g" style="font-size:12px;padding:6px 14px;" onclick="alert('従業員一覧画面へ遷移し、未入力項目がある従業員のみフィルター表示します。\n\n※ 実際の従業員一覧画面はインポート機能の外にあるため、モックでは遷移しません。')">従業員一覧（未入力フィルター） →</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px;justify-content:center;margin-top:20px;">
+      <button class="btn btn-primary" onclick="go('s-top')">インポートトップへ戻る</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+</div><!-- /app -->
+
+<!-- Demo nav -->
+<div class="demo-nav">
+  <h4>画面切替（デモ用）</h4>
+  <button class="current" onclick="go('s-top')">トップ</button>
+  <div class="dn-sep"></div>
+  <button onclick="go('s-tpl1')">テンプレ① アップロード</button>
+
+  <button onclick="go('s-tpl2')">テンプレ② 確認・実行</button>
+  <button onclick="go('s-tpl3')">テンプレ③ 完了</button>
+  <div class="dn-sep"></div>
+  <button onclick="go('s-saas1')">SaaS① アップロード</button>
+  <button onclick="go('s-saas1');demoShowError1()" style="color:#e74c3c;">SaaS① エラーデモ</button>
+  <button onclick="go('s-saas-settings')">取り込み設定</button>
+  <button onclick="go('s-saas-map-edit-1')">マッピング編集(1st)</button>
+  <button onclick="go('s-saas-map-edit-2')">マッピング編集(2nd)</button>
+  <button onclick="go('s-saas2')">初回マッピング設定</button>
+  <button onclick="go('s-saas-preview')">SaaS② プレビュー・確認</button>
+  <button onclick="go('s-saas4')">SaaS③ 完了</button>
+</div>
+
+<script>
+function go(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.demo-nav button').forEach(b => b.classList.remove('current'));
+  document.querySelectorAll('.demo-nav button').forEach(b => {
+    if (b.getAttribute('onclick') && b.getAttribute('onclick').includes("'" + id + "'")) b.classList.add('current');
+  });
+  if (id === 's-saas2') showMappingPanels();
+  if (id === 's-saas-settings') updateSettingsScreen();
+  if (id === 's-tpl2') updateTplConfirmSections();
+  window.scrollTo(0, 0);
+}
+function selTpl(el) {
+  el.parentElement.querySelectorAll('.tpl-item').forEach(t => t.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function selSaasMain(el, type) {
+  currentSaasType = type;
+  document.querySelectorAll('#saas-list .saas-item').forEach(t => t.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('source-kot').style.display = type === 'kot' ? '' : 'none';
+  document.getElementById('source-jc').style.display = type === 'jc' ? '' : 'none';
+  document.getElementById('source-other').style.display = type === 'other' ? '' : 'none';
+  document.getElementById('saas-other-form').style.display = type === 'other' ? '' : 'none';
+  // Show/hide sections for "other"
+  var isOther = (type === 'other');
+  document.getElementById('saas-section-sources').style.display = isOther ? 'none' : '';
+  document.getElementById('saas-section-upload').style.display = isOther ? 'none' : '';
+  document.getElementById('saas-section-buttons').style.display = isOther ? 'none' : '';
+  document.getElementById('saas-mapping-hint').style.display = isOther ? 'none' : '';
+  setTimeout(updateUploadSteps, 10);
+}
+var currentSaasType = 'kot';
+
+function toggleCheck(el) {
+  // Toggle checked state based on actual checkbox
+  var cb = el.querySelector('input[type="checkbox"]');
+  // checkbox toggles automatically on click, so read current state
+  setTimeout(function() {
+    if (cb && cb.checked) {
+      el.classList.add('checked');
+      el.style.borderColor = '#2ec4a0';
+      el.style.background = '#f7fdfb';
+    } else {
+      el.classList.remove('checked');
+      el.style.borderColor = '#e8e8e8';
+      el.style.background = '#fff';
+    }
+    updateUploadSteps();
+    if (el.hasAttribute('data-tpl')) updateTplUploadUI();
+  }, 0);
+}
+
+function getVisibleSourceContainer() {
+  var map = { 'kot': 'source-kot', 'jc': 'source-jc', 'other': 'source-other' };
+  return document.getElementById(map[currentSaasType]);
+}
+
+function getCheckedSources() {
+  var container = getVisibleSourceContainer();
+  if (!container) return [];
+  var results = [];
+  container.querySelectorAll('.source-check').forEach(function(el) {
+    var cb = el.querySelector('input[type="checkbox"]');
+    if (cb && cb.checked) results.push(el);
+  });
+  return results;
+}
+
+function updateUploadSteps() {
+  var guideEl = document.getElementById('saas-upload-order-guide');
+  var currentLabel = document.getElementById('saas-up-current-label');
+  var checked = getCheckedSources();
+
+  resetUploadState();
+
+  if (checked.length >= 2) {
+    guideEl.style.display = '';
+    currentLabel.style.display = '';
+    var name1 = checked[0].querySelector('div[style*="font-size:13px"]').textContent.trim();
+    var name2 = checked[1].querySelector('div[style*="font-size:13px"]').textContent.trim();
+    // 順序ガイド更新
+    document.getElementById('saas-order-name1').textContent = name1;
+    document.getElementById('saas-order-name2').textContent = name2;
+    // アップロード口ラベル（1stから開始）
+    document.getElementById('saas-up-current-badge').textContent = '1st';
+    document.getElementById('saas-up-current-badge').style.background = '#1a73e8';
+    document.getElementById('saas-up-current-name').textContent = name1;
+    document.getElementById('saas-up-current-hint').textContent = 'をアップロードしてください';
+    document.getElementById('saas-up-current-hint').style.color = '#1a73e8';
+    // エラー用
+    document.getElementById('saas-up-error-name').textContent = name1;
+    // ファイル名ラベル更新
+    document.getElementById('saas-up-file1-name').textContent = name1;
+    document.getElementById('saas-up-file2-name').textContent = name2;
+  } else {
+    guideEl.style.display = 'none';
+    currentLabel.style.display = 'none';
+  }
+}
+
+var uploadStep = 0; // 0=待機, 1=1st完了, 2=2nd完了
+
+function demoUploadFile() {
+  var checked = getCheckedSources();
+  if (checked.length <= 1) {
+    // 1ソース: そのままアップロード完了
+    document.getElementById('saas-up-files').style.display = '';
+    document.getElementById('saas-up-file1').style.display = '';
+    document.getElementById('saas-up-dropzone').style.display = 'none';
+    var label = document.getElementById('saas-up-current-label');
+    if (label) label.style.display = 'none';
+  } else if (uploadStep === 0) {
+    // 2ソース: 1st完了
+    uploadStep = 1;
+    document.getElementById('saas-up-files').style.display = '';
+    document.getElementById('saas-up-file1').style.display = '';
+    // ラベルを2ndに切り替え
+    var name2 = checked[1].querySelector('div[style*="font-size:13px"]').textContent.trim();
+    document.getElementById('saas-up-current-badge').textContent = '2nd';
+    document.getElementById('saas-up-current-badge').style.background = '#f59e0b';
+    document.getElementById('saas-up-current-name').textContent = name2;
+    document.getElementById('saas-up-current-hint').textContent = 'をアップロードしてください';
+    document.getElementById('saas-up-current-hint').style.color = '#f59e0b';
+  } else if (uploadStep === 1) {
+    // 2ソース: 2nd完了
+    uploadStep = 2;
+    document.getElementById('saas-up-file2').style.display = '';
+    document.getElementById('saas-up-dropzone').style.display = 'none';
+    document.getElementById('saas-up-current-label').style.display = 'none';
+  }
+  document.getElementById('saas-up-error').style.display = 'none';
+}
+
+function demoShowError1() {
+  document.getElementById('saas-up-error').style.display = '';
+}
+
+function resetUploadState() {
+  uploadStep = 0;
+  document.getElementById('saas-up-dropzone').style.display = '';
+  document.getElementById('saas-up-files').style.display = 'none';
+  document.getElementById('saas-up-file1').style.display = 'none';
+  document.getElementById('saas-up-file2').style.display = 'none';
+  document.getElementById('saas-up-error').style.display = 'none';
+}
+function showMappingPanels() {
+  // Hide all panels first
+  document.querySelectorAll('.map-panel').forEach(p => p.classList.remove('visible'));
+  // Show panels for checked sources
+  document.querySelectorAll('.source-check.checked[data-map]').forEach(function(el) {
+    var panelId = el.getAttribute('data-map');
+    var panel = document.getElementById(panelId);
+    if (panel) panel.classList.add('visible');
+  });
+}
+function selSaas(el) {
+  el.parentElement.querySelectorAll('.saas-item').forEach(t => t.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function selPill(el) {
+  el.parentElement.querySelectorAll('.source-pill').forEach(t => t.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function selDup(el) {
+  el.parentElement.querySelectorAll('.dup-opt').forEach(t => t.classList.remove('selected'));
+  el.classList.add('selected');
+}
+// Template upload
+var tplUploadStep = 0;
+
+function demoTplUpload() {
+  var checked = document.querySelectorAll('#s-tpl1 .source-check');
+  var checkedCount = 0;
+  checked.forEach(function(el) { if (el.querySelector('input[type="checkbox"]').checked) checkedCount++; });
+
+  if (checkedCount <= 1) {
+    document.getElementById('tpl-up-files').style.display = '';
+    document.getElementById('tpl-up-file1').style.display = '';
+    document.getElementById('tpl-up-dropzone').style.display = 'none';
+    document.getElementById('tpl-up-current-label').style.display = 'none';
+  } else if (tplUploadStep === 0) {
+    tplUploadStep = 1;
+    document.getElementById('tpl-up-files').style.display = '';
+    document.getElementById('tpl-up-file1').style.display = '';
+    document.getElementById('tpl-up-current-badge').textContent = '2nd';
+    document.getElementById('tpl-up-current-badge').style.background = '#f59e0b';
+    document.getElementById('tpl-up-current-name').textContent = '② 従業員データ';
+    document.getElementById('tpl-up-current-hint').style.color = '#f59e0b';
+  } else if (tplUploadStep === 1) {
+    tplUploadStep = 2;
+    document.getElementById('tpl-up-file2').style.display = '';
+    document.getElementById('tpl-up-dropzone').style.display = 'none';
+    document.getElementById('tpl-up-current-label').style.display = 'none';
+  }
+}
+
+var tplSelectedTypes = [];
+
+function getTplChecked() {
+  var result = [];
+  document.querySelectorAll('#s-tpl1 .source-check').forEach(function(el) {
+    if (el.querySelector('input[type="checkbox"]').checked) {
+      result.push(el.getAttribute('data-tpl'));
+    }
+  });
+  return result;
+}
+
+function updateTplUploadUI() {
+  tplSelectedTypes = getTplChecked();
+  var guide = document.getElementById('tpl-upload-order-guide');
+  var multiLabel = document.getElementById('tpl-up-current-label');
+  var singleLabel = document.getElementById('tpl-up-single-label');
+
+  if (tplSelectedTypes.length >= 2) {
+    guide.style.display = '';
+    multiLabel.style.display = 'flex';
+    singleLabel.style.display = 'none';
+  } else if (tplSelectedTypes.length === 1) {
+    guide.style.display = 'none';
+    multiLabel.style.display = 'none';
+    singleLabel.style.display = '';
+    var name = tplSelectedTypes[0] === 'master' ? '① 設定マスタ' : '② 従業員データ';
+    document.getElementById('tpl-up-single-name').textContent = name;
+  } else {
+    guide.style.display = 'none';
+    multiLabel.style.display = 'none';
+    singleLabel.style.display = 'none';
+  }
+
+  // Reset upload state
+  tplUploadStep = 0;
+  document.getElementById('tpl-up-dropzone').style.display = '';
+  document.getElementById('tpl-up-files').style.display = 'none';
+  document.getElementById('tpl-up-file1').style.display = 'none';
+  document.getElementById('tpl-up-file2').style.display = 'none';
+  document.getElementById('tpl-up-current-badge').textContent = '1st';
+  document.getElementById('tpl-up-current-badge').style.background = '#1a73e8';
+  document.getElementById('tpl-up-current-name').textContent = '① 設定マスタ';
+  document.getElementById('tpl-up-current-hint').style.color = '#1a73e8';
+}
+
+function switchSaasPreviewTab(el, idx) {
+  el.parentElement.querySelectorAll('.stab').forEach(function(t) { t.classList.remove('active'); });
+  el.classList.add('active');
+  document.querySelectorAll('.saas-pv-tab').forEach(function(t) { t.style.display = 'none'; });
+  document.getElementById('saas-pv-' + idx).style.display = '';
+}
+
+function switchMasterTab(el, idx) {
+  el.parentElement.querySelectorAll('.stab').forEach(function(t) { t.classList.remove('active'); });
+  el.classList.add('active');
+  document.querySelectorAll('.master-tab-content').forEach(function(t) { t.style.display = 'none'; });
+  document.getElementById('master-tab-' + idx).style.display = '';
+}
+
+function updateTplConfirmSections() {
+  var types = getTplChecked();
+  document.getElementById('tpl-confirm-master').style.display = types.indexOf('master') >= 0 ? '' : 'none';
+  document.getElementById('tpl-confirm-employee').style.display = types.indexOf('employee') >= 0 ? '' : 'none';
+}
+
+function updateSettingsScreen() {
+  var checked = getCheckedSources();
+  var s1 = document.getElementById('settings-source-1');
+  var s2 = document.getElementById('settings-source-2');
+
+  if (checked.length >= 2) {
+    s1.style.display = '';
+    s2.style.display = '';
+    // Update names
+    var name1 = checked[0].querySelector('div[style*="font-size:13px"]').textContent.trim();
+    var name2 = checked[1].querySelector('div[style*="font-size:13px"]').textContent.trim();
+    s1.querySelector('.settings-source-name').textContent = name1;
+    s2.querySelector('.settings-source-name').textContent = name2;
+    s1.querySelector('.settings-source-badge').textContent = '1st';
+    s2.querySelector('.settings-source-badge').textContent = '2nd';
+  } else if (checked.length === 1) {
+    s1.style.display = '';
+    s2.style.display = 'none';
+    var name1 = checked[0].querySelector('div[style*="font-size:13px"]').textContent.trim();
+    s1.querySelector('.settings-source-name').textContent = name1;
+    s1.querySelector('.settings-source-badge').textContent = '';
+    s1.querySelector('.settings-source-badge').style.display = 'none';
+  } else {
+    s1.style.display = 'none';
+    s2.style.display = 'none';
+  }
+}
+
+function demoSaveSettings() {
+  document.getElementById('settings-save-done').style.display = '';
+  setTimeout(function() { document.getElementById('settings-save-done').style.display = 'none'; }, 2000);
+}
+
+function applySavedFormat(el, name) {
+  document.getElementById('saved-format-list').style.display = 'none';
+  document.getElementById('saved-format-applied').style.display = '';
+  document.getElementById('saved-format-applied-name').textContent = name;
+}
+
+function clearSavedFormat() {
+  document.getElementById('saved-format-list').style.display = '';
+  document.getElementById('saved-format-applied').style.display = 'none';
+}
+
+function goTplWithEmployeeSelected() {
+  go('s-tpl1');
+  // Uncheck master, check employee
+  var checks = document.querySelectorAll('#s-tpl1 .source-check');
+  checks.forEach(function(el) {
+    var cb = el.querySelector('input[type="checkbox"]');
+    if (el.getAttribute('data-tpl') === 'employee') {
+      cb.checked = true;
+      el.classList.add('checked');
+      el.style.borderColor = '#2ec4a0';
+      el.style.background = '#f7fdfb';
+    } else {
+      cb.checked = false;
+      el.classList.remove('checked');
+      el.style.borderColor = '#e8e8e8';
+      el.style.background = '#fff';
+    }
+  });
+  updateTplUploadUI();
+}
+
+function downloadHokanTemplate() {
+  // Generate demo CSV
+  var rows = [
+    '従業員名\t従業員コード\t電話番号\tメールアドレス\t交通費単位\t交通費',
+    '山田太郎\tEMP-001\t\t\t\t',
+    '佐藤花子\tEMP-002\t\t\t\t',
+    '田中一郎\tEMP-003\t\t\t\t',
+    '鈴木次郎\tEMP-004\t\t\t\t',
+    '高橋美咲\tEMP-005\t\t\t\t',
+    '渡辺健太\tEMP-006\t\t\t\t',
+    '中村由美\tEMP-008\t\t\t\t',
+    '伊藤大輔\tEMP-009\t\t\t\t',
+    '松本恵\tEMP-010\t\t\t\t',
+    '木村翔\tEMP-011\t\t\t\t',
+    '林真由美\tEMP-012\t\t\t\t',
+    '清水拓也\tEMP-013\t\t\t\t',
+    '森本彩\tEMP-014\t\t\t\t',
+    '石田健一\tEMP-015\t\t\t\t'
+  ];
+  var blob = new Blob([rows.join('\n')], {type:'text/tab-separated-values'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = '補完用テンプレート_従業員データ.tsv';
+  a.click();
+  document.getElementById('hokan-done').style.display = '';
+}
+
+// Init on load
+document.addEventListener('DOMContentLoaded', function() {
+  updateUploadSteps();
+  updateTplUploadUI();
+});
+</script>
+</body>
+</html>
