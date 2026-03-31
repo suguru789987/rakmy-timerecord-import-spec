@@ -369,7 +369,7 @@
             <div style="font-size:13px;font-weight:600;">① 設定マスタ</div>
             <div style="font-size:11px;color:#888;">業態・ブランド、店舗、雇用区分をまとめて登録（10列）</div>
           </div>
-          <a class="dl-link" href="#" onclick="event.stopPropagation();" style="font-size:11px;">⬇ テンプレートDL</a>
+          <a class="dl-link" href="#" onclick="event.stopPropagation();downloadMasterTemplate();" style="font-size:11px;">⬇ テンプレートDL</a>
         </label>
         <label style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:2px solid #e8e8e8;border-radius:8px;cursor:pointer;transition:all 0.15s;" class="source-check checked" data-tpl="employee" onclick="toggleCheck(this)">
           <input type="checkbox" checked style="accent-color:#2ec4a0;width:16px;height:16px;margin-top:2px;">
@@ -377,7 +377,7 @@
             <div style="font-size:13px;font-weight:600;">② 従業員データ</div>
             <div style="font-size:11px;color:#888;">従業員情報を登録、①の設定マスタと紐付け（8列）</div>
           </div>
-          <a class="dl-link" href="#" onclick="event.stopPropagation();" style="font-size:11px;">⬇ テンプレートDL</a>
+          <a class="dl-link" href="#" onclick="event.stopPropagation();downloadEmployeeTemplate();" style="font-size:11px;">⬇ テンプレートDL</a>
         </label>
       </div>
     </div>
@@ -1756,6 +1756,37 @@ function goTplWithEmployeeSelected() {
     }
   });
   updateTplUploadUI();
+}
+
+function downloadMasterTemplate() {
+  var rows = [
+    '業態・ブランド名\t店舗名\t郵便番号\t住所\t雇用区分名\t雇用区分コード\t給与体系\t金額\t月次契約労働時間\t月みなし残業時間',
+    '居酒屋\t渋谷店\t150-0002\t東京都渋谷区渋谷1-1-1\t正社員A\tEMP-TYPE-001\t月給\t200000\t160\t20',
+    '居酒屋\t渋谷店\t150-0002\t東京都渋谷区渋谷1-1-1\tパートB\tEMP-TYPE-002\t時給\t1200\t\t',
+    'カフェ\t新宿店\t160-0022\t東京都新宿区新宿3-3-3\t正社員A\tEMP-TYPE-001\t月給\t200000\t160\t20',
+    'カフェ\t新宿店\t160-0022\t東京都新宿区新宿3-3-3\t日給スタッフC\tEMP-TYPE-003\t日給\t10000\t8\t'
+  ];
+  var blob = new Blob([rows.join('\n')], {type:'text/tab-separated-values'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'ラクミー_インポートテンプレート_①設定マスタ.tsv';
+  a.click();
+}
+
+function downloadEmployeeTemplate() {
+  var rows = [
+    '従業員名\t電話番号\tメールアドレス\t従業員コード\t雇用区分名\t店舗名\t交通費単位\t交通費',
+    '山田太郎\t090-1234-5678\tyamada@example.com\tEMP-001\t正社員A\t渋谷店\t月額\t30000',
+    '佐藤花子\t080-9876-5432\tsato@example.com\t\t正社員A\t渋谷店\t月額\t50000',
+    '田中一郎\t070-1111-2222\ttanaka@example.com\tEMP-003\tパートB\t渋谷店\t日額\t500',
+    '鈴木次郎\t090-5555-6666\tsuzuki@example.com\t\t正社員A\t新宿店\t月額\t30000',
+    '高橋美咲\t080-7777-8888\ttakahashi@example.com\t\t日給スタッフC\t新宿店\t日額\t800'
+  ];
+  var blob = new Blob([rows.join('\n')], {type:'text/tab-separated-values'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'ラクミー_インポートテンプレート_②従業員データ.tsv';
+  a.click();
 }
 
 function downloadHokanTemplate() {
