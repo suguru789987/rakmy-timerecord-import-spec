@@ -233,13 +233,13 @@
   /* Source check */
   .source-check.checked { border-color: #2ec4a0 !important; background: #f7fdfb !important; }
 
-  /* Page nav (for demo) */
-  .demo-nav { position: fixed; bottom: 16px; right: 16px; background: #222; color: #fff; padding: 14px 16px; border-radius: 10px; font-size: 11px; z-index: 100; box-shadow: 0 4px 20px rgba(0,0,0,0.3); width: 260px; }
-  .demo-nav h4 { font-size: 11px; color: #888; margin-bottom: 8px; }
-  .demo-nav button { display: block; width: 100%; text-align: left; background: none; border: none; color: #aaa; padding: 4px 0; cursor: pointer; font-size: 11px; }
-  .demo-nav button:hover { color: #2ec4a0; }
+  /* Page nav (for demo) - in sidebar */
+  .demo-nav { background: #f8f8f8; border-top: 1px solid #eee; padding: 10px 12px; font-size: 10px; overflow-y: auto; }
+  .demo-nav h4 { font-size: 10px; color: #999; margin-bottom: 6px; }
+  .demo-nav button { display: block; width: 100%; text-align: left; background: none; border: none; color: #888; padding: 3px 4px; cursor: pointer; font-size: 10px; border-radius: 3px; }
+  .demo-nav button:hover { color: #2ec4a0; background: #eefaf6; }
   .demo-nav button.current { color: #2ec4a0; font-weight: 600; }
-  .demo-nav .dn-sep { height: 1px; background: #444; margin: 6px 0; }
+  .demo-nav .dn-sep { height: 1px; background: #e0e0e0; margin: 4px 0; }
 </style>
 </head>
 <body>
@@ -266,6 +266,23 @@
       <a href="#">🏢 会社情報</a>
       <a href="#">🔗 外部連携</a>
     </div>
+  </div>
+  <div class="demo-nav">
+    <h4>画面切替（デモ用）</h4>
+    <button class="current" onclick="go('s-top')">トップ</button>
+    <div class="dn-sep"></div>
+    <button onclick="go('s-tpl1')">テンプレ① アップロード</button>
+    <button onclick="go('s-tpl2')">テンプレ② 確認・実行</button>
+    <button onclick="go('s-tpl3')">テンプレ③ 完了</button>
+    <div class="dn-sep"></div>
+    <button onclick="go('s-saas1')">SaaS① アップロード</button>
+    <button onclick="go('s-saas1');demoShowError1()" style="color:#e74c3c;">SaaS① エラーデモ</button>
+    <button onclick="go('s-saas-settings')">取り込み設定</button>
+    <button onclick="go('s-saas-map-edit-1')">マッピング編集(1st)</button>
+    <button onclick="go('s-saas-map-edit-2')">マッピング編集(2nd)</button>
+    <button onclick="go('s-saas2')">初回マッピング設定</button>
+    <button onclick="go('s-saas-preview')">SaaS② プレビュー・確認</button>
+    <button onclick="go('s-saas4')">SaaS③ 完了</button>
   </div>
   <div class="sidebar-bottom"><div class="avatar-sm">👤</div><div><div style="font-weight:600">筒井</div><div style="color:#999;font-size:11px">オーナー</div></div></div>
 </nav>
@@ -1411,25 +1428,6 @@
 </div><!-- /main -->
 </div><!-- /app -->
 
-<!-- Demo nav -->
-<div class="demo-nav">
-  <h4>画面切替（デモ用）</h4>
-  <button class="current" onclick="go('s-top')">トップ</button>
-  <div class="dn-sep"></div>
-  <button onclick="go('s-tpl1')">テンプレ① アップロード</button>
-
-  <button onclick="go('s-tpl2')">テンプレ② 確認・実行</button>
-  <button onclick="go('s-tpl3')">テンプレ③ 完了</button>
-  <div class="dn-sep"></div>
-  <button onclick="go('s-saas1')">SaaS① アップロード</button>
-  <button onclick="go('s-saas1');demoShowError1()" style="color:#e74c3c;">SaaS① エラーデモ</button>
-  <button onclick="go('s-saas-settings')">取り込み設定</button>
-  <button onclick="go('s-saas-map-edit-1')">マッピング編集(1st)</button>
-  <button onclick="go('s-saas-map-edit-2')">マッピング編集(2nd)</button>
-  <button onclick="go('s-saas2')">初回マッピング設定</button>
-  <button onclick="go('s-saas-preview')">SaaS② プレビュー・確認</button>
-  <button onclick="go('s-saas4')">SaaS③ 完了</button>
-</div>
 
 <script>
 function go(id) {
