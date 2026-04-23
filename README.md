@@ -3,6 +3,7 @@
 > **制作:** [@suguru789987](https://github.com/suguru789987) (PdM)
 > **担当範囲:** テンプレート列設計(2方式×18列) / 外部勤怠サービス(KoT/Jobcan) 列マッピング / インポート順序制御 / 自動生成コード仕様 / 入力ガイド作成
 > **ツール:** Claude Code / HTML / Markdown / TSV
+> **🌐 Live Demo:** https://suguru789987.github.io/rakmy-timerecord-import-spec/
 
 ---
 
