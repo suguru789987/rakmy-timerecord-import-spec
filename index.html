@@ -243,6 +243,19 @@
 </style>
 </head>
 <body>
+
+<!-- 新規登録ガイドからの遷移時のみ表示されるバナー(#saas-setup / #tpl-setup) -->
+<div id="from-setup-banner" style="display:none;position:sticky;top:0;z-index:200;background:linear-gradient(135deg,#e8f8f5,#f0faf7);border-bottom:2px solid #2ec4a5;padding:10px 18px;">
+  <div style="display:flex;align-items:center;gap:14px;max-width:1100px;margin:0 auto;">
+    <span style="font-size:22px;">📋</span>
+    <div style="flex:1;line-height:1.5;">
+      <div style="font-size:12px;font-weight:700;color:#1a9e7e;" id="from-setup-banner-title">新規登録ガイド からの遷移中</div>
+      <div style="font-size:10px;color:#555;" id="from-setup-banner-desc">この画面は新規登録ガイドの一部です。インポート完了後、登録ガイドへ戻ってください。</div>
+    </div>
+    <button onclick="bGoBackToSetupGuide()" style="background:#fff;color:#1a9e7e;border:1.5px solid #2ec4a5;border-radius:6px;padding:6px 14px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">↩ 登録ガイドへ戻る</button>
+  </div>
+</div>
+
 <div class="app">
 
 <!-- Sidebar -->
@@ -1906,13 +1919,51 @@ function downloadHokanTemplate() {
 function applyHashRouting() {
   try {
     var hash = (window.location.hash || '').replace('#', '');
-    if (hash === 'saas') {
-      // 外部連携の入口: 連携元サービス選択(KoT/ジョブカン/その他)から始まる画面
+    // 新規登録ガイドからの遷移(setup付き) / 運用更新からの遷移(setup無し)で動線を分ける
+    if (hash === 'saas-setup') {
+      // 初期登録専用: 連携元サービス選択画面 + 「登録ガイドへ戻る」バナー
+      go('s-saas1');
+      showFromSetupBanner('saas');
+    } else if (hash === 'tpl-setup') {
+      // 初期登録専用: テンプレ画面 + 「登録ガイドへ戻る」バナー
+      go('s-tpl1');
+      showFromSetupBanner('tpl');
+    } else if (hash === 'saas') {
+      // 運用更新用: 連携元サービス選択画面のみ(バナー無し)
       go('s-saas1');
     } else if (hash === 'tpl') {
+      // 運用更新用: テンプレ画面のみ(バナー無し)
       go('s-tpl1');
     }
   } catch (e) { /* no-op */ }
+}
+
+// 新規登録ガイドから遷移してきた時のバナー表示
+function showFromSetupBanner(kind) {
+  var banner = document.getElementById('from-setup-banner');
+  if (!banner) return;
+  var titleEl = document.getElementById('from-setup-banner-title');
+  var descEl = document.getElementById('from-setup-banner-desc');
+  if (titleEl) {
+    titleEl.textContent = (kind === 'saas')
+      ? '📋 新規登録ガイド ・ Step 2: 外部勤怠サービスからインポート'
+      : '📋 新規登録ガイド ・ テンプレートで取り込み';
+  }
+  if (descEl) {
+    descEl.textContent = 'この画面は新規登録ガイドの一部です。インポート完了後は「↩ 登録ガイドへ戻る」で進捗を確認できます。';
+  }
+  banner.style.display = '';
+}
+
+// 登録ガイドに戻る: タブクローズ or 登録ガイドURLへ
+function bGoBackToSetupGuide() {
+  var guideUrl = 'https://suguru789987.github.io/rakmy-owner-registration-mock/#b0';
+  try { window.close(); } catch (e) {}
+  setTimeout(function() {
+    if (!window.closed) {
+      window.location.href = guideUrl;
+    }
+  }, 100);
 }
 
 // Init on load
