@@ -1966,6 +1966,108 @@ function bGoBackToSetupGuide() {
   }, 100);
 }
 
+/* ============================================================
+   インポート画面用 透明な sessionStorage 自動保存(UI変更なし)
+   - チェックボックス・セレクトの状態を保存
+   - ページリロード時に自動復元
+   - 完了画面到達(s-tpl3 / s-saas4)で自動クリア
+   ============================================================ */
+(function() {
+  var STORAGE_KEY = 'importMockAutoSaveV1';
+
+  function getKey(el, prefix, idx) {
+    var screen = el.closest('.screen');
+    return (screen ? screen.id : 'global') + '_' + prefix + '_' + idx;
+  }
+
+  function saveState() {
+    try {
+      var data = {};
+      document.querySelectorAll('.source-check').forEach(function(label, idx) {
+        var cb = label.querySelector('input[type="checkbox"]');
+        if (cb) data[getKey(label, 'check', idx)] = cb.checked;
+      });
+      document.querySelectorAll('.screen select').forEach(function(sel, idx) {
+        data[getKey(sel, 'sel', idx)] = sel.value;
+      });
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    } catch (e) { /* no-op */ }
+  }
+
+  function restoreState() {
+    try {
+      var raw = sessionStorage.getItem(STORAGE_KEY);
+      if (!raw) return false;
+      var data = JSON.parse(raw);
+      var restored = false;
+      document.querySelectorAll('.source-check').forEach(function(label, idx) {
+        var k = getKey(label, 'check', idx);
+        if (data[k] !== undefined) {
+          var cb = label.querySelector('input[type="checkbox"]');
+          if (cb && cb.checked !== data[k]) {
+            cb.checked = data[k];
+            label.classList.toggle('checked', data[k]);
+            restored = true;
+          }
+        }
+      });
+      document.querySelectorAll('.screen select').forEach(function(sel, idx) {
+        var k = getKey(sel, 'sel', idx);
+        if (data[k] !== undefined && sel.value !== data[k]) {
+          sel.value = data[k];
+          restored = true;
+        }
+      });
+      return restored;
+    } catch (e) { return false; }
+  }
+
+  function showRestoreToast() {
+    var t = document.createElement('div');
+    t.style.cssText = 'position:fixed;bottom:20px;right:20px;background:rgba(40,40,40,0.95);color:#fff;padding:10px 16px;border-radius:8px;font-size:11px;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.25);max-width:300px;line-height:1.5;';
+    t.innerHTML = '✓ 前回の入力内容を復元しました<br><span style="font-size:9px;opacity:0.7;">マッピング・選択状態をsessionStorageから復元</span>';
+    document.body.appendChild(t);
+    setTimeout(function(){ t.style.transition='opacity 0.3s'; t.style.opacity='0'; setTimeout(function(){t.remove();},300); }, 4000);
+  }
+
+  function clearState() {
+    sessionStorage.removeItem(STORAGE_KEY);
+  }
+
+  // 変更検知(イベントデリゲーション)
+  document.addEventListener('change', function(e) {
+    if (e.target.matches('select') || e.target.matches('input[type="checkbox"]')) {
+      saveState();
+    }
+  });
+  // .source-check の onclick toggleCheck() 後にも保存
+  document.addEventListener('click', function(e) {
+    if (e.target.closest('.source-check')) {
+      setTimeout(saveState, 60);
+    }
+  });
+
+  // go() をラップして完了画面到達時にクリア
+  var origGo = null;
+  function wrapGo() {
+    if (typeof window.go !== 'function' || origGo) return;
+    origGo = window.go;
+    window.go = function(id) {
+      origGo.apply(this, arguments);
+      if (id === 's-tpl3' || id === 's-saas4') {
+        clearState();
+      }
+    };
+  }
+
+  // 初期化: DOMContentLoaded後に復元+go()ラップ
+  document.addEventListener('DOMContentLoaded', function() {
+    wrapGo();
+    var ok = restoreState();
+    if (ok) showRestoreToast();
+  });
+})();
+
 // Init on load
 document.addEventListener('DOMContentLoaded', function() {
   updateUploadSteps();
