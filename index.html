@@ -323,7 +323,7 @@
       <div class="history-list">
         <div class="history-row">
           <span class="history-badge badge-tpl">テンプレート</span>
-          <span class="history-file">①設定マスタ_20260331.tsv</span>
+          <span class="history-file">①業態ブランド_20260331.tsv</span>
           <span class="history-date">2026/03/31 14:20</span>
           <span class="history-result result-ok">✓ 成功 7件</span>
         </div>
@@ -1283,7 +1283,7 @@
         <tbody>
           <tr><td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;font-weight:600;">電話番号</td><td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;color:#e74c3c;">★ 必須</td><td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;color:#888;">空欄</td><td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;font-size:11px;" rowspan="4" style="vertical-align:top;">
             <div style="font-size:11px;line-height:1.6;padding:8px 10px;">
-              <div style="margin-bottom:4px;">完了画面で<strong>補完用テンプレート</strong>をダウンロードし、不足データを入力後、テンプレートインポート（②従業員データ・上書き更新）で一括補完できます。</div>
+              <div style="margin-bottom:4px;">完了画面で<strong>補完用テンプレート</strong>をダウンロードし、不足データを入力後、テンプレートインポート（④従業員・上書き更新）で一括補完できます。</div>
             </div>
           </td></tr>
           <tr><td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;font-weight:600;">メールアドレス</td><td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;color:#e74c3c;">★ 必須</td><td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;color:#888;">空欄</td></tr>
@@ -1845,7 +1845,7 @@ function downloadEmployeeTemplate() {
   var blob = new Blob([rows.join('\n')], {type:'text/tab-separated-values'});
   var a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'ラクミー_インポートテンプレート_②従業員データ.tsv';
+  a.download = 'ラクミー_インポートテンプレート_④従業員.tsv';
   a.click();
 }
 
