@@ -361,21 +361,37 @@
 
     <div class="wcard">
       <div class="wcard-title"><span class="num">1</span> テンプレートを選択（複数選択可）</div>
-      <div class="alert alert-info" style="margin-bottom:12px;">初期セットアップの場合は両方選択してください。①②を同時にインポートできます。</div>
+      <div class="alert alert-info" style="margin-bottom:12px;">初期セットアップの場合は4種すべて選択してください。①→②→③→④の順番で取り込まれます。</div>
       <div style="display:flex;flex-direction:column;gap:8px;">
-        <label style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:2px solid #e8e8e8;border-radius:8px;cursor:pointer;transition:all 0.15s;" class="source-check checked" data-tpl="master" onclick="toggleCheck(this)">
+        <label style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:2px solid #e8e8e8;border-radius:8px;cursor:pointer;transition:all 0.15s;" class="source-check checked" data-tpl="brand" onclick="toggleCheck(this)">
           <input type="checkbox" checked style="accent-color:#2ec4a0;width:16px;height:16px;margin-top:2px;">
           <div style="flex:1;">
-            <div style="font-size:13px;font-weight:600;">① 設定マスタ</div>
-            <div style="font-size:11px;color:#888;">業態・ブランド、店舗、雇用区分をまとめて登録（10列）</div>
+            <div style="font-size:13px;font-weight:600;">① 業態・ブランド</div>
+            <div style="font-size:11px;color:#888;">業態（飲食店・小売店など）と運営ブランド名を登録（3列）</div>
           </div>
-          <a class="dl-link" href="#" onclick="event.stopPropagation();downloadMasterTemplate();" style="font-size:11px;">⬇ テンプレートDL</a>
+          <a class="dl-link" href="#" onclick="event.stopPropagation();downloadBrandTemplate();" style="font-size:11px;">⬇ テンプレートDL</a>
+        </label>
+        <label style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:2px solid #e8e8e8;border-radius:8px;cursor:pointer;transition:all 0.15s;" class="source-check checked" data-tpl="store" onclick="toggleCheck(this)">
+          <input type="checkbox" checked style="accent-color:#2ec4a0;width:16px;height:16px;margin-top:2px;">
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:600;">② 店舗</div>
+            <div style="font-size:11px;color:#888;">店舗名・所属ブランド・住所・営業時間を登録（4列）・前提: ① 業態・ブランド</div>
+          </div>
+          <a class="dl-link" href="#" onclick="event.stopPropagation();downloadStoreTemplate();" style="font-size:11px;">⬇ テンプレートDL</a>
+        </label>
+        <label style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:2px solid #e8e8e8;border-radius:8px;cursor:pointer;transition:all 0.15s;" class="source-check checked" data-tpl="emptype" onclick="toggleCheck(this)">
+          <input type="checkbox" checked style="accent-color:#2ec4a0;width:16px;height:16px;margin-top:2px;">
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:600;">③ 雇用区分</div>
+            <div style="font-size:11px;color:#888;">雇用区分名・種別・時給単位を登録（3列）</div>
+          </div>
+          <a class="dl-link" href="#" onclick="event.stopPropagation();downloadEmptypeTemplate();" style="font-size:11px;">⬇ テンプレートDL</a>
         </label>
         <label style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:2px solid #e8e8e8;border-radius:8px;cursor:pointer;transition:all 0.15s;" class="source-check checked" data-tpl="employee" onclick="toggleCheck(this)">
           <input type="checkbox" checked style="accent-color:#2ec4a0;width:16px;height:16px;margin-top:2px;">
           <div style="flex:1;">
-            <div style="font-size:13px;font-weight:600;">② 従業員データ</div>
-            <div style="font-size:11px;color:#888;">従業員情報を登録、①の設定マスタと紐付け（8列）</div>
+            <div style="font-size:13px;font-weight:600;">④ 従業員</div>
+            <div style="font-size:11px;color:#888;">従業員情報を登録、② 店舗・③ 雇用区分と紐付け（5列）・前提: ②③</div>
           </div>
           <a class="dl-link" href="#" onclick="event.stopPropagation();downloadEmployeeTemplate();" style="font-size:11px;">⬇ テンプレートDL</a>
         </label>
@@ -385,18 +401,24 @@
     <div class="wcard">
       <div class="wcard-title"><span class="num">2</span> ファイルをアップロード</div>
 
-      <!-- 順序ガイド（2つ選択時のみ表示） -->
+      <!-- 順序ガイド（複数選択時に表示） -->
       <div id="tpl-upload-order-guide" style="margin-bottom:14px;">
         <div style="background:#f8f8f8;border-radius:8px;padding:12px 16px;">
           <div style="font-size:12px;font-weight:700;margin-bottom:8px;">アップロード順序</div>
-          <div style="display:flex;align-items:center;gap:8px;">
-            <span style="background:#1a73e8;color:#fff;padding:2px 10px;border-radius:4px;font-size:10px;font-weight:700;">1st</span>
-            <span style="font-size:12px;">① 設定マスタ</span>
-            <span style="font-size:14px;color:#ccc;">→</span>
-            <span style="background:#f59e0b;color:#fff;padding:2px 10px;border-radius:4px;font-size:10px;font-weight:700;">2nd</span>
-            <span style="font-size:12px;">② 従業員データ</span>
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+            <span style="background:#1a73e8;color:#fff;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;">1st</span>
+            <span style="font-size:11px;">① 業態</span>
+            <span style="font-size:13px;color:#ccc;">→</span>
+            <span style="background:#1a73e8;color:#fff;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;">2nd</span>
+            <span style="font-size:11px;">② 店舗</span>
+            <span style="font-size:13px;color:#ccc;">→</span>
+            <span style="background:#1a73e8;color:#fff;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;">3rd</span>
+            <span style="font-size:11px;">③ 雇用区分</span>
+            <span style="font-size:13px;color:#ccc;">→</span>
+            <span style="background:#f59e0b;color:#fff;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;">4th</span>
+            <span style="font-size:11px;">④ 従業員</span>
           </div>
-          <div style="font-size:11px;color:#888;margin-top:6px;">設定マスタを先にアップロードし、従業員データで紐付けます。</div>
+          <div style="font-size:11px;color:#888;margin-top:6px;">業態 → 店舗 → 雇用区分 → 従業員 の順に取り込まれます（依存関係順）。</div>
         </div>
       </div>
 
@@ -1758,19 +1780,57 @@ function goTplWithEmployeeSelected() {
   updateTplUploadUI();
 }
 
-function downloadMasterTemplate() {
+// ① 業態・ブランド テンプレート
+function downloadBrandTemplate() {
   var rows = [
-    '業態・ブランド名\t店舗名\t郵便番号\t住所\t雇用区分名\t雇用区分コード\t給与体系\t金額\t月次契約労働時間\t月みなし残業時間',
-    '居酒屋\t渋谷店\t150-0002\t東京都渋谷区渋谷1-1-1\t正社員A\tEMP-TYPE-001\t月給\t200000\t160\t20',
-    '居酒屋\t渋谷店\t150-0002\t東京都渋谷区渋谷1-1-1\tパートB\tEMP-TYPE-002\t時給\t1200\t\t',
-    'カフェ\t新宿店\t160-0022\t東京都新宿区新宿3-3-3\t正社員A\tEMP-TYPE-001\t月給\t200000\t160\t20',
-    'カフェ\t新宿店\t160-0022\t東京都新宿区新宿3-3-3\t日給スタッフC\tEMP-TYPE-003\t日給\t10000\t8\t'
+    '業態\tブランド名\tブランドコード',
+    '飲食店\t居酒屋ラクミー\tIZA',
+    '飲食店\tカフェラクミー\tCAF',
+    '小売店\tラクミーマート\tMRT'
   ];
   var blob = new Blob([rows.join('\n')], {type:'text/tab-separated-values'});
   var a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'ラクミー_インポートテンプレート_①設定マスタ.tsv';
+  a.download = 'ラクミー_インポートテンプレート_①業態ブランド.tsv';
   a.click();
+}
+
+// ② 店舗 テンプレート
+function downloadStoreTemplate() {
+  var rows = [
+    '店舗名\t所属ブランドコード\t郵便番号\t住所\t開店時間\t閉店時間',
+    '渋谷店\tIZA\t150-0002\t東京都渋谷区渋谷1-1-1\t11:00\t23:00',
+    '新宿店\tCAF\t160-0022\t東京都新宿区新宿3-3-3\t08:00\t22:00',
+    '池袋店\tMRT\t171-0021\t東京都豊島区西池袋1-1-1\t10:00\t22:00'
+  ];
+  var blob = new Blob([rows.join('\n')], {type:'text/tab-separated-values'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'ラクミー_インポートテンプレート_②店舗.tsv';
+  a.click();
+}
+
+// ③ 雇用区分 テンプレート
+function downloadEmptypeTemplate() {
+  var rows = [
+    '雇用区分名\t雇用区分コード\t給与体系\t金額\t月次契約労働時間\t月みなし残業時間',
+    '正社員A\tEMP-TYPE-001\t月給\t200000\t160\t20',
+    'パートB\tEMP-TYPE-002\t時給\t1200\t\t',
+    '日給スタッフC\tEMP-TYPE-003\t日給\t10000\t8\t'
+  ];
+  var blob = new Blob([rows.join('\n')], {type:'text/tab-separated-values'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'ラクミー_インポートテンプレート_③雇用区分.tsv';
+  a.click();
+}
+
+// (旧) 設定マスタ統合版 - 後方互換用に残置
+function downloadMasterTemplate() {
+  // 互換: 全テンプレを個別DL
+  downloadBrandTemplate();
+  downloadStoreTemplate();
+  downloadEmptypeTemplate();
 }
 
 function downloadEmployeeTemplate() {
