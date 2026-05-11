@@ -1816,47 +1816,10 @@ function downloadHokanTemplate() {
   document.getElementById('hokan-done').style.display = '';
 }
 
-// URLパラメータ対応: 新規登録ガイドからの遷移時に方式選択をスキップ
-// ?method=template|external &step=brand|store|emptype|emp
-// パラメータなしの場合は従来通り s-top(方式選択)から開始
-function applyQueryParamRouting() {
-  try {
-    var params = new URLSearchParams(window.location.search);
-    var method = params.get('method');
-    var step = params.get('step');
-    if (!method) return; // 通常起動(運用更新時はクエリ無し)
-
-    if (method === 'template') {
-      // テンプレートアップロード画面に直接遷移
-      go('s-tpl1');
-      // step に応じて該当テンプレートを事前チェック
-      // step=brand/store/emptype → 設定マスタ(master)
-      // step=emp → 従業員データ(employee)
-      var targetTpl = (step === 'emp') ? 'employee' : 'master';
-      var checks = document.querySelectorAll('#s-tpl1 .source-check[data-tpl]');
-      checks.forEach(function(el) {
-        var cb = el.querySelector('input[type="checkbox"]');
-        if (el.getAttribute('data-tpl') === targetTpl) {
-          cb.checked = true;
-          el.classList.add('checked');
-        } else {
-          cb.checked = false;
-          el.classList.remove('checked');
-        }
-      });
-      if (typeof updateTplUploadUI === 'function') updateTplUploadUI();
-    } else if (method === 'external') {
-      // 外部勤怠サービス: 連携先設定画面に直接遷移
-      go('s-saas-settings');
-    }
-  } catch (e) { /* no-op */ }
-}
-
 // Init on load
 document.addEventListener('DOMContentLoaded', function() {
   updateUploadSteps();
   updateTplUploadUI();
-  applyQueryParamRouting();
 });
 </script>
 </body>
