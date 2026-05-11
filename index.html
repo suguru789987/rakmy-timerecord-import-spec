@@ -243,6 +243,19 @@
 </style>
 </head>
 <body>
+
+<!-- 新規登録ガイドから遷移してきた時のみ表示されるバナー(?method=&step= 付きアクセス時) -->
+<div id="from-guide-banner" style="display:none;position:sticky;top:0;z-index:100;background:linear-gradient(135deg,#e8f8f5,#f0faf7);border-bottom:2px solid #2ec4a5;padding:10px 18px;">
+  <div style="display:flex;align-items:center;gap:14px;max-width:1100px;margin:0 auto;">
+    <span style="font-size:22px;">📋</span>
+    <div style="flex:1;line-height:1.5;">
+      <div style="font-size:12px;font-weight:700;color:#1a9e7e;" id="from-guide-banner-title">新規登録ガイドからの遷移中</div>
+      <div style="font-size:10px;color:#555;" id="from-guide-banner-desc">指示通りインポートを進めてください。完了後は登録ガイドに戻れます。</div>
+    </div>
+    <button onclick="bGoBackToGuide()" style="background:#fff;color:#1a9e7e;border:1.5px solid #2ec4a5;border-radius:6px;padding:6px 14px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">↩ 登録ガイドに戻る</button>
+  </div>
+</div>
+
 <div class="app">
 
 <!-- Sidebar -->
@@ -1827,11 +1840,7 @@ function applyQueryParamRouting() {
     if (!method) return; // 通常起動(運用更新時はクエリ無し)
 
     if (method === 'template') {
-      // テンプレートアップロード画面に直接遷移
       go('s-tpl1');
-      // step に応じて該当テンプレートを事前チェック
-      // step=brand/store/emptype → 設定マスタ(master)
-      // step=emp → 従業員データ(employee)
       var targetTpl = (step === 'emp') ? 'employee' : 'master';
       var checks = document.querySelectorAll('#s-tpl1 .source-check[data-tpl]');
       checks.forEach(function(el) {
@@ -1846,10 +1855,61 @@ function applyQueryParamRouting() {
       });
       if (typeof updateTplUploadUI === 'function') updateTplUploadUI();
     } else if (method === 'external') {
-      // 外部勤怠サービス: 連携先設定画面に直接遷移
       go('s-saas-settings');
     }
+
+    // 新規登録ガイドからの遷移バナーを表示
+    showFromGuideBanner(method, step);
   } catch (e) { /* no-op */ }
+}
+
+// 新規登録ガイドからの遷移バナー: ステップ・方式に応じてメッセージを動的設定
+function showFromGuideBanner(method, step) {
+  var banner = document.getElementById('from-guide-banner');
+  if (!banner) return;
+  var titleEl = document.getElementById('from-guide-banner-title');
+  var descEl = document.getElementById('from-guide-banner-desc');
+  var stepLabels = {
+    brand:   'Step ① 業態・ブランド',
+    store:   'Step ② 店舗',
+    emptype: 'Step ③ 雇用区分',
+    emp:     'Step ④ 従業員'
+  };
+  var methodLabels = {
+    template: 'テンプレートで取り込み',
+    external: '外部勤怠サービスから取り込み'
+  };
+  var stepLabel = stepLabels[step] || '';
+  var methodLabel = methodLabels[method] || '';
+  if (titleEl) {
+    titleEl.textContent = '📋 新規登録ガイド' + (stepLabel ? ' ・ ' + stepLabel : '') + 'のインポート';
+  }
+  if (descEl) {
+    var desc = methodLabel + ' で進行中。';
+    if (step === 'brand' && method === 'external') {
+      desc += '※ 業態・ブランドは外部連携対象外のためテンプレート方式で取り込みます。';
+    } else {
+      desc += '完了後は「↩ 登録ガイドに戻る」ボタンで進捗を確認できます。';
+    }
+    descEl.textContent = desc;
+  }
+  banner.style.display = '';
+}
+
+// 登録ガイドに戻る: 開いたタブを閉じるか、登録ガイドのURLへ遷移
+function bGoBackToGuide() {
+  var guideUrl = 'https://suguru789987.github.io/rakmy-owner-registration-mock/#b0';
+  // ユーザーが b0 から target=_blank で開いた場合は元タブが存在するため、このタブを閉じる
+  // window.close() はJSで開かれたタブ or target=_blank由来のタブで動作
+  try {
+    window.close();
+  } catch (e) {}
+  // フォールバック: 閉じられなかった場合は登録ガイドへ遷移
+  setTimeout(function() {
+    if (!window.closed) {
+      window.location.href = guideUrl;
+    }
+  }, 100);
 }
 
 // Init on load
