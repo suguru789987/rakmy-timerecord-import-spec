@@ -395,6 +395,14 @@
           </div>
           <a class="dl-link" href="#" onclick="event.stopPropagation();downloadEmployeeTemplate();" style="font-size:11px;">⬇ テンプレートDL</a>
         </label>
+        <label style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:2px solid #e8e8e8;border-radius:8px;cursor:pointer;transition:all 0.15s;" class="source-check" data-tpl="admin" onclick="toggleCheck(this)">
+          <input type="checkbox" style="accent-color:#2ec4a0;width:16px;height:16px;margin-top:2px;">
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:600;">⑤ 管理者</div>
+            <div style="font-size:11px;color:#888;">管理者を一括登録、② 店舗と紐付け（4列）・前提: ② 店舗 ・<span style="color:#999;">※外部連携対象外、テンプレートのみ</span></div>
+          </div>
+          <a class="dl-link" href="#" onclick="event.stopPropagation();downloadAdminTemplate();" style="font-size:11px;">⬇ テンプレートDL</a>
+        </label>
       </div>
     </div>
 
@@ -417,8 +425,11 @@
             <span style="font-size:13px;color:#ccc;">→</span>
             <span style="background:#f59e0b;color:#fff;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;">4th</span>
             <span style="font-size:11px;">④ 従業員</span>
+            <span style="font-size:13px;color:#ccc;">→</span>
+            <span style="background:#7b1fa2;color:#fff;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;">5th</span>
+            <span style="font-size:11px;">⑤ 管理者</span>
           </div>
-          <div style="font-size:11px;color:#888;margin-top:6px;">業態 → 店舗 → 雇用区分 → 従業員 の順に取り込まれます（依存関係順）。</div>
+          <div style="font-size:11px;color:#888;margin-top:6px;">業態 → 店舗 → 雇用区分 → 従業員 → 管理者 の順に取り込まれます（依存関係順）。</div>
         </div>
       </div>
 
@@ -1822,6 +1833,21 @@ function downloadEmptypeTemplate() {
   var a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = 'ラクミー_インポートテンプレート_③雇用区分.tsv';
+  a.click();
+}
+
+// ⑤ 管理者 テンプレート(外部連携対象外、テンプレのみ)
+function downloadAdminTemplate() {
+  var rows = [
+    '管理者名\tメールアドレス\t担当店舗\t権限',
+    '佐藤花子\tsato-mgr@example.com\t渋谷店\t管理者',
+    '田中一郎\ttanaka-mgr@example.com\t新宿店\t管理者',
+    '高橋次郎\ttakahashi-mgr@example.com\t渋谷店,新宿店,池袋店\t管理者'
+  ];
+  var blob = new Blob([rows.join('\n')], {type:'text/tab-separated-values'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'ラクミー_インポートテンプレート_⑤管理者.tsv';
   a.click();
 }
 

@@ -1,0 +1,4 @@
+管理者名	メールアドレス	担当店舗	権限
+佐藤花子	sato-mgr@example.com	渋谷店	管理者
+田中一郎	tanaka-mgr@example.com	新宿店	管理者
+高橋次郎	takahashi-mgr@example.com	渋谷店,新宿店,池袋店	管理者
