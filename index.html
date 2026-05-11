@@ -1876,10 +1876,28 @@ function downloadHokanTemplate() {
   document.getElementById('hokan-done').style.display = '';
 }
 
+// Hash アンカー対応(ディープリンク用、非破壊): #saas → 外部連携画面、#tpl → テンプレ画面
+function applyHashRouting() {
+  try {
+    var hash = (window.location.hash || '').replace('#', '');
+    if (hash === 'saas') {
+      go('s-saas-settings');
+    } else if (hash === 'tpl') {
+      go('s-tpl1');
+    }
+  } catch (e) { /* no-op */ }
+}
+
 // Init on load
 document.addEventListener('DOMContentLoaded', function() {
   updateUploadSteps();
   updateTplUploadUI();
+  applyHashRouting();
+});
+
+// ブラウザ戻る/進む対応
+window.addEventListener('hashchange', function() {
+  applyHashRouting();
 });
 </script>
 </body>
