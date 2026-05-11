@@ -1907,7 +1907,8 @@ function applyHashRouting() {
   try {
     var hash = (window.location.hash || '').replace('#', '');
     if (hash === 'saas') {
-      go('s-saas-settings');
+      // 外部連携の入口: 連携元サービス選択(KoT/ジョブカン/その他)から始まる画面
+      go('s-saas1');
     } else if (hash === 'tpl') {
       go('s-tpl1');
     }
