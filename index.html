@@ -377,11 +377,11 @@
 
     <div class="wcard">
       <div class="wcard-title"><span class="num">1</span> テンプレートを選択（複数選択可）</div>
-      <div style="font-size:11px;color:#666;margin-bottom:12px;">☑ 取り込むテンプレートを選択。必須4項目は <strong>① → ② → ③ → ④</strong> の順、⑤ 管理者は任意。</div>
+      <div id="tpl-select-caption" style="font-size:11px;color:#666;margin-bottom:12px;">☑ 取り込むテンプレートを選択。必須4項目は <strong>① → ② → ③ → ④</strong> の順、⑤ 管理者は任意。</div>
 
       <!-- 必須グループ -->
       <div style="border:1px solid #c5ede0;border-radius:10px;padding:12px 14px;margin-bottom:10px;">
-        <div style="font-size:11px;font-weight:700;color:#0e9077;margin-bottom:8px;">必須4項目（順序必須）</div>
+        <div id="tpl-required-header" style="font-size:11px;font-weight:700;color:#0e9077;margin-bottom:8px;">必須4項目（順序必須）</div>
         <div style="display:flex;flex-direction:column;gap:6px;">
           <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #e8e8e8;border-radius:6px;cursor:pointer;background:#fff;" class="source-check checked" data-tpl="brand" onclick="toggleCheck(this)">
             <input type="checkbox" checked style="accent-color:#2ec4a0;width:16px;height:16px;">
@@ -1495,6 +1495,8 @@ var currentSaasType = 'kot';
 function toggleCheck(el) {
   // Toggle checked state based on actual checkbox
   var cb = el.querySelector('input[type="checkbox"]');
+  // setup モード中の必須項目(disabled)はクリック無効
+  if (cb && cb.disabled) return;
   // checkbox toggles automatically on click, so read current state
   setTimeout(function() {
     if (cb && cb.checked) {
@@ -2009,21 +2011,60 @@ function applyHashRouting() {
     var hash = (window.location.hash || '').replace('#', '');
     // 新規登録ガイドからの遷移(setup付き) / 運用更新からの遷移(setup無し)で動線を分ける
     if (hash === 'saas-setup') {
-      // 初期登録専用: 連携元サービス選択画面 + 「登録ガイドへ戻る」バナー
       go('s-saas1');
       showFromSetupBanner('saas');
+      applyTplMode('setup');
     } else if (hash === 'tpl-setup') {
-      // 初期登録専用: テンプレ画面 + 「登録ガイドへ戻る」バナー
       go('s-tpl1');
       showFromSetupBanner('tpl');
+      applyTplMode('setup');
     } else if (hash === 'saas') {
-      // 運用更新用: 連携元サービス選択画面のみ(バナー無し)
       go('s-saas1');
+      applyTplMode('ops');
     } else if (hash === 'tpl') {
-      // 運用更新用: テンプレ画面のみ(バナー無し)
       go('s-tpl1');
+      applyTplMode('ops');
+    } else {
+      // ハッシュなし: 運用更新扱い
+      applyTplMode('ops');
     }
   } catch (e) { /* no-op */ }
+}
+
+// 新規登録(setup) と 運用更新(ops) でテンプレ取込UIを出し分け
+function applyTplMode(mode) {
+  document.body.setAttribute('data-tpl-mode', mode);
+  var captionEl = document.getElementById('tpl-select-caption');
+  var requiredHeader = document.getElementById('tpl-required-header');
+  if (captionEl && requiredHeader) {
+    if (mode === 'setup') {
+      captionEl.innerHTML = '<strong style="color:#0e9077;">初回セットアップです。</strong>必須4項目を <strong>① → ② → ③ → ④</strong> の順で取り込みます。⑤ 管理者は任意。';
+      requiredHeader.textContent = '必須4項目(順序固定)';
+      requiredHeader.style.color = '#0e9077';
+    } else {
+      captionEl.innerHTML = '<strong style="color:#1a73e8;">追加・更新・削除</strong>に使えます。必要な項目だけ選択してください。複数選択時は <strong>① → ② → ③ → ④</strong> の依存関係順に取り込まれます。';
+      requiredHeader.textContent = '必須4項目(依存関係順)';
+      requiredHeader.style.color = '#555';
+    }
+  }
+  // チェックボックス: setup は必須4項目を ON 固定(disabled)、ops は自由
+  ['brand','store','emptype','employee'].forEach(function(k) {
+    var label = document.querySelector('#s-tpl1 .source-check[data-tpl="' + k + '"]');
+    if (!label) return;
+    var cb = label.querySelector('input[type="checkbox"]');
+    if (mode === 'setup') {
+      if (cb) { cb.checked = true; cb.disabled = true; }
+      label.classList.add('checked');
+      label.style.opacity = '1';
+      label.style.cursor = 'default';
+    } else {
+      if (cb) { cb.disabled = false; }
+      label.style.cursor = 'pointer';
+    }
+  });
+  // 運用更新モードでは初期チェックを全OFFにすると逆に手間なので、初期OFFはせず既存状態を維持
+  // ただし setup→ops 切替時は全 ON が引き継がれてしまうので運用想定では問題なし
+  updateTplUploadUI();
 }
 
 // 新規登録ガイドから遷移してきた時のバナー表示
