@@ -1773,18 +1773,21 @@ var TPL_ORDER_DEF = [
 ];
 
 function renderTplOrderGuide(selected) {
+  var guideEl = document.getElementById('tpl-upload-order-guide');
   var rowEl = document.getElementById('tpl-upload-order-row');
   var captionEl = document.getElementById('tpl-upload-order-caption');
   var titleEl = document.getElementById('tpl-upload-order-title');
-  if (!rowEl || !captionEl) return;
+  if (!rowEl || !captionEl || !guideEl) return;
   var mode = document.body.getAttribute('data-tpl-mode') || 'ops';
   var ordinals = ['1st','2nd','3rd','4th'];
   var requiredAll = TPL_ORDER_DEF.filter(function(t) { return t.required; });
   var requiredSelected = requiredAll.filter(function(t) { return selected.indexOf(t.key) >= 0; });
   var optionalSelected = TPL_ORDER_DEF.filter(function(t) { return !t.required && selected.indexOf(t.key) >= 0; });
+  var totalSelected = requiredSelected.length + optionalSelected.length;
   var html = '';
   if (mode === 'setup') {
     // 新規登録: 必須4項目を常時表示、未選択はグレーアウト、バッジ(1st/2nd/...)あり
+    guideEl.style.display = '';
     if (titleEl) titleEl.textContent = 'アップロード順序';
     requiredAll.forEach(function(t, idx) {
       var isSelected = selected.indexOf(t.key) >= 0;
@@ -1801,17 +1804,26 @@ function renderTplOrderGuide(selected) {
       html += '<span style="font-size:11px;color:' + t.color + ';">' + t.label + '</span>';
       html += '</span>';
     });
+    rowEl.innerHTML = html;
     var setupCaption = '必須4項目は <strong>業態 → 店舗 → 雇用区分 → 従業員</strong> の順で取り込まれます（依存関係順・順序必須）。';
     if (optionalSelected.length > 0) setupCaption += ' <span style="color:#7b1fa2;">⑤ 管理者(任意)は最後に取り込まれます。</span>';
     captionEl.innerHTML = setupCaption;
   } else {
-    // 運用更新: 選択された項目のみ表示、バッジ無し、依存関係順
+    // 運用更新: 単体更新が主なので順序ガイドは2件以上選択時のみ表示
     if (titleEl) titleEl.textContent = 'アップロード対象';
-    if (requiredSelected.length === 0 && optionalSelected.length === 0) {
+    if (totalSelected === 0) {
+      guideEl.style.display = '';
       rowEl.innerHTML = '<span style="font-size:11px;color:#888;">アップロードする項目を上で選択してください。</span>';
       captionEl.textContent = '';
       return;
     }
+    if (totalSelected === 1) {
+      // 単体更新: 順序ガイド枠ごと非表示(下のアップロードラベルだけで充分)
+      guideEl.style.display = 'none';
+      return;
+    }
+    // 2件以上: 依存関係順を表示
+    guideEl.style.display = '';
     requiredSelected.forEach(function(t, idx) {
       if (idx > 0) html += '<span style="font-size:13px;color:#ccc;">→</span>';
       html += '<span style="font-size:12px;font-weight:600;color:' + t.color + ';">' + t.label + '</span>';
@@ -1824,17 +1836,15 @@ function renderTplOrderGuide(selected) {
       }
     });
     rowEl.innerHTML = html;
-    captionEl.innerHTML = '選択した項目を <strong>依存関係順</strong> に取り込みます。';
+    captionEl.innerHTML = '複数選択時は <strong>依存関係順</strong> に取り込まれます。';
   }
 }
 
 function updateTplUploadUI() {
   tplSelectedTypes = getTplChecked();
-  var guide = document.getElementById('tpl-upload-order-guide');
 
-  // 動的順序ガイド描画(必須Step 1-4は常時表示)
+  // 動的順序ガイド描画(表示/非表示は renderTplOrderGuide が制御)
   renderTplOrderGuide(tplSelectedTypes);
-  guide.style.display = '';
 
   // 旧仕様(2項目時代)の残骸を確実に隠す
   var singleLabel = document.getElementById('tpl-up-single-label');
