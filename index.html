@@ -2363,20 +2363,14 @@ function applyTplMode(mode) {
       requiredHeader.style.color = '#555';
     }
   }
-  // チェックボックス: setup は必須4項目を ON 固定(disabled)、ops は自由
+  // チェックボックス: 両モードで触れる(setupはON初期、opsはユーザー任意)
   ['brand','store','emptype','employee'].forEach(function(k) {
     var label = document.querySelector('#s-tpl1 .source-check[data-tpl="' + k + '"]');
     if (!label) return;
     var cb = label.querySelector('input[type="checkbox"]');
-    if (mode === 'setup') {
-      if (cb) { cb.checked = true; cb.disabled = true; }
-      label.classList.add('checked');
-      label.style.opacity = '1';
-      label.style.cursor = 'default';
-    } else {
-      if (cb) { cb.disabled = false; }
-      label.style.cursor = 'pointer';
-    }
+    if (cb) { cb.disabled = false; }
+    label.style.cursor = 'pointer';
+    label.style.opacity = '1';
   });
   // 運用更新モードでは初期チェックを全OFFにすると逆に手間なので、初期OFFはせず既存状態を維持
   // ただし setup→ops 切替時は全 ON が引き継がれてしまうので運用想定では問題なし
