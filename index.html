@@ -364,7 +364,15 @@
 <!-- TEMPLATE: STEP 1 - 選択＆アップロード（統合） -->
 <!-- ==================== -->
 <div class="screen" id="s-tpl1">
-  <div class="page-header"><h1 class="page-title">テンプレートで取り込み</h1></div>
+  <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+    <h1 class="page-title" style="margin:0;">テンプレートで取り込み</h1>
+    <!-- 🛠 デモ用モード切替(本番では非表示推奨) -->
+    <div style="display:flex;align-items:center;gap:8px;font-size:10px;background:#fff3e0;border:1px dashed #e67e22;border-radius:8px;padding:6px 10px;">
+      <span style="color:#e67e22;font-weight:700;">🛠 デモ用</span>
+      <button class="tpl-mode-toggle" data-mode="setup" onclick="switchTplMode('setup')" style="font-size:11px;padding:4px 10px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;">新規登録</button>
+      <button class="tpl-mode-toggle" data-mode="ops" onclick="switchTplMode('ops')" style="font-size:11px;padding:4px 10px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;">運用更新</button>
+    </div>
+  </div>
   <div class="content">
 
     <div class="flow-steps">
@@ -2031,9 +2039,34 @@ function applyHashRouting() {
   } catch (e) { /* no-op */ }
 }
 
+// デモ用: モード切替ボタンから呼ばれる(URLハッシュも同期更新)
+function switchTplMode(mode) {
+  if (mode !== 'setup' && mode !== 'ops') mode = 'ops';
+  var newHash = (mode === 'setup') ? '#tpl-setup' : '#tpl';
+  if (location.hash !== newHash) {
+    history.replaceState(null, '', newHash);
+  }
+  // バナー表示制御
+  var banner = document.getElementById('from-setup-banner');
+  if (mode === 'setup') {
+    showFromSetupBanner('tpl');
+  } else if (banner) {
+    banner.style.display = 'none';
+  }
+  applyTplMode(mode);
+}
+
 // 新規登録(setup) と 運用更新(ops) でテンプレ取込UIを出し分け
 function applyTplMode(mode) {
   document.body.setAttribute('data-tpl-mode', mode);
+  // デモ用トグルの active 表示
+  document.querySelectorAll('.tpl-mode-toggle').forEach(function(btn) {
+    var isActive = btn.getAttribute('data-mode') === mode;
+    btn.style.background = isActive ? '#2ec4a0' : '#fff';
+    btn.style.color = isActive ? '#fff' : '#555';
+    btn.style.borderColor = isActive ? '#2ec4a0' : '#ccc';
+    btn.style.fontWeight = isActive ? '700' : '400';
+  });
   var captionEl = document.getElementById('tpl-select-caption');
   var requiredHeader = document.getElementById('tpl-required-header');
   if (captionEl && requiredHeader) {
