@@ -386,6 +386,11 @@
     <div class="wcard">
       <div class="wcard-title"><span class="num">1</span> テンプレートを選択（複数選択可）</div>
       <div id="tpl-select-caption" style="font-size:11px;color:#666;margin-bottom:12px;">☑ 取り込むテンプレートを選択。必須4項目は <strong>① → ② → ③ → ④</strong> の順、⑤ 管理者は任意。</div>
+      <!-- 初期セットアップ時の進捗チップ(setupモードのみ表示) -->
+      <div id="tpl-setup-progress" style="display:none;margin-bottom:12px;padding:10px 12px;background:#fef9e7;border:1px solid #f0d68a;border-radius:8px;">
+        <div style="font-size:11px;font-weight:700;color:#7a5800;margin-bottom:6px;">⚠️ 初期セットアップ進捗</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;" id="tpl-setup-progress-chips"></div>
+      </div>
 
       <!-- 必須グループ -->
       <div id="tpl-required-group" style="border:1px solid #c5ede0;border-radius:10px;padding:12px 14px;margin-bottom:10px;">
@@ -653,6 +658,11 @@
 
     <!-- モード別キャプション(JSで動的更新) -->
     <div id="saas-mode-caption" style="font-size:12px;color:#666;margin-bottom:14px;padding:10px 14px;border-radius:8px;background:#f8f8f8;border-left:3px solid #1a73e8;display:none;"></div>
+    <!-- 初期セットアップ時の進捗チップ(setupモードのみ表示) -->
+    <div id="saas-setup-progress" style="display:none;margin-bottom:14px;padding:10px 12px;background:#fef9e7;border:1px solid #f0d68a;border-radius:8px;">
+      <div style="font-size:11px;font-weight:700;color:#7a5800;margin-bottom:6px;">⚠️ 初期セットアップ進捗</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;" id="saas-setup-progress-chips"></div>
+    </div>
 
 
     <div class="flow-steps">
@@ -2246,6 +2256,16 @@ function applySaasMode(mode) {
   refreshSaasUploadBanner();
   // アップロード対象・ガイドを業態+連携元のチェック状態で再描画
   if (typeof updateUploadSteps === 'function') updateUploadSteps();
+  // 初期セットアップ進捗チップ(setupモードのみ表示)
+  var saasProg = document.getElementById('saas-setup-progress');
+  if (saasProg) {
+    if (mode === 'setup') {
+      saasProg.style.display = '';
+      renderSetupProgressChips('saas-setup-progress-chips');
+    } else {
+      saasProg.style.display = 'none';
+    }
+  }
 }
 
 // 業態・ブランドチェックボックスのトグル
@@ -2270,6 +2290,35 @@ function toggleSaasBrandCheck(el) {
 function refreshSaasUploadBanner() {
   var banner = document.getElementById('saas-setup-upload-banner');
   if (banner) banner.style.display = 'none';
+}
+
+// 進捗チップ共通生成(setupモード時の完了/未完了明示UI)
+function renderSetupProgressChips(targetRowId) {
+  var rowEl = document.getElementById(targetRowId);
+  if (!rowEl) return;
+  // import-spec単独では本物のdoneを知り得ないため、デモ用ステータスを表示
+  // (本番ではDB連携でdoneを取得し動的更新)
+  var stepDefs = [
+    { num: '①', name: '業態・ブランド', status: 'todo' },
+    { num: '②', name: '店舗',          status: 'todo' },
+    { num: '③', name: '雇用区分',      status: 'todo' },
+    { num: '④', name: '従業員',        status: 'todo' }
+  ];
+  var html = '';
+  stepDefs.forEach(function(d, idx) {
+    var st;
+    if (d.status === 'done') {
+      st = { ic: '✓', color: '#0e9077', bg: '#e8f9f4', border: '#b2ebe0' };
+    } else if (idx === 0 && d.status === 'todo') {
+      st = { ic: '⏳', color: '#0e9077', bg: '#fff', border: '#2ec4a5' };
+    } else {
+      st = { ic: '🔒', color: '#999', bg: '#fafafa', border: '#e8e8e8' };
+    }
+    html += '<div style="display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;border:1px solid ' + st.border + ';background:' + st.bg + ';font-size:11px;color:' + st.color + ';font-weight:600;">' + st.ic + ' ' + d.num + ' ' + d.name;
+    if (idx === 0) html += '<span style="font-size:9px;background:#2ec4a5;color:#fff;padding:1px 6px;border-radius:8px;font-weight:700;margin-left:2px;">次</span>';
+    html += '</div>';
+  });
+  rowEl.innerHTML = html;
 }
 
 var TPL_FOCUS_LABELS = { brand: '業態・ブランド', store: '店舗', emptype: '雇用区分', employee: '従業員', admin: '管理者' };
@@ -2372,6 +2421,16 @@ function applyTplMode(mode) {
   // 運用更新モードでは初期チェックを全OFFにすると逆に手間なので、初期OFFはせず既存状態を維持
   // ただし setup→ops 切替時は全 ON が引き継がれてしまうので運用想定では問題なし
   updateTplUploadUI();
+  // 初期セットアップ進捗チップ(setupモードのみ表示)
+  var tplProg = document.getElementById('tpl-setup-progress');
+  if (tplProg) {
+    if (mode === 'setup') {
+      tplProg.style.display = '';
+      renderSetupProgressChips('tpl-setup-progress-chips');
+    } else {
+      tplProg.style.display = 'none';
+    }
+  }
 }
 
 // 新規初期セットアップから遷移してきた時のバナー表示
