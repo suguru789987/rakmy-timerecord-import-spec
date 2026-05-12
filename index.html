@@ -1580,69 +1580,130 @@ function getCheckedSources() {
   return results;
 }
 
+var SAAS_UPLOAD_COLORS = ['#7b1fa2','#1a73e8','#f59e0b','#e74c3c'];
+var SAAS_UPLOAD_ORDINALS = ['1st','2nd','3rd','4th'];
+
+function getSaasUploadQueue() {
+  var queue = [];
+  // 業態・ブランドがチェック済みなら先頭(テンプレ補完)
+  var brandCheck = document.getElementById('saas-brand-check');
+  if (brandCheck && brandCheck.style.display !== 'none') {
+    var bcb = brandCheck.querySelector('input[type="checkbox"]');
+    if (bcb && bcb.checked) {
+      queue.push({ key: 'brand', name: '業態・ブランド', isBrand: true });
+    }
+  }
+  // 連携元データソース
+  getCheckedSources().forEach(function(el) {
+    var nm = el.querySelector('div[style*="font-size:13px"]');
+    var name = nm ? nm.textContent.trim() : '不明';
+    queue.push({ key: el.getAttribute('data-map') || name, name: name, isBrand: false });
+  });
+  return queue;
+}
+
 function updateUploadSteps() {
   var guideEl = document.getElementById('saas-upload-order-guide');
   var currentLabel = document.getElementById('saas-up-current-label');
-  var checked = getCheckedSources();
+  if (!guideEl || !currentLabel) return;
 
   resetUploadState();
+  var queue = getSaasUploadQueue();
+  window._saasUploadQueue = queue;
 
-  if (checked.length >= 2) {
-    guideEl.style.display = '';
-    currentLabel.style.display = '';
-    var name1 = checked[0].querySelector('div[style*="font-size:13px"]').textContent.trim();
-    var name2 = checked[1].querySelector('div[style*="font-size:13px"]').textContent.trim();
-    // 順序ガイド更新
-    document.getElementById('saas-order-name1').textContent = name1;
-    document.getElementById('saas-order-name2').textContent = name2;
-    // アップロード口ラベル（1stから開始）
-    document.getElementById('saas-up-current-badge').textContent = '1st';
-    document.getElementById('saas-up-current-badge').style.background = '#1a73e8';
-    document.getElementById('saas-up-current-name').textContent = name1;
-    document.getElementById('saas-up-current-hint').textContent = 'をアップロードしてください';
-    document.getElementById('saas-up-current-hint').style.color = '#1a73e8';
-    // エラー用
-    document.getElementById('saas-up-error-name').textContent = name1;
-    // ファイル名ラベル更新
-    document.getElementById('saas-up-file1-name').textContent = name1;
-    document.getElementById('saas-up-file2-name').textContent = name2;
-  } else {
+  if (queue.length === 0) {
     guideEl.style.display = 'none';
     currentLabel.style.display = 'none';
+    return;
   }
+
+  if (queue.length === 1) {
+    // 単独: 順序ガイド非表示、現在ラベルはバッジなしのシンプル表示
+    guideEl.style.display = 'none';
+    currentLabel.style.display = '';
+    var badge = document.getElementById('saas-up-current-badge');
+    if (badge) badge.style.display = 'none';
+    document.getElementById('saas-up-current-name').textContent = queue[0].name;
+    document.getElementById('saas-up-current-hint').textContent = 'をアップロードしてください';
+    document.getElementById('saas-up-current-hint').style.color = SAAS_UPLOAD_COLORS[0];
+    return;
+  }
+
+  // 2件以上: 順序ガイドを動的描画
+  guideEl.style.display = '';
+  var rowEl = guideEl.querySelector('div[style*="display:flex"]');
+  if (rowEl) {
+    var html = '';
+    queue.forEach(function(item, idx) {
+      var col = SAAS_UPLOAD_COLORS[idx] || '#888';
+      if (idx > 0) html += '<span style="font-size:14px;color:#ccc;flex-shrink:0;">→</span>';
+      html += '<span style="background:' + col + ';color:#fff;padding:2px 10px;border-radius:4px;font-size:10px;font-weight:700;flex-shrink:0;">' + (SAAS_UPLOAD_ORDINALS[idx] || (idx+1)) + '</span>';
+      html += '<span style="font-size:12px;">' + item.name + '</span>';
+    });
+    rowEl.innerHTML = html;
+  }
+  // 現在ラベル
+  currentLabel.style.display = '';
+  var badge2 = document.getElementById('saas-up-current-badge');
+  if (badge2) {
+    badge2.style.display = '';
+    badge2.textContent = SAAS_UPLOAD_ORDINALS[0];
+    badge2.style.background = SAAS_UPLOAD_COLORS[0];
+  }
+  document.getElementById('saas-up-current-name').textContent = queue[0].name;
+  document.getElementById('saas-up-current-hint').textContent = 'をアップロードしてください';
+  document.getElementById('saas-up-current-hint').style.color = SAAS_UPLOAD_COLORS[0];
+  // エラー用
+  var errName = document.getElementById('saas-up-error-name');
+  if (errName) errName.textContent = queue[0].name;
 }
 
-var uploadStep = 0; // 0=待機, 1=1st完了, 2=2nd完了
+var uploadStep = 0; // queue 内の進行カーソル
 
 function demoUploadFile() {
-  var checked = getCheckedSources();
-  if (checked.length <= 1) {
-    // 1ソース: そのままアップロード完了
-    document.getElementById('saas-up-files').style.display = '';
-    document.getElementById('saas-up-file1').style.display = '';
-    document.getElementById('saas-up-dropzone').style.display = 'none';
-    var label = document.getElementById('saas-up-current-label');
-    if (label) label.style.display = 'none';
-  } else if (uploadStep === 0) {
-    // 2ソース: 1st完了
-    uploadStep = 1;
-    document.getElementById('saas-up-files').style.display = '';
-    document.getElementById('saas-up-file1').style.display = '';
-    // ラベルを2ndに切り替え
-    var name2 = checked[1].querySelector('div[style*="font-size:13px"]').textContent.trim();
-    document.getElementById('saas-up-current-badge').textContent = '2nd';
-    document.getElementById('saas-up-current-badge').style.background = '#f59e0b';
-    document.getElementById('saas-up-current-name').textContent = name2;
-    document.getElementById('saas-up-current-hint').textContent = 'をアップロードしてください';
-    document.getElementById('saas-up-current-hint').style.color = '#f59e0b';
-  } else if (uploadStep === 1) {
-    // 2ソース: 2nd完了
-    uploadStep = 2;
-    document.getElementById('saas-up-file2').style.display = '';
+  var queue = window._saasUploadQueue || getSaasUploadQueue();
+  if (queue.length === 0) return;
+  // 履歴ファイル追加
+  appendSaasUploadedFile(queue[uploadStep]);
+  uploadStep++;
+  document.getElementById('saas-up-files').style.display = '';
+  if (uploadStep < queue.length) {
+    // 次の対象にラベル更新
+    var col = SAAS_UPLOAD_COLORS[uploadStep] || '#888';
+    var ord = SAAS_UPLOAD_ORDINALS[uploadStep] || (uploadStep+1);
+    var badge = document.getElementById('saas-up-current-badge');
+    if (badge) { badge.style.display = ''; badge.textContent = ord; badge.style.background = col; }
+    document.getElementById('saas-up-current-name').textContent = queue[uploadStep].name;
+    document.getElementById('saas-up-current-hint').style.color = col;
+    if (queue.length === 1) {
+      var badge2 = document.getElementById('saas-up-current-badge');
+      if (badge2) badge2.style.display = 'none';
+    }
+  } else {
+    // 全完了
     document.getElementById('saas-up-dropzone').style.display = 'none';
     document.getElementById('saas-up-current-label').style.display = 'none';
   }
   document.getElementById('saas-up-error').style.display = 'none';
+}
+
+function appendSaasUploadedFile(item) {
+  var files = document.getElementById('saas-up-files');
+  if (!files) return;
+  var idx = (window._saasUploadQueue || []).indexOf(item);
+  var col = SAAS_UPLOAD_COLORS[idx] || '#888';
+  var ord = SAAS_UPLOAD_ORDINALS[idx] || (idx+1);
+  var row = document.createElement('div');
+  row.className = 'saas-up-dynamic-row';
+  row.style.cssText = 'padding:10px 14px;background:#f7fdfb;border:1px solid #c5ede0;border-radius:8px;margin-bottom:6px;';
+  row.innerHTML = '<div style="display:flex;align-items:center;gap:8px;">' +
+    '<span style="background:' + col + ';color:#fff;padding:1px 8px;border-radius:3px;font-size:9px;font-weight:700;">' + ord + '</span>' +
+    '<span style="font-size:12px;">📄</span>' +
+    '<span style="font-size:12px;font-weight:600;">' + item.name + '_20260512.csv</span>' +
+    '<span style="font-size:11px;color:#888;">2.4 KB</span>' +
+    '<span style="font-size:11px;color:#2ec4a0;font-weight:600;margin-left:auto;">✓ 完了</span>' +
+  '</div>';
+  files.appendChild(row);
 }
 
 function demoShowError1() {
@@ -1652,10 +1713,14 @@ function demoShowError1() {
 function resetUploadState() {
   uploadStep = 0;
   document.getElementById('saas-up-dropzone').style.display = '';
-  document.getElementById('saas-up-files').style.display = 'none';
-  document.getElementById('saas-up-file1').style.display = 'none';
-  document.getElementById('saas-up-file2').style.display = 'none';
-  document.getElementById('saas-up-error').style.display = 'none';
+  var files = document.getElementById('saas-up-files');
+  if (files) {
+    files.style.display = 'none';
+    files.querySelectorAll('.saas-up-dynamic-row').forEach(function(r) { r.remove(); });
+  }
+  var f1 = document.getElementById('saas-up-file1'); if (f1) f1.style.display = 'none';
+  var f2 = document.getElementById('saas-up-file2'); if (f2) f2.style.display = 'none';
+  var err = document.getElementById('saas-up-error'); if (err) err.style.display = 'none';
 }
 function showMappingPanels() {
   // Hide all panels first
@@ -2175,6 +2240,8 @@ function applySaasMode(mode) {
   if (brandCheck) brandCheck.style.display = 'flex';
   // アップロード順序バナーは setup モード時のみ表示(順序必須を明示)
   refreshSaasUploadBanner();
+  // アップロード対象・ガイドを業態+連携元のチェック状態で再描画
+  if (typeof updateUploadSteps === 'function') updateUploadSteps();
 }
 
 // 業態・ブランドチェックボックスのトグル
@@ -2191,6 +2258,7 @@ function toggleSaasBrandCheck(el) {
       el.style.borderColor = '#e8e8e8';
     }
     refreshSaasUploadBanner();
+    updateUploadSteps();
   }, 0);
 }
 
