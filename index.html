@@ -689,12 +689,12 @@
       <div class="wcard-title"><span class="num" id="saas-num-2">2</span> 取り込みデータ（複数選択可）</div>
       <div style="font-size:11px;color:#666;margin-bottom:10px;" id="saas-source-hint">基本1ファイル、給与データがあれば2ファイルまで。内部で自動仕分け。</div>
 
-      <!-- setup モードのみ: 業態・ブランド(テンプレ補完) -->
-      <label id="saas-brand-check" style="display:none;align-items:center;gap:10px;padding:12px 14px;border:1px solid #c5ede0;border-radius:8px;background:#fafffd;margin-bottom:10px;cursor:pointer;" class="source-check checked" data-saas-extra="brand" onclick="toggleSaasBrandCheck(this)">
+      <!-- 業態・ブランド(テンプレ): 両モードで表示 -->
+      <label id="saas-brand-check" style="display:none;align-items:center;gap:10px;padding:10px 12px;border:1px solid #e8e8e8;border-radius:8px;margin-bottom:8px;cursor:pointer;background:#fff;" class="source-check checked" data-saas-extra="brand" onclick="toggleSaasBrandCheck(this)">
         <input type="checkbox" checked style="accent-color:#2ec4a0;width:16px;height:16px;">
         <div style="flex:1;">
-          <div style="font-size:13px;font-weight:600;">業態・ブランド <span style="font-size:9px;padding:1px 7px;background:#f3e5f5;color:#7b1fa2;border-radius:10px;font-weight:600;margin-left:6px;">テンプレ補完</span></div>
-          <div style="font-size:11px;color:#888;">外部勤怠サービスに情報がないためテンプレで取込(3列)</div>
+          <div style="font-size:13px;font-weight:600;">業態・ブランド <span style="font-size:9px;padding:1px 7px;background:#f3e5f5;color:#7b1fa2;border-radius:10px;font-weight:600;margin-left:6px;">テンプレ</span></div>
+          <div style="font-size:11px;color:#888;">3列 ・ 外部勤怠サービス対象外</div>
         </div>
         <a class="dl-link" href="#" onclick="event.stopPropagation();downloadBrandTemplate();" style="font-size:11px;">⬇ テンプレートDL</a>
       </label>
@@ -2161,17 +2161,11 @@ function applySaasMode(mode) {
       capEl.innerHTML = '<strong style="color:#1a73e8;">追加・更新</strong> ・ 既存の連携元から再取込・差分追加';
     }
   }
-  // 業態・ブランドチェック項目とアップロード順序バナーの表示制御
+  // 業態・ブランドチェック項目: 両モードで表示(ユーザー任意でON/OFF)
   var brandCheck = document.getElementById('saas-brand-check');
-  var setupBanner = document.getElementById('saas-setup-upload-banner');
-  if (mode === 'setup') {
-    if (brandCheck) brandCheck.style.display = 'flex';
-    // バナーは brandCheck が ON のときのみ表示
-    refreshSaasUploadBanner();
-  } else {
-    if (brandCheck) brandCheck.style.display = 'none';
-    if (setupBanner) setupBanner.style.display = 'none';
-  }
+  if (brandCheck) brandCheck.style.display = 'flex';
+  // アップロード順序バナーは setup モード時のみ表示(順序必須を明示)
+  refreshSaasUploadBanner();
 }
 
 // 業態・ブランドチェックボックスのトグル
