@@ -656,13 +656,6 @@
   </div>
   <div class="content">
 
-    <!-- 初期セットアップ時の進捗チップ(setupモードのみ表示) -->
-    <div id="saas-setup-progress" style="display:none;margin-bottom:14px;padding:10px 12px;background:#fef9e7;border:1px solid #f0d68a;border-radius:8px;">
-      <div style="font-size:11px;font-weight:700;color:#7a5800;margin-bottom:6px;">⚠️ 初期セットアップ進捗</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;" id="saas-setup-progress-chips"></div>
-    </div>
-
-
     <div class="flow-steps">
       <div class="fs active"><span class="fs-num">1</span><span class="fs-label">選択・アップロード</span></div>
       <div class="fs-line"></div>
@@ -673,6 +666,11 @@
 
     <div class="wcard">
       <div class="wcard-title"><span class="num" id="saas-num-1">1</span> 連携元サービス</div>
+      <!-- 初期セットアップ時の進捗チップ(setupモードのみ表示) -->
+      <div id="saas-setup-progress" style="display:none;margin-bottom:14px;padding:10px 12px;background:#fef9e7;border:1px solid #f0d68a;border-radius:8px;">
+        <div style="font-size:11px;font-weight:700;color:#7a5800;margin-bottom:6px;">⚠️ 初期セットアップ進捗</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;" id="saas-setup-progress-chips"></div>
+      </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:stretch;" id="saas-list">
         <div class="saas-item selected" onclick="selSaasMain(this,'kot')" data-saas="kot" style="flex:1;min-width:180px;">
           <div class="saas-logo kot">KoT</div>
