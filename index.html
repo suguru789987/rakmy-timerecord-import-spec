@@ -1510,6 +1510,15 @@ function go(id) {
   if (id === 's-saas2') showMappingPanels();
   if (id === 's-saas-settings') updateSettingsScreen();
   if (id === 's-tpl2') updateTplConfirmSections();
+  // 画面遷移時にモードUI(setup/ops)を反映
+  if (id === 's-saas1' && typeof applySaasMode === 'function') {
+    var sh = (location.hash || '').replace('#', '');
+    applySaasMode(sh === 'saas-setup' ? 'setup' : 'ops');
+  }
+  if (id === 's-tpl1' && typeof applyTplMode === 'function') {
+    var th = (location.hash || '').replace('#', '');
+    applyTplMode((th === 'tpl-setup') ? 'setup' : 'ops');
+  }
   window.scrollTo(0, 0);
 }
 function selTpl(el) {
