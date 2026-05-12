@@ -443,10 +443,10 @@
     <div class="wcard">
       <div class="wcard-title"><span class="num">2</span> ファイルをアップロード</div>
 
-      <!-- 順序ガイド（チェック状態に応じて動的表示） -->
+      <!-- 順序ガイド（チェック状態 + モードに応じて動的表示） -->
       <div id="tpl-upload-order-guide" style="margin-bottom:14px;">
         <div style="background:#f8f8f8;border-radius:8px;padding:12px 16px;">
-          <div style="font-size:12px;font-weight:700;margin-bottom:8px;">アップロード順序</div>
+          <div id="tpl-upload-order-title" style="font-size:12px;font-weight:700;margin-bottom:8px;">アップロード順序</div>
           <div id="tpl-upload-order-row" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;"></div>
           <div id="tpl-upload-order-caption" style="font-size:11px;color:#888;margin-top:6px;"></div>
         </div>
@@ -1649,32 +1649,41 @@ function applyTplUploadCurrent() {
   var queue = getTplUploadQueue();
   var label = document.getElementById('tpl-up-current-label');
   var dropzone = document.getElementById('tpl-up-dropzone');
+  var badge = document.getElementById('tpl-up-current-badge');
+  var nameEl = document.getElementById('tpl-up-current-name');
+  var hint = document.getElementById('tpl-up-current-hint');
   if (queue.length === 0 || tplUploadCursor >= queue.length) {
-    // すべて完了
     label.style.display = 'none';
     dropzone.style.display = 'none';
     return;
   }
   var current = queue[tplUploadCursor];
+  var mode = document.body.getAttribute('data-tpl-mode') || 'ops';
   var ordinals = ['1st','2nd','3rd','4th'];
   var idx = TPL_ORDER_DEF.indexOf(current);
-  var badge = document.getElementById('tpl-up-current-badge');
-  var nameEl = document.getElementById('tpl-up-current-name');
-  var hint = document.getElementById('tpl-up-current-hint');
-  if (current.required) {
-    badge.textContent = ordinals[idx];
-    badge.style.background = current.color;
-    badge.style.color = '#fff';
-    badge.style.border = 'none';
-    hint.style.color = current.color;
+  if (mode === 'setup') {
+    // 新規登録: バッジ付き
+    badge.style.display = '';
+    if (current.required) {
+      badge.textContent = ordinals[idx];
+      badge.style.background = current.color;
+      badge.style.color = '#fff';
+      badge.style.border = 'none';
+      hint.style.color = current.color;
+    } else {
+      badge.textContent = '任意';
+      badge.style.background = '#fff';
+      badge.style.color = current.color;
+      badge.style.border = '1px solid ' + current.color;
+      hint.style.color = current.color;
+    }
   } else {
-    badge.textContent = '任意';
-    badge.style.background = '#fff';
-    badge.style.color = current.color;
-    badge.style.border = '1px solid ' + current.color;
+    // 運用更新: バッジ非表示、ラベルだけシンプル表示
+    badge.style.display = 'none';
     hint.style.color = current.color;
   }
-  nameEl.textContent = current.label;
+  nameEl.textContent = current.label + (mode === 'ops' && !current.required ? '(任意)' : '');
+  nameEl.style.color = (mode === 'ops') ? current.color : '';
   label.style.display = 'flex';
   dropzone.style.display = '';
 }
@@ -1766,35 +1775,56 @@ var TPL_ORDER_DEF = [
 function renderTplOrderGuide(selected) {
   var rowEl = document.getElementById('tpl-upload-order-row');
   var captionEl = document.getElementById('tpl-upload-order-caption');
+  var titleEl = document.getElementById('tpl-upload-order-title');
   if (!rowEl || !captionEl) return;
+  var mode = document.body.getAttribute('data-tpl-mode') || 'ops';
   var ordinals = ['1st','2nd','3rd','4th'];
   var requiredAll = TPL_ORDER_DEF.filter(function(t) { return t.required; });
+  var requiredSelected = requiredAll.filter(function(t) { return selected.indexOf(t.key) >= 0; });
   var optionalSelected = TPL_ORDER_DEF.filter(function(t) { return !t.required && selected.indexOf(t.key) >= 0; });
   var html = '';
-  // 必須4項目は常時表示。未選択はグレーアウト
-  requiredAll.forEach(function(t, idx) {
-    var isSelected = selected.indexOf(t.key) >= 0;
-    var opacity = isSelected ? '1' : '0.35';
-    if (idx > 0) html += '<span style="font-size:13px;color:#ccc;">→</span>';
-    html += '<span style="display:inline-flex;align-items:center;gap:6px;opacity:' + opacity + ';">';
-    html += '<span style="background:' + t.color + ';color:#fff;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;">' + ordinals[idx] + '</span>';
-    html += '<span style="font-size:11px;">' + t.label + (isSelected ? '' : ' <span style="color:#aaa;font-size:9px;">(未選択)</span>') + '</span>';
-    html += '</span>';
-  });
-  // 任意項目(管理者)はチェック時のみ追加表示
-  optionalSelected.forEach(function(t) {
-    html += '<span style="margin-left:8px;display:inline-flex;align-items:center;gap:6px;padding-left:8px;border-left:1px dashed #ccc;">';
-    html += '<span style="background:#fff;color:' + t.color + ';border:1px solid ' + t.color + ';padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;">任意</span>';
-    html += '<span style="font-size:11px;color:' + t.color + ';">' + t.label + '</span>';
-    html += '</span>';
-  });
-  rowEl.innerHTML = html;
-  // キャプション
-  var captionBase = '必須4項目は <strong>業態 → 店舗 → 雇用区分 → 従業員</strong> の順で取り込まれます（依存関係順・順序必須）。';
-  if (optionalSelected.length > 0) {
-    captionEl.innerHTML = captionBase + ' <span style="color:#7b1fa2;">⑤ 管理者(任意)は最後に取り込まれます。</span>';
+  if (mode === 'setup') {
+    // 新規登録: 必須4項目を常時表示、未選択はグレーアウト、バッジ(1st/2nd/...)あり
+    if (titleEl) titleEl.textContent = 'アップロード順序';
+    requiredAll.forEach(function(t, idx) {
+      var isSelected = selected.indexOf(t.key) >= 0;
+      var opacity = isSelected ? '1' : '0.35';
+      if (idx > 0) html += '<span style="font-size:13px;color:#ccc;">→</span>';
+      html += '<span style="display:inline-flex;align-items:center;gap:6px;opacity:' + opacity + ';">';
+      html += '<span style="background:' + t.color + ';color:#fff;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;">' + ordinals[idx] + '</span>';
+      html += '<span style="font-size:11px;">' + t.label + (isSelected ? '' : ' <span style="color:#aaa;font-size:9px;">(未選択)</span>') + '</span>';
+      html += '</span>';
+    });
+    optionalSelected.forEach(function(t) {
+      html += '<span style="margin-left:8px;display:inline-flex;align-items:center;gap:6px;padding-left:8px;border-left:1px dashed #ccc;">';
+      html += '<span style="background:#fff;color:' + t.color + ';border:1px solid ' + t.color + ';padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;">任意</span>';
+      html += '<span style="font-size:11px;color:' + t.color + ';">' + t.label + '</span>';
+      html += '</span>';
+    });
+    var setupCaption = '必須4項目は <strong>業態 → 店舗 → 雇用区分 → 従業員</strong> の順で取り込まれます（依存関係順・順序必須）。';
+    if (optionalSelected.length > 0) setupCaption += ' <span style="color:#7b1fa2;">⑤ 管理者(任意)は最後に取り込まれます。</span>';
+    captionEl.innerHTML = setupCaption;
   } else {
-    captionEl.innerHTML = captionBase;
+    // 運用更新: 選択された項目のみ表示、バッジ無し、依存関係順
+    if (titleEl) titleEl.textContent = 'アップロード対象';
+    if (requiredSelected.length === 0 && optionalSelected.length === 0) {
+      rowEl.innerHTML = '<span style="font-size:11px;color:#888;">アップロードする項目を上で選択してください。</span>';
+      captionEl.textContent = '';
+      return;
+    }
+    requiredSelected.forEach(function(t, idx) {
+      if (idx > 0) html += '<span style="font-size:13px;color:#ccc;">→</span>';
+      html += '<span style="font-size:12px;font-weight:600;color:' + t.color + ';">' + t.label + '</span>';
+    });
+    optionalSelected.forEach(function(t) {
+      if (requiredSelected.length > 0) {
+        html += '<span style="margin-left:8px;padding-left:8px;border-left:1px dashed #ccc;font-size:12px;font-weight:600;color:' + t.color + ';">' + t.label + '<span style="font-size:10px;font-weight:400;margin-left:4px;">(任意)</span></span>';
+      } else {
+        html += '<span style="font-size:12px;font-weight:600;color:' + t.color + ';">' + t.label + '<span style="font-size:10px;font-weight:400;margin-left:4px;">(任意)</span></span>';
+      }
+    });
+    rowEl.innerHTML = html;
+    captionEl.innerHTML = '選択した項目を <strong>依存関係順</strong> に取り込みます。';
   }
 }
 
