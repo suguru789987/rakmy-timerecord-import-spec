@@ -654,14 +654,6 @@
     <!-- モード別キャプション(JSで動的更新) -->
     <div id="saas-mode-caption" style="font-size:12px;color:#666;margin-bottom:14px;padding:10px 14px;border-radius:8px;background:#f8f8f8;border-left:3px solid #1a73e8;display:none;"></div>
 
-    <!-- Step 1: 業態・ブランド先行取込(setup モードのみ表示) -->
-    <div class="wcard" id="saas-section-brand" style="display:none;">
-      <div class="wcard-title"><span class="num" id="saas-num-brand">1</span> 業態・ブランド <span style="font-size:10px;font-weight:400;color:#7b1fa2;background:#f3e5f5;padding:2px 8px;border-radius:10px;margin-left:6px;">テンプレ</span></div>
-      <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #e8e8e8;border-radius:8px;">
-        <div style="flex:1;font-size:13px;font-weight:600;">業態・ブランド <span style="font-size:10px;color:#888;font-weight:400;">3列</span></div>
-        <a class="dl-link" href="#" onclick="event.preventDefault();downloadBrandTemplate();" style="font-size:11px;">⬇ テンプレートDL</a>
-      </div>
-    </div>
 
     <div class="flow-steps">
       <div class="fs active"><span class="fs-num">1</span><span class="fs-label">選択・アップロード</span></div>
@@ -694,8 +686,18 @@
     </div>
 
     <div class="wcard" id="saas-section-sources">
-      <div class="wcard-title"><span class="num" id="saas-num-2">2</span> 取り込むデータソース（複数選択可）</div>
+      <div class="wcard-title"><span class="num" id="saas-num-2">2</span> 取り込みデータ（複数選択可）</div>
       <div style="font-size:11px;color:#666;margin-bottom:10px;" id="saas-source-hint">基本1ファイル、給与データがあれば2ファイルまで。内部で自動仕分け。</div>
+
+      <!-- setup モードのみ: 業態・ブランド(テンプレ補完) -->
+      <label id="saas-brand-check" style="display:none;align-items:center;gap:10px;padding:12px 14px;border:1px solid #c5ede0;border-radius:8px;background:#fafffd;margin-bottom:10px;cursor:pointer;" class="source-check checked" data-saas-extra="brand" onclick="toggleSaasBrandCheck(this)">
+        <input type="checkbox" checked style="accent-color:#2ec4a0;width:16px;height:16px;">
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:600;">業態・ブランド <span style="font-size:9px;padding:1px 7px;background:#f3e5f5;color:#7b1fa2;border-radius:10px;font-weight:600;margin-left:6px;">テンプレ補完</span></div>
+          <div style="font-size:11px;color:#888;">外部勤怠サービスに情報がないためテンプレで取込(3列)</div>
+        </div>
+        <a class="dl-link" href="#" onclick="event.stopPropagation();downloadBrandTemplate();" style="font-size:11px;">⬇ テンプレートDL</a>
+      </label>
 
       <!-- KoT用 -->
       <div id="source-kot">
@@ -2159,27 +2161,45 @@ function applySaasMode(mode) {
       capEl.innerHTML = '<strong style="color:#1a73e8;">追加・更新</strong> ・ 既存の連携元から再取込・差分追加';
     }
   }
-  // セクション表示と番号書換
-  var brandSection = document.getElementById('saas-section-brand');
+  // 業態・ブランドチェック項目とアップロード順序バナーの表示制御
+  var brandCheck = document.getElementById('saas-brand-check');
   var setupBanner = document.getElementById('saas-setup-upload-banner');
-  var num1 = document.getElementById('saas-num-1');
-  var num2 = document.getElementById('saas-num-2');
-  var num3 = document.getElementById('saas-num-3');
   if (mode === 'setup') {
-    if (brandSection) brandSection.style.display = '';
-    if (setupBanner) setupBanner.style.display = '';
-    // setup: Step 1=業態, Step 2=連携元, Step 3=データソース, Step 4=アップロード
-    if (num1) num1.textContent = '2';
-    if (num2) num2.textContent = '3';
-    if (num3) num3.textContent = '4';
+    if (brandCheck) brandCheck.style.display = 'flex';
+    // バナーは brandCheck が ON のときのみ表示
+    refreshSaasUploadBanner();
   } else {
-    if (brandSection) brandSection.style.display = 'none';
+    if (brandCheck) brandCheck.style.display = 'none';
     if (setupBanner) setupBanner.style.display = 'none';
-    // ops: 元の番号
-    if (num1) num1.textContent = '1';
-    if (num2) num2.textContent = '2';
-    if (num3) num3.textContent = '3';
   }
+}
+
+// 業態・ブランドチェックボックスのトグル
+function toggleSaasBrandCheck(el) {
+  var cb = el.querySelector('input[type="checkbox"]');
+  setTimeout(function() {
+    if (cb && cb.checked) {
+      el.classList.add('checked');
+      el.style.background = '#fafffd';
+      el.style.borderColor = '#c5ede0';
+    } else {
+      el.classList.remove('checked');
+      el.style.background = '#fff';
+      el.style.borderColor = '#e8e8e8';
+    }
+    refreshSaasUploadBanner();
+  }, 0);
+}
+
+// アップロード順序バナーを業態チェック状態に応じて更新
+function refreshSaasUploadBanner() {
+  var banner = document.getElementById('saas-setup-upload-banner');
+  var brandCheck = document.getElementById('saas-brand-check');
+  if (!banner) return;
+  var mode = document.body.getAttribute('data-saas-mode') || 'ops';
+  if (mode !== 'setup') { banner.style.display = 'none'; return; }
+  var cb = brandCheck ? brandCheck.querySelector('input[type="checkbox"]') : null;
+  banner.style.display = (cb && cb.checked) ? '' : 'none';
 }
 
 // 「管理者だけ取り込み」初期化: 必須4項目グループを非表示 + 管理者だけON
