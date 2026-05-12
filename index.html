@@ -654,6 +654,21 @@
     <!-- モード別キャプション(JSで動的更新) -->
     <div id="saas-mode-caption" style="font-size:12px;color:#666;margin-bottom:14px;padding:10px 14px;border-radius:8px;background:#f8f8f8;border-left:3px solid #1a73e8;display:none;"></div>
 
+    <!-- Step 1: 業態・ブランド先行取込(setup モードのみ表示) -->
+    <div class="wcard" id="saas-section-brand" style="display:none;">
+      <div class="wcard-title"><span class="num" id="saas-num-brand">1</span> 業態・ブランドを先に取り込み <span style="font-size:10px;font-weight:400;color:#7b1fa2;background:#f3e5f5;padding:2px 8px;border-radius:10px;margin-left:6px;">必須・テンプレ</span></div>
+      <div class="alert alert-info" style="margin-bottom:12px;">⚠️ 外部勤怠サービスには業態・ブランド情報が無いため、<strong>専用テンプレートで補完取込</strong>します。テンプレートを準備のうえ、下の「ファイルをアップロード」セクションで <strong>最初に</strong> アップロードしてください。</div>
+      <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid #e8e8e8;border-radius:8px;background:#fafffd;">
+        <div style="width:32px;height:32px;border-radius:50%;background:#e8f9f4;color:#0e9077;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;">①</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:600;">業態・ブランド (3列)</div>
+          <div style="font-size:11px;color:#888;">業態 / ブランド名 / ブランドコード</div>
+        </div>
+        <a class="dl-link" href="#" onclick="event.preventDefault();downloadBrandTemplate();" style="font-size:11px;">⬇ テンプレートDL</a>
+      </div>
+      <div style="font-size:10px;color:#888;margin-top:8px;">※ 下部「ファイルをアップロード」で 1st として取り込まれます。</div>
+    </div>
+
     <div class="flow-steps">
       <div class="fs active"><span class="fs-num">1</span><span class="fs-label">選択・アップロード</span></div>
       <div class="fs-line"></div>
@@ -663,7 +678,7 @@
     </div>
 
     <div class="wcard">
-      <div class="wcard-title"><span class="num">1</span> 連携元サービス</div>
+      <div class="wcard-title"><span class="num" id="saas-num-1">1</span> 連携元サービス</div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:stretch;" id="saas-list">
         <div class="saas-item selected" onclick="selSaasMain(this,'kot')" data-saas="kot" style="flex:1;min-width:180px;">
           <div class="saas-logo kot">KoT</div>
@@ -685,7 +700,7 @@
     </div>
 
     <div class="wcard" id="saas-section-sources">
-      <div class="wcard-title"><span class="num">2</span> 取り込むデータソース（複数選択可）</div>
+      <div class="wcard-title"><span class="num" id="saas-num-2">2</span> 取り込むデータソース（複数選択可）</div>
       <div class="alert alert-info" style="margin-bottom:12px;" id="saas-source-hint">設定データは基本1ファイル、給与データがあれば2ファイルまで取り込めます。内部で自動仕分けして各設定テーブルに登録します。</div>
 
       <!-- KoT用 -->
@@ -755,7 +770,20 @@
     </div>
 
     <div class="wcard" id="saas-section-upload">
-      <div class="wcard-title"><span class="num">3</span> ファイルをアップロード</div>
+      <div class="wcard-title"><span class="num" id="saas-num-3">3</span> ファイルをアップロード</div>
+
+      <!-- Step 1業態テンプレを先頭にする setup モード専用バナー -->
+      <div id="saas-setup-upload-banner" style="display:none;margin-bottom:12px;padding:12px 14px;background:#fafffd;border:1px solid #c5ede0;border-radius:8px;">
+        <div style="font-size:11px;font-weight:700;color:#0e9077;margin-bottom:6px;">📥 アップロード順序</div>
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+          <span style="background:#7b1fa2;color:#fff;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;">1st</span>
+          <span style="font-size:11px;">① 業態・ブランド(テンプレ)</span>
+          <span style="font-size:13px;color:#ccc;">→</span>
+          <span style="background:#1a73e8;color:#fff;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;">2nd〜</span>
+          <span style="font-size:11px;">外部勤怠サービスのCSVデータ</span>
+        </div>
+        <div style="font-size:10px;color:#888;margin-top:6px;">業態・ブランドのテンプレを <strong>最初に</strong> アップロード → その後に外部CSVデータをアップロードします。</div>
+      </div>
 
       <!-- アップロード順序ガイド（2ソース選択時のみ表示） -->
       <div id="saas-upload-order-guide" style="display:none;margin-bottom:14px;">
@@ -2131,13 +2159,33 @@ function applySaasMode(mode) {
     if (mode === 'setup') {
       capEl.style.borderLeftColor = '#0e9077';
       capEl.style.background = '#f0faf7';
-      capEl.innerHTML = '<strong style="color:#0e9077;">🆕 初回セットアップです。</strong> 外部勤怠サービスを選び、<strong>店舗・雇用区分・従業員</strong> を一括取込します。<br>' +
-        '<span style="font-size:10px;color:#777;">※ 業態・ブランドは外部勤怠サービスに情報がないため、別途 <strong>テンプレートで取り込み</strong> から補完登録してください(ガイドの Step 1)。</span>';
+      capEl.innerHTML = '<strong style="color:#0e9077;">🆕 初回セットアップです。</strong> 必須項目をすべてここで取り込みます: <strong>Step 1 業態・ブランド</strong> (テンプレ) + <strong>Step 2-4 連携元データ</strong> (店舗・雇用区分・従業員)';
     } else {
       capEl.style.borderLeftColor = '#1a73e8';
       capEl.style.background = '#f8f8f8';
       capEl.innerHTML = '<strong style="color:#1a73e8;">追加・更新</strong> に使えます。既存の連携元から再取込・差分追加を行えます。';
     }
+  }
+  // セクション表示と番号書換
+  var brandSection = document.getElementById('saas-section-brand');
+  var setupBanner = document.getElementById('saas-setup-upload-banner');
+  var num1 = document.getElementById('saas-num-1');
+  var num2 = document.getElementById('saas-num-2');
+  var num3 = document.getElementById('saas-num-3');
+  if (mode === 'setup') {
+    if (brandSection) brandSection.style.display = '';
+    if (setupBanner) setupBanner.style.display = '';
+    // setup: Step 1=業態, Step 2=連携元, Step 3=データソース, Step 4=アップロード
+    if (num1) num1.textContent = '2';
+    if (num2) num2.textContent = '3';
+    if (num3) num3.textContent = '4';
+  } else {
+    if (brandSection) brandSection.style.display = 'none';
+    if (setupBanner) setupBanner.style.display = 'none';
+    // ops: 元の番号
+    if (num1) num1.textContent = '1';
+    if (num2) num2.textContent = '2';
+    if (num3) num3.textContent = '3';
   }
 }
 
