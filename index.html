@@ -1653,33 +1653,80 @@ function selDup(el) {
   el.parentElement.querySelectorAll('.dup-opt').forEach(t => t.classList.remove('selected'));
   el.classList.add('selected');
 }
-// Template upload
+// Template upload (必須Step 1-4 → 任意 admin の順に進行)
 var tplUploadStep = 0;
+var tplUploadCursor = 0;
+
+function getTplUploadQueue() {
+  var selected = getTplChecked();
+  return TPL_ORDER_DEF.filter(function(t) { return selected.indexOf(t.key) >= 0; });
+}
+
+function applyTplUploadCurrent() {
+  var queue = getTplUploadQueue();
+  var label = document.getElementById('tpl-up-current-label');
+  var dropzone = document.getElementById('tpl-up-dropzone');
+  if (queue.length === 0 || tplUploadCursor >= queue.length) {
+    // すべて完了
+    label.style.display = 'none';
+    dropzone.style.display = 'none';
+    return;
+  }
+  var current = queue[tplUploadCursor];
+  var ordinals = ['1st','2nd','3rd','4th'];
+  var idx = TPL_ORDER_DEF.indexOf(current);
+  var badge = document.getElementById('tpl-up-current-badge');
+  var nameEl = document.getElementById('tpl-up-current-name');
+  var hint = document.getElementById('tpl-up-current-hint');
+  if (current.required) {
+    badge.textContent = ordinals[idx];
+    badge.style.background = current.color;
+    badge.style.color = '#fff';
+    badge.style.border = 'none';
+    hint.style.color = current.color;
+  } else {
+    badge.textContent = '任意';
+    badge.style.background = '#fff';
+    badge.style.color = current.color;
+    badge.style.border = '1px solid ' + current.color;
+    hint.style.color = current.color;
+  }
+  nameEl.textContent = current.label;
+  label.style.display = 'flex';
+  dropzone.style.display = '';
+}
+
+function appendTplUploadedFile(item) {
+  var files = document.getElementById('tpl-up-files');
+  files.style.display = '';
+  var ordinals = ['1st','2nd','3rd','4th'];
+  var idx = TPL_ORDER_DEF.indexOf(item);
+  var badgeText = item.required ? ordinals[idx] : '任意';
+  var badgeBg = item.required ? item.color : '#fff';
+  var badgeFg = item.required ? '#fff' : item.color;
+  var badgeBorder = item.required ? 'none' : '1px solid ' + item.color;
+  var labelKey = item.label.replace(/^[①②③④⑤]\s*/, '');
+  var row = document.createElement('div');
+  row.className = 'tpl-up-dynamic-row';
+  row.style.cssText = 'padding:10px 14px;background:#f7fdfb;border:1px solid #c5ede0;border-radius:8px;margin-bottom:6px;';
+  row.innerHTML = '<div style="display:flex;align-items:center;gap:8px;">' +
+    '<span style="background:' + badgeBg + ';color:' + badgeFg + ';border:' + badgeBorder + ';padding:1px 8px;border-radius:3px;font-size:9px;font-weight:700;">' + badgeText + '</span>' +
+    '<span style="font-size:12px;">📄</span>' +
+    '<span style="font-size:12px;font-weight:600;">' + labelKey + '_20260512.tsv</span>' +
+    '<span style="font-size:11px;color:#888;">2.4 KB</span>' +
+    '<span style="font-size:11px;color:#2ec4a0;font-weight:600;margin-left:auto;">✓ 完了</span>' +
+  '</div>';
+  files.appendChild(row);
+}
 
 function demoTplUpload() {
-  var checked = document.querySelectorAll('#s-tpl1 .source-check');
-  var checkedCount = 0;
-  checked.forEach(function(el) { if (el.querySelector('input[type="checkbox"]').checked) checkedCount++; });
-
-  if (checkedCount <= 1) {
-    document.getElementById('tpl-up-files').style.display = '';
-    document.getElementById('tpl-up-file1').style.display = '';
-    document.getElementById('tpl-up-dropzone').style.display = 'none';
-    document.getElementById('tpl-up-current-label').style.display = 'none';
-  } else if (tplUploadStep === 0) {
-    tplUploadStep = 1;
-    document.getElementById('tpl-up-files').style.display = '';
-    document.getElementById('tpl-up-file1').style.display = '';
-    document.getElementById('tpl-up-current-badge').textContent = '2nd';
-    document.getElementById('tpl-up-current-badge').style.background = '#f59e0b';
-    document.getElementById('tpl-up-current-name').textContent = '② 従業員データ';
-    document.getElementById('tpl-up-current-hint').style.color = '#f59e0b';
-  } else if (tplUploadStep === 1) {
-    tplUploadStep = 2;
-    document.getElementById('tpl-up-file2').style.display = '';
-    document.getElementById('tpl-up-dropzone').style.display = 'none';
-    document.getElementById('tpl-up-current-label').style.display = 'none';
-  }
+  var queue = getTplUploadQueue();
+  if (queue.length === 0) return;
+  var current = queue[tplUploadCursor];
+  if (!current) return;
+  appendTplUploadedFile(current);
+  tplUploadCursor++;
+  applyTplUploadCurrent();
 }
 
 var tplSelectedTypes = [];
@@ -1741,36 +1788,25 @@ function renderTplOrderGuide(selected) {
 function updateTplUploadUI() {
   tplSelectedTypes = getTplChecked();
   var guide = document.getElementById('tpl-upload-order-guide');
-  var multiLabel = document.getElementById('tpl-up-current-label');
-  var singleLabel = document.getElementById('tpl-up-single-label');
 
   // 動的順序ガイド描画(必須Step 1-4は常時表示)
   renderTplOrderGuide(tplSelectedTypes);
   guide.style.display = '';
 
-  if (tplSelectedTypes.length >= 2) {
-    multiLabel.style.display = 'flex';
-    singleLabel.style.display = 'none';
-  } else if (tplSelectedTypes.length === 1) {
-    multiLabel.style.display = 'none';
-    singleLabel.style.display = '';
-    var name = tplSelectedTypes[0] === 'master' ? '① 設定マスタ' : '② 従業員データ';
-    document.getElementById('tpl-up-single-name').textContent = name;
-  } else {
-    multiLabel.style.display = 'none';
-    singleLabel.style.display = 'none';
-  }
+  // single-labelは旧仕様(2項目時代)の残骸。新仕様では使わない
+  var singleLabel = document.getElementById('tpl-up-single-label');
+  if (singleLabel) singleLabel.style.display = 'none';
 
-  // Reset upload state
+  // アップロード状態リセット: 必須Step 1から再スタート
   tplUploadStep = 0;
-  document.getElementById('tpl-up-dropzone').style.display = '';
-  document.getElementById('tpl-up-files').style.display = 'none';
+  tplUploadCursor = 0;
+  var files = document.getElementById('tpl-up-files');
+  files.style.display = 'none';
+  files.querySelectorAll('.tpl-up-dynamic-row').forEach(function(r) { r.remove(); });
   document.getElementById('tpl-up-file1').style.display = 'none';
   document.getElementById('tpl-up-file2').style.display = 'none';
-  document.getElementById('tpl-up-current-badge').textContent = '1st';
-  document.getElementById('tpl-up-current-badge').style.background = '#1a73e8';
-  document.getElementById('tpl-up-current-name').textContent = '① 設定マスタ';
-  document.getElementById('tpl-up-current-hint').style.color = '#1a73e8';
+  // current ラベルを必須順番の先頭(または任意のみなら任意)に
+  applyTplUploadCurrent();
 }
 
 function switchSaasPreviewTab(el, idx) {
