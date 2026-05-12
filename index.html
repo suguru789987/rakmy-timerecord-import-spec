@@ -385,7 +385,7 @@
 
     <div class="wcard">
       <div class="wcard-title"><span class="num">1</span> テンプレートを選択（複数選択可）</div>
-      <div id="tpl-select-caption" style="font-size:11px;color:#666;margin-bottom:12px;">☑ 取り込むテンプレートを選択。必須4項目は <strong>① → ② → ③ → ④</strong> の順、⑤ 管理者は任意。</div>
+      <div id="tpl-select-caption" style="display:none;"></div>
       <!-- 初期セットアップ時の進捗チップ(setupモードのみ表示) -->
       <div id="tpl-setup-progress" style="display:none;margin-bottom:12px;padding:10px 12px;background:#fef9e7;border:1px solid #f0d68a;border-radius:8px;">
         <div style="font-size:11px;font-weight:700;color:#7a5800;margin-bottom:6px;">⚠️ 初期セットアップ進捗</div>
@@ -2329,12 +2329,6 @@ function initTplFocusOnly(key) {
   // 管理者の場合は必須グループ枠ごと非表示、それ以外は維持
   var requiredGroup = document.getElementById('tpl-required-group');
   if (requiredGroup) requiredGroup.style.display = (key === 'admin') ? 'none' : '';
-  // キャプション専用文言
-  var captionEl = document.getElementById('tpl-select-caption');
-  if (captionEl) {
-    var col = (key === 'admin') ? '#7b1fa2' : '#1a73e8';
-    captionEl.innerHTML = '<strong style="color:' + col + ';">' + (TPL_FOCUS_LABELS[key] || '') + 'を取り込み</strong>します。必要に応じて他項目も追加できます。';
-  }
   updateTplUploadUI();
 }
 
@@ -2374,15 +2368,13 @@ function applyTplMode(mode) {
     btn.style.borderColor = isActive ? '#2ec4a0' : '#ccc';
     btn.style.fontWeight = isActive ? '700' : '400';
   });
-  var captionEl = document.getElementById('tpl-select-caption');
+  // 必須グループヘッダのみmode別に更新(キャプションは撤去済)
   var requiredHeader = document.getElementById('tpl-required-header');
-  if (captionEl && requiredHeader) {
+  if (requiredHeader) {
     if (mode === 'setup') {
-      captionEl.innerHTML = '<strong style="color:#0e9077;">初回セットアップです。</strong>必須4項目を <strong>① → ② → ③ → ④</strong> の順で取り込みます。⑤ 管理者は任意。';
       requiredHeader.textContent = '必須4項目(順序固定)';
       requiredHeader.style.color = '#0e9077';
     } else {
-      captionEl.innerHTML = '<strong style="color:#1a73e8;">追加・更新・削除</strong>に使えます。必要な項目だけ選択してください。複数選択時は <strong>① → ② → ③ → ④</strong> の依存関係順に取り込まれます。';
       requiredHeader.textContent = '必須4項目(依存関係順)';
       requiredHeader.style.color = '#555';
     }
