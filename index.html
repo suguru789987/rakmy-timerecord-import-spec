@@ -2066,6 +2066,12 @@ function applyHashRouting() {
       go('s-tpl1');
       showFromSetupBanner('tpl');
       applyTplMode('setup');
+    } else if (hash === 'tpl-admin') {
+      // 新規登録ガイドの後追加項目「管理者を取り込み」専用導線
+      go('s-tpl1');
+      showFromSetupBanner('tpl-admin');
+      applyTplMode('ops');
+      initTplAdminOnly();
     } else if (hash === 'saas') {
       go('s-saas1');
       applyTplMode('ops');
@@ -2077,6 +2083,28 @@ function applyHashRouting() {
       applyTplMode('ops');
     }
   } catch (e) { /* no-op */ }
+}
+
+// 「管理者だけ取り込み」初期化: 必須4項目OFF + 管理者ON
+function initTplAdminOnly() {
+  ['brand','store','emptype','employee'].forEach(function(k) {
+    var label = document.querySelector('#s-tpl1 .source-check[data-tpl="' + k + '"]');
+    if (!label) return;
+    var cb = label.querySelector('input[type="checkbox"]');
+    if (cb) { cb.checked = false; }
+    label.classList.remove('checked');
+    label.style.borderColor = '#e8e8e8';
+    label.style.background = '#fff';
+  });
+  var adminLabel = document.querySelector('#s-tpl1 .source-check[data-tpl="admin"]');
+  if (adminLabel) {
+    var adminCb = adminLabel.querySelector('input[type="checkbox"]');
+    if (adminCb) { adminCb.checked = true; }
+    adminLabel.classList.add('checked');
+    adminLabel.style.borderColor = '#2ec4a0';
+    adminLabel.style.background = '#f7fdfb';
+  }
+  updateTplUploadUI();
 }
 
 // デモ用: モード切替ボタンから呼ばれる(URLハッシュも同期更新)
@@ -2147,9 +2175,13 @@ function showFromSetupBanner(kind) {
   var titleEl = document.getElementById('from-setup-banner-title');
   var descEl = document.getElementById('from-setup-banner-desc');
   if (titleEl) {
-    titleEl.textContent = (kind === 'saas')
-      ? '📋 新規登録ガイド ・ Step 2: 外部勤怠サービスからインポート'
-      : '📋 新規登録ガイド ・ テンプレートで取り込み';
+    if (kind === 'saas') {
+      titleEl.textContent = '📋 新規登録ガイド ・ Step 2: 外部勤怠サービスからインポート';
+    } else if (kind === 'tpl-admin') {
+      titleEl.textContent = '📋 新規登録ガイド ・ 後追加項目: 管理者を取り込み';
+    } else {
+      titleEl.textContent = '📋 新規登録ガイド ・ テンプレートで取り込み';
+    }
   }
   if (descEl) {
     descEl.textContent = 'この画面は新規登録ガイドの一部です。インポート完了後は「↩ 登録ガイドへ戻る」で進捗を確認できます。';
