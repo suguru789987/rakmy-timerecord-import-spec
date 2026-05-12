@@ -2266,7 +2266,7 @@ function refreshSaasUploadBanner() {
   if (banner) banner.style.display = 'none';
 }
 
-// 進捗バナー生成(setupモード時の完了/未完了明示UI・テキスト1行)
+// 進捗バナー生成(setupモード時・テキスト1行 + 横長プログレスバー)
 function renderSetupProgressChips(targetRowId) {
   var rowEl = document.getElementById(targetRowId);
   if (!rowEl) return;
@@ -2275,13 +2275,17 @@ function renderSetupProgressChips(targetRowId) {
   var total = 4;
   var stepNames = ['業態・ブランド', '店舗', '雇用区分', '従業員'];
   var stepNums = ['①', '②', '③', '④'];
-  var nextName = (done < total) ? (stepNums[done] + ' ' + stepNames[done]) : '完了';
+  var pct = (done / total) * 100;
   var html;
   if (done >= total) {
-    html = '<span style="font-size:11px;color:#0e9077;">✓ 取り込み完了（' + total + '/' + total + '）</span>';
+    html = '<div style="font-size:11px;color:#0e9077;margin-bottom:5px;">✓ 取り込み完了（' + total + '/' + total + '）</div>';
   } else {
-    html = '<span style="font-size:11px;color:#666;">📊 取り込み進捗 <strong style="color:#0e9077;">' + done + '/' + total + ' 完了</strong> ・ 次は <strong style="color:#0e9077;">' + nextName + '</strong> から（残り <strong>' + (total - done) + '</strong> 項目）</span>';
+    var nextName = stepNums[done] + ' ' + stepNames[done];
+    html = '<div style="font-size:11px;color:#666;margin-bottom:5px;">📊 取り込み進捗 <strong style="color:#0e9077;">' + done + '/' + total + ' 完了</strong> ・ 次は <strong style="color:#0e9077;">' + nextName + '</strong> から(残り <strong>' + (total - done) + '</strong> 項目)</div>';
   }
+  html += '<div style="height:6px;background:#eee;border-radius:3px;overflow:hidden;">' +
+    '<div style="height:100%;background:#2ec4a5;width:' + pct + '%;transition:width 0.4s;"></div>' +
+    '</div>';
   rowEl.innerHTML = html;
 }
 
