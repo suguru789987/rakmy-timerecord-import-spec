@@ -386,10 +386,9 @@
     <div class="wcard">
       <div class="wcard-title"><span class="num">1</span> テンプレートを選択（複数選択可）</div>
       <div id="tpl-select-caption" style="display:none;"></div>
-      <!-- 初期セットアップ時の進捗チップ(setupモードのみ表示) -->
-      <div id="tpl-setup-progress" style="display:none;margin-bottom:12px;padding:10px 12px;background:#fef9e7;border:1px solid #f0d68a;border-radius:8px;">
-        <div style="font-size:11px;font-weight:700;color:#7a5800;margin-bottom:6px;">⚠️ 初期セットアップ進捗</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;" id="tpl-setup-progress-chips"></div>
+      <!-- 初期セットアップ時の進捗チップ(setupモードのみ・ミニマル表示) -->
+      <div id="tpl-setup-progress" style="display:none;margin-bottom:12px;">
+        <div style="display:flex;gap:5px;flex-wrap:wrap;" id="tpl-setup-progress-chips"></div>
       </div>
 
       <!-- 必須グループ -->
@@ -688,10 +687,9 @@
 
     <div class="wcard" id="saas-section-sources">
       <div class="wcard-title"><span class="num" id="saas-num-2">2</span> 取り込みデータ（複数選択可）</div>
-      <!-- 初期セットアップ時の進捗チップ(setupモードのみ表示) -->
-      <div id="saas-setup-progress" style="display:none;margin-bottom:14px;padding:10px 12px;background:#fef9e7;border:1px solid #f0d68a;border-radius:8px;">
-        <div style="font-size:11px;font-weight:700;color:#7a5800;margin-bottom:6px;">⚠️ 初期セットアップ進捗</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;" id="saas-setup-progress-chips"></div>
+      <!-- 初期セットアップ時の進捗チップ(setupモードのみ・ミニマル表示) -->
+      <div id="saas-setup-progress" style="display:none;margin-bottom:12px;">
+        <div style="display:flex;gap:5px;flex-wrap:wrap;" id="saas-setup-progress-chips"></div>
       </div>
       <div style="display:none;" id="saas-source-hint"></div>
 
@@ -700,7 +698,6 @@
         <input type="checkbox" checked style="accent-color:#2ec4a0;width:16px;height:16px;">
         <div style="flex:1;">
           <div style="font-size:13px;font-weight:600;">業態・ブランド <span style="font-size:9px;padding:1px 7px;background:#f3e5f5;color:#7b1fa2;border-radius:10px;font-weight:600;margin-left:6px;">テンプレ</span></div>
-          <div style="font-size:11px;color:#888;">3列 ・ 外部勤怠サービス対象外</div>
         </div>
         <a class="dl-link" href="#" onclick="event.stopPropagation();downloadBrandTemplate();" style="font-size:11px;">⬇ テンプレートDL</a>
       </label>
@@ -720,21 +717,18 @@
             <input type="checkbox" style="accent-color:#2ec4a0;width:16px;height:16px;">
             <div style="flex:1;">
               <div style="font-size:13px;font-weight:600;">所属グループデータ <span style="font-size:9px;padding:1px 7px;background:#fef3e2;color:#e67e22;border-radius:10px;font-weight:600;margin-left:6px;">任意</span></div>
-              <div style="font-size:10px;color:#888;">→ タイムレコの 店舗情報 にマッピング</div>
             </div>
           </label>
           <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #e8e8e8;border-radius:8px;cursor:pointer;" class="source-check" data-map="map-kot-rate" onclick="toggleCheck(this)">
             <input type="checkbox" style="accent-color:#2ec4a0;width:16px;height:16px;">
             <div style="flex:1;">
               <div style="font-size:13px;font-weight:600;">単価データ <span style="font-size:9px;padding:1px 7px;background:#fef3e2;color:#e67e22;border-radius:10px;font-weight:600;margin-left:6px;">任意</span></div>
-              <div style="font-size:10px;color:#888;">→ タイムレコの 雇用区分 にマッピング</div>
             </div>
           </label>
           <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #e8e8e8;border-radius:8px;cursor:pointer;" class="source-check" data-map="map-kot-admin" onclick="toggleCheck(this)">
             <input type="checkbox" style="accent-color:#2ec4a0;width:16px;height:16px;">
             <div style="flex:1;">
               <div style="font-size:13px;font-weight:600;">管理者データ <span style="font-size:9px;padding:1px 7px;background:#fef3e2;color:#e67e22;border-radius:10px;font-weight:600;margin-left:6px;">任意</span></div>
-              <div style="font-size:10px;color:#888;">→ タイムレコの 管理者 にマッピング</div>
             </div>
           </label>
         </div>
@@ -1917,9 +1911,7 @@ function renderTplOrderGuide(selected) {
       html += '</span>';
     });
     rowEl.innerHTML = html;
-    var setupCaption = '必須4項目は <strong>業態 → 店舗 → 雇用区分 → 従業員</strong> の順で取り込まれます（依存関係順・順序必須）。';
-    if (optionalSelected.length > 0) setupCaption += ' <span style="color:#7b1fa2;">⑤ 管理者(任意)は最後に取り込まれます。</span>';
-    captionEl.innerHTML = setupCaption;
+    captionEl.innerHTML = '';
   } else {
     // 運用更新: 単体更新が主なので順序ガイドは2件以上選択時のみ表示
     if (titleEl) titleEl.textContent = 'アップロード対象';
@@ -1948,7 +1940,7 @@ function renderTplOrderGuide(selected) {
       }
     });
     rowEl.innerHTML = html;
-    captionEl.innerHTML = '複数選択時は <strong>依存関係順</strong> に取り込まれます。';
+    captionEl.innerHTML = '';
   }
 }
 
