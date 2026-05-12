@@ -2266,32 +2266,23 @@ function refreshSaasUploadBanner() {
   if (banner) banner.style.display = 'none';
 }
 
-// 進捗チップ共通生成(setupモード時の完了/未完了明示UI)
+// 進捗バナー生成(setupモード時の完了/未完了明示UI・プログレスバー形式)
 function renderSetupProgressChips(targetRowId) {
   var rowEl = document.getElementById(targetRowId);
   if (!rowEl) return;
-  // import-spec単独では本物のdoneを知り得ないため、デモ用ステータスを表示
-  // (本番ではDB連携でdoneを取得し動的更新)
-  var stepDefs = [
-    { num: '①', name: '業態・ブランド', status: 'todo' },
-    { num: '②', name: '店舗',          status: 'todo' },
-    { num: '③', name: '雇用区分',      status: 'todo' },
-    { num: '④', name: '従業員',        status: 'todo' }
-  ];
-  var html = '';
-  stepDefs.forEach(function(d, idx) {
-    var st;
-    if (d.status === 'done') {
-      st = { ic: '✓', color: '#0e9077', bg: '#e8f9f4', border: '#b2ebe0' };
-    } else if (idx === 0 && d.status === 'todo') {
-      st = { ic: '⏳', color: '#0e9077', bg: '#fff', border: '#2ec4a5' };
-    } else {
-      st = { ic: '🔒', color: '#999', bg: '#fafafa', border: '#e8e8e8' };
-    }
-    html += '<div style="display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;border:1px solid ' + st.border + ';background:' + st.bg + ';font-size:11px;color:' + st.color + ';font-weight:600;">' + st.ic + ' ' + d.num + ' ' + d.name;
-    if (idx === 0) html += '<span style="font-size:9px;background:#2ec4a5;color:#fff;padding:1px 6px;border-radius:8px;font-weight:700;margin-left:2px;">次</span>';
-    html += '</div>';
-  });
+  // import-spec単独では本物のdoneを知り得ないため、デモ用に固定値(0/4)
+  var done = 0;
+  var total = 4;
+  var pct = (done / total) * 100;
+  var stepNames = ['業態・ブランド', '店舗', '雇用区分', '従業員'];
+  var nextName = (done < total) ? stepNames[done] : '完了';
+  var html = '<div style="display:flex;align-items:center;gap:10px;font-size:11px;color:#666;">' +
+    '<span style="white-space:nowrap;">📊 取り込み進捗: <strong style="color:#0e9077;">' + done + '/' + total + '</strong></span>' +
+    '<div style="flex:1;height:6px;background:#eee;border-radius:3px;overflow:hidden;min-width:80px;">' +
+    '<div style="height:100%;background:#2ec4a5;width:' + pct + '%;transition:width 0.4s;"></div>' +
+    '</div>' +
+    (done < total ? '<span style="white-space:nowrap;color:#0e9077;">次: <strong>' + nextName + '</strong></span>' : '') +
+    '</div>';
   rowEl.innerHTML = html;
 }
 
