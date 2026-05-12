@@ -668,15 +668,15 @@
       <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:stretch;" id="saas-list">
         <div class="saas-item selected" onclick="selSaasMain(this,'kot')" data-saas="kot" style="flex:1;min-width:180px;">
           <div class="saas-logo kot">KoT</div>
-          <div><h4>キングオブタイム</h4><p>勤怠管理 / 人事労務</p></div>
+          <div><h4>キングオブタイム</h4></div>
         </div>
         <div class="saas-item" onclick="selSaasMain(this,'jc')" data-saas="jc" style="flex:1;min-width:180px;">
           <div class="saas-logo jc">JC</div>
-          <div><h4>ジョブカン</h4><p>勤怠管理 / 給与計算</p></div>
+          <div><h4>ジョブカン</h4></div>
         </div>
         <div class="saas-item" onclick="selSaasMain(this,'other')" data-saas="other" style="flex:1;min-width:180px;border-style:dashed;">
           <div class="saas-logo" style="background:#999;font-size:20px;">+</div>
-          <div><h4 style="color:#888;">その他のサービス</h4><p>お問い合わせください</p></div>
+          <div><h4 style="color:#888;">その他</h4></div>
         </div>
       </div>
       <div id="saas-other-form" style="display:none;margin-top:12px;padding:20px;background:#f8f8f8;border-radius:8px;text-align:center;">
@@ -687,7 +687,7 @@
 
     <div class="wcard" id="saas-section-sources">
       <div class="wcard-title"><span class="num" id="saas-num-2">2</span> 取り込みデータ（複数選択可）</div>
-      <div style="font-size:11px;color:#666;margin-bottom:10px;" id="saas-source-hint">基本1ファイル、給与データがあれば2ファイルまで。内部で自動仕分け。</div>
+      <div style="display:none;" id="saas-source-hint"></div>
 
       <!-- 業態・ブランド(テンプレ): 両モードで表示 -->
       <label id="saas-brand-check" style="display:none;align-items:center;gap:10px;padding:10px 12px;border:1px solid #e8e8e8;border-radius:8px;margin-bottom:8px;cursor:pointer;background:#fff;" class="source-check checked" data-saas-extra="brand" onclick="toggleSaasBrandCheck(this)">
@@ -701,50 +701,28 @@
 
       <!-- KoT用 -->
       <div id="source-kot">
-        <div style="font-size:12px;font-weight:600;color:#1a73e8;margin-bottom:10px;">キングオブタイム データソース</div>
         <div style="display:flex;flex-direction:column;gap:8px;">
-          <label style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:2px solid #e8e8e8;border-radius:8px;cursor:pointer;transition:all 0.15s;" class="source-check checked" data-map="map-kot-emp" onclick="toggleCheck(this)">
-            <input type="checkbox" checked style="accent-color:#2ec4a0;width:16px;height:16px;margin-top:2px;">
-            <div style="flex:1;">
-              <div style="font-size:13px;font-weight:600;">従業員データ（employee_info）</div>
-              <div style="font-size:11px;color:#888;">勤怠管理 → 従業員データエクスポート</div>
-              <div style="font-size:11px;color:#2ec4a0;font-weight:600;margin-top:2px;">基本（必須）</div>
-            </div>
-            <span class="tpl-badge" style="font-size:10px;">設定データ</span>
+          <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #e8e8e8;border-radius:8px;cursor:pointer;" class="source-check checked" data-map="map-kot-emp" onclick="toggleCheck(this)">
+            <input type="checkbox" checked style="accent-color:#2ec4a0;width:16px;height:16px;">
+            <div style="flex:1;font-size:13px;font-weight:600;">従業員データ <span style="font-size:9px;padding:1px 7px;background:#e8f9f4;color:#0e9077;border-radius:10px;font-weight:600;margin-left:6px;">必須</span></div>
           </label>
-          <label style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:2px solid #e8e8e8;border-radius:8px;cursor:pointer;transition:all 0.15s;" class="source-check" data-map="map-kot-hr" onclick="toggleCheck(this)">
-            <input type="checkbox" style="accent-color:#2ec4a0;width:16px;height:16px;margin-top:2px;">
-            <div style="flex:1;">
-              <div style="font-size:13px;font-weight:600;">従業員一覧エクスポート（hr_）</div>
-              <div style="font-size:11px;color:#888;">人事労務 → 従業員一覧エクスポート（給与・契約種別を含む）</div>
-              <div style="font-size:11px;color:#f59e0b;font-weight:600;margin-top:2px;">任意（給与データ補完）</div>
-            </div>
-            <span class="tpl-badge" style="font-size:10px;">給与データ</span>
+          <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #e8e8e8;border-radius:8px;cursor:pointer;" class="source-check" data-map="map-kot-hr" onclick="toggleCheck(this)">
+            <input type="checkbox" style="accent-color:#2ec4a0;width:16px;height:16px;">
+            <div style="flex:1;font-size:13px;font-weight:600;">従業員一覧 <span style="font-size:9px;padding:1px 7px;background:#fef3e2;color:#e67e22;border-radius:10px;font-weight:600;margin-left:6px;">任意</span></div>
           </label>
         </div>
       </div>
 
       <!-- Jobcan用 -->
       <div id="source-jc" style="display:none;">
-        <div style="font-size:12px;font-weight:600;color:#ff6b35;margin-bottom:10px;">ジョブカン データソース</div>
         <div style="display:flex;flex-direction:column;gap:8px;">
-          <label style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:2px solid #e8e8e8;border-radius:8px;cursor:pointer;transition:all 0.15s;" class="source-check checked" data-map="map-jc-staff" onclick="toggleCheck(this)">
-            <input type="checkbox" checked style="accent-color:#2ec4a0;width:16px;height:16px;margin-top:2px;">
-            <div style="flex:1;">
-              <div style="font-size:13px;font-weight:600;">スタッフ情報ダウンロード（staff-info-）</div>
-              <div style="font-size:11px;color:#888;">勤怠管理 → スタッフ情報ダウンロード</div>
-              <div style="font-size:11px;color:#2ec4a0;font-weight:600;margin-top:2px;">基本（必須）</div>
-            </div>
-            <span class="tpl-badge" style="font-size:10px;">設定データ</span>
+          <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #e8e8e8;border-radius:8px;cursor:pointer;" class="source-check checked" data-map="map-jc-staff" onclick="toggleCheck(this)">
+            <input type="checkbox" checked style="accent-color:#2ec4a0;width:16px;height:16px;">
+            <div style="flex:1;font-size:13px;font-weight:600;">スタッフ情報 <span style="font-size:9px;padding:1px 7px;background:#e8f9f4;color:#0e9077;border-radius:10px;font-weight:600;margin-left:6px;">必須</span></div>
           </label>
-          <label style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:2px solid #e8e8e8;border-radius:8px;cursor:pointer;transition:all 0.15s;" class="source-check" data-map="map-jc-emp" onclick="toggleCheck(this)">
-            <input type="checkbox" style="accent-color:#2ec4a0;width:16px;height:16px;margin-top:2px;">
-            <div style="flex:1;">
-              <div style="font-size:13px;font-weight:600;">従業員データダウンロード（jobcan_employees）</div>
-              <div style="font-size:11px;color:#888;">給与計算 → 従業員データダウンロード（給与形態・基本給を含む）</div>
-              <div style="font-size:11px;color:#f59e0b;font-weight:600;margin-top:2px;">任意（給与データ補完）</div>
-            </div>
-            <span class="tpl-badge" style="font-size:10px;">給与データ</span>
+          <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #e8e8e8;border-radius:8px;cursor:pointer;" class="source-check" data-map="map-jc-emp" onclick="toggleCheck(this)">
+            <input type="checkbox" style="accent-color:#2ec4a0;width:16px;height:16px;">
+            <div style="flex:1;font-size:13px;font-weight:600;">従業員データ <span style="font-size:9px;padding:1px 7px;background:#fef3e2;color:#e67e22;border-radius:10px;font-weight:600;margin-left:6px;">任意</span></div>
           </label>
         </div>
       </div>
@@ -791,7 +769,6 @@
             <span style="background:#f59e0b;color:#fff;padding:2px 10px;border-radius:4px;font-size:10px;font-weight:700;flex-shrink:0;">2nd</span>
             <span style="font-size:12px;" id="saas-order-name2">従業員一覧エクスポート（hr_）</span>
           </div>
-          <div style="font-size:11px;color:#888;margin-top:6px;">設定データを先にアップロードし、給与データで補完します。順序が異なるとエラーになります。</div>
         </div>
       </div>
 
@@ -2268,15 +2245,10 @@ function toggleSaasBrandCheck(el) {
   }, 0);
 }
 
-// アップロード順序バナーを業態チェック状態に応じて更新
+// アップロード順序バナーは動的順序ガイド(updateUploadSteps)で代替するため常時非表示
 function refreshSaasUploadBanner() {
   var banner = document.getElementById('saas-setup-upload-banner');
-  var brandCheck = document.getElementById('saas-brand-check');
-  if (!banner) return;
-  var mode = document.body.getAttribute('data-saas-mode') || 'ops';
-  if (mode !== 'setup') { banner.style.display = 'none'; return; }
-  var cb = brandCheck ? brandCheck.querySelector('input[type="checkbox"]') : null;
-  banner.style.display = (cb && cb.checked) ? '' : 'none';
+  if (banner) banner.style.display = 'none';
 }
 
 var TPL_FOCUS_LABELS = { brand: '業態・ブランド', store: '店舗', emptype: '雇用区分', employee: '従業員', admin: '管理者' };
