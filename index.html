@@ -314,8 +314,11 @@
         <h3>テンプレートで取り込み</h3>
         <p>ラクミー専用テンプレートにデータを入力してインポート。初期セットアップに最適。</p>
         <div class="ic-steps">
-          <span class="ic-step">① 設定マスタ</span>
-          <span class="ic-step">② 従業員データ</span>
+          <span class="ic-step">① 業態</span>
+          <span class="ic-step">② 店舗</span>
+          <span class="ic-step">③ 雇用区分</span>
+          <span class="ic-step">④ 従業員</span>
+          <span class="ic-step" style="color:#7b1fa2;">⑤ 管理者(任意)</span>
         </div>
         <div class="ic-arrow">→</div>
       </div>
@@ -455,15 +458,15 @@
         </div>
       </div>
 
-      <!-- アップロード対象ラベル -->
+      <!-- アップロード対象ラベル(JSで動的更新、初期は必須Step 1) -->
       <div id="tpl-up-current-label" style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
         <span id="tpl-up-current-badge" style="background:#1a73e8;color:#fff;padding:2px 10px;border-radius:4px;font-size:10px;font-weight:700;">1st</span>
-        <span style="font-size:13px;font-weight:600;" id="tpl-up-current-name">① 設定マスタ</span>
+        <span style="font-size:13px;font-weight:600;" id="tpl-up-current-name">① 業態・ブランド</span>
         <span style="font-size:11px;color:#1a73e8;font-weight:600;" id="tpl-up-current-hint">をアップロードしてください</span>
       </div>
-      <!-- 1つ選択時のラベル -->
+      <!-- 1つ選択時のラベル(旧仕様残骸・新仕様では未使用) -->
       <div id="tpl-up-single-label" style="display:none;margin-bottom:8px;">
-        <span style="font-size:13px;font-weight:600;" id="tpl-up-single-name">① 設定マスタ</span>
+        <span style="font-size:13px;font-weight:600;" id="tpl-up-single-name">① 業態・ブランド</span>
         <span style="font-size:11px;color:#888;">をアップロードしてください</span>
       </div>
 
@@ -475,26 +478,10 @@
         <div class="ub-hint">TSV / CSV（最大10MB）</div>
       </div>
 
-      <!-- アップロード済みファイル一覧 -->
+      <!-- アップロード済みファイル一覧(JSで動的に行を追加。tpl-up-file1/file2は旧仕様残骸で非使用) -->
       <div id="tpl-up-files" style="display:none;margin-top:10px;">
-        <div id="tpl-up-file1" style="display:none;padding:10px 14px;background:#f7fdfb;border:1px solid #c5ede0;border-radius:8px;margin-bottom:6px;">
-          <div style="display:flex;align-items:center;gap:8px;">
-            <span style="background:#1a73e8;color:#fff;padding:1px 8px;border-radius:3px;font-size:9px;font-weight:700;">1st</span>
-            <span style="font-size:12px;">📄</span>
-            <span style="font-size:12px;font-weight:600;">設定マスタ_20260331.tsv</span>
-            <span style="font-size:11px;color:#888;">2.4 KB · 5行</span>
-            <span style="font-size:11px;color:#2ec4a0;font-weight:600;margin-left:auto;">✓ 完了</span>
-          </div>
-        </div>
-        <div id="tpl-up-file2" style="display:none;padding:10px 14px;background:#f7fdfb;border:1px solid #c5ede0;border-radius:8px;">
-          <div style="display:flex;align-items:center;gap:8px;">
-            <span style="background:#f59e0b;color:#fff;padding:1px 8px;border-radius:3px;font-size:9px;font-weight:700;">2nd</span>
-            <span style="font-size:12px;">📄</span>
-            <span style="font-size:12px;font-weight:600;">従業員データ_20260331.tsv</span>
-            <span style="font-size:11px;color:#888;">3.1 KB · 8行</span>
-            <span style="font-size:11px;color:#2ec4a0;font-weight:600;margin-left:auto;">✓ 完了</span>
-          </div>
-        </div>
+        <div id="tpl-up-file1" style="display:none;"></div>
+        <div id="tpl-up-file2" style="display:none;"></div>
       </div>
     </div>
 
