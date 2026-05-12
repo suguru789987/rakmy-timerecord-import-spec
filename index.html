@@ -1708,15 +1708,21 @@ function renderTplOrderGuide(selected) {
   var captionEl = document.getElementById('tpl-upload-order-caption');
   if (!rowEl || !captionEl) return;
   var ordinals = ['1st','2nd','3rd','4th'];
-  var required = TPL_ORDER_DEF.filter(function(t) { return t.required && selected.indexOf(t.key) >= 0; });
-  var optional = TPL_ORDER_DEF.filter(function(t) { return !t.required && selected.indexOf(t.key) >= 0; });
+  var requiredAll = TPL_ORDER_DEF.filter(function(t) { return t.required; });
+  var optionalSelected = TPL_ORDER_DEF.filter(function(t) { return !t.required && selected.indexOf(t.key) >= 0; });
   var html = '';
-  required.forEach(function(t, idx) {
+  // 必須4項目は常時表示。未選択はグレーアウト
+  requiredAll.forEach(function(t, idx) {
+    var isSelected = selected.indexOf(t.key) >= 0;
+    var opacity = isSelected ? '1' : '0.35';
     if (idx > 0) html += '<span style="font-size:13px;color:#ccc;">→</span>';
+    html += '<span style="display:inline-flex;align-items:center;gap:6px;opacity:' + opacity + ';">';
     html += '<span style="background:' + t.color + ';color:#fff;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;">' + ordinals[idx] + '</span>';
-    html += '<span style="font-size:11px;">' + t.label + '</span>';
+    html += '<span style="font-size:11px;">' + t.label + (isSelected ? '' : ' <span style="color:#aaa;font-size:9px;">(未選択)</span>') + '</span>';
+    html += '</span>';
   });
-  optional.forEach(function(t) {
+  // 任意項目(管理者)はチェック時のみ追加表示
+  optionalSelected.forEach(function(t) {
     html += '<span style="margin-left:8px;display:inline-flex;align-items:center;gap:6px;padding-left:8px;border-left:1px dashed #ccc;">';
     html += '<span style="background:#fff;color:' + t.color + ';border:1px solid ' + t.color + ';padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;">任意</span>';
     html += '<span style="font-size:11px;color:' + t.color + ';">' + t.label + '</span>';
@@ -1724,14 +1730,11 @@ function renderTplOrderGuide(selected) {
   });
   rowEl.innerHTML = html;
   // キャプション
-  if (required.length > 0 && optional.length > 0) {
-    captionEl.innerHTML = '必須は <strong>' + required.map(function(t){return t.label.replace(/^[①②③④⑤]\s*/, '');}).join(' → ') + '</strong> の順（依存関係順）。<span style="color:#7b1fa2;">⑤ 管理者は任意</span>で、最後に取り込まれます。';
-  } else if (required.length > 0) {
-    captionEl.innerHTML = '<strong>' + required.map(function(t){return t.label.replace(/^[①②③④⑤]\s*/, '');}).join(' → ') + '</strong> の順（依存関係順）で取り込まれます。';
-  } else if (optional.length > 0) {
-    captionEl.innerHTML = '<span style="color:#7b1fa2;">⑤ 管理者のみ</span>を取り込みます。前提: ② 店舗が既登録済みであること。';
+  var captionBase = '必須4項目は <strong>業態 → 店舗 → 雇用区分 → 従業員</strong> の順で取り込まれます（依存関係順・順序必須）。';
+  if (optionalSelected.length > 0) {
+    captionEl.innerHTML = captionBase + ' <span style="color:#7b1fa2;">⑤ 管理者(任意)は最後に取り込まれます。</span>';
   } else {
-    captionEl.textContent = '';
+    captionEl.innerHTML = captionBase;
   }
 }
 
@@ -1741,21 +1744,19 @@ function updateTplUploadUI() {
   var multiLabel = document.getElementById('tpl-up-current-label');
   var singleLabel = document.getElementById('tpl-up-single-label');
 
-  // 動的順序ガイド描画
+  // 動的順序ガイド描画(必須Step 1-4は常時表示)
   renderTplOrderGuide(tplSelectedTypes);
+  guide.style.display = '';
 
   if (tplSelectedTypes.length >= 2) {
-    guide.style.display = '';
     multiLabel.style.display = 'flex';
     singleLabel.style.display = 'none';
   } else if (tplSelectedTypes.length === 1) {
-    guide.style.display = 'none';
     multiLabel.style.display = 'none';
     singleLabel.style.display = '';
     var name = tplSelectedTypes[0] === 'master' ? '① 設定マスタ' : '② 従業員データ';
     document.getElementById('tpl-up-single-name').textContent = name;
   } else {
-    guide.style.display = 'none';
     multiLabel.style.display = 'none';
     singleLabel.style.display = 'none';
   }
