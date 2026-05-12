@@ -699,16 +699,36 @@
         <a class="dl-link" href="#" onclick="event.stopPropagation();downloadBrandTemplate();" style="font-size:11px;">⬇ テンプレートDL</a>
       </label>
 
-      <!-- KoT用 -->
+      <!-- KoT用: KOTエクスポートデータ仕様に基づき4種類 -->
       <div id="source-kot">
         <div style="display:flex;flex-direction:column;gap:8px;">
           <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #e8e8e8;border-radius:8px;cursor:pointer;" class="source-check checked" data-map="map-kot-emp" onclick="toggleCheck(this)">
             <input type="checkbox" checked style="accent-color:#2ec4a0;width:16px;height:16px;">
-            <div style="flex:1;font-size:13px;font-weight:600;">従業員データ <span style="font-size:9px;padding:1px 7px;background:#e8f9f4;color:#0e9077;border-radius:10px;font-weight:600;margin-left:6px;">必須</span></div>
+            <div style="flex:1;">
+              <div style="font-size:13px;font-weight:600;">従業員データ <span style="font-size:9px;padding:1px 7px;background:#e8f9f4;color:#0e9077;border-radius:10px;font-weight:600;margin-left:6px;">必須</span></div>
+              <div style="font-size:10px;color:#888;">→ タイムレコの 従業員 にマッピング</div>
+            </div>
           </label>
-          <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #e8e8e8;border-radius:8px;cursor:pointer;" class="source-check" data-map="map-kot-hr" onclick="toggleCheck(this)">
+          <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #e8e8e8;border-radius:8px;cursor:pointer;" class="source-check checked" data-map="map-kot-group" onclick="toggleCheck(this)">
+            <input type="checkbox" checked style="accent-color:#2ec4a0;width:16px;height:16px;">
+            <div style="flex:1;">
+              <div style="font-size:13px;font-weight:600;">所属グループデータ <span style="font-size:9px;padding:1px 7px;background:#e8f9f4;color:#0e9077;border-radius:10px;font-weight:600;margin-left:6px;">必須</span></div>
+              <div style="font-size:10px;color:#888;">→ タイムレコの 店舗情報 にマッピング</div>
+            </div>
+          </label>
+          <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #e8e8e8;border-radius:8px;cursor:pointer;" class="source-check checked" data-map="map-kot-rate" onclick="toggleCheck(this)">
+            <input type="checkbox" checked style="accent-color:#2ec4a0;width:16px;height:16px;">
+            <div style="flex:1;">
+              <div style="font-size:13px;font-weight:600;">単価データ <span style="font-size:9px;padding:1px 7px;background:#e8f9f4;color:#0e9077;border-radius:10px;font-weight:600;margin-left:6px;">必須</span></div>
+              <div style="font-size:10px;color:#888;">→ タイムレコの 雇用区分 にマッピング</div>
+            </div>
+          </label>
+          <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #e8e8e8;border-radius:8px;cursor:pointer;" class="source-check" data-map="map-kot-admin" onclick="toggleCheck(this)">
             <input type="checkbox" style="accent-color:#2ec4a0;width:16px;height:16px;">
-            <div style="flex:1;font-size:13px;font-weight:600;">従業員一覧 <span style="font-size:9px;padding:1px 7px;background:#fef3e2;color:#e67e22;border-radius:10px;font-weight:600;margin-left:6px;">任意</span></div>
+            <div style="flex:1;">
+              <div style="font-size:13px;font-weight:600;">管理者データ <span style="font-size:9px;padding:1px 7px;background:#fef3e2;color:#e67e22;border-radius:10px;font-weight:600;margin-left:6px;">任意</span></div>
+              <div style="font-size:10px;color:#888;">→ タイムレコの 管理者 にマッピング</div>
+            </div>
           </label>
         </div>
       </div>
