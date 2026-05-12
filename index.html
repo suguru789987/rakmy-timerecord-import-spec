@@ -2175,11 +2175,17 @@ function applyHashRouting() {
       showFromSetupBanner('tpl');
       applyTplMode('setup');
     } else if (hash === 'tpl-admin') {
-      // 新規登録ガイドの後追加項目「管理者を取り込み」専用導線
+      // 新規登録ガイドの後追加項目「管理者を取り込み」専用導線(後方互換)
       go('s-tpl1');
       showFromSetupBanner('tpl-admin');
       applyTplMode('ops');
-      initTplAdminOnly();
+      initTplFocusOnly('admin');
+    } else if (/^tpl-only-(brand|store|emptype|employee|admin)$/.test(hash)) {
+      // 運用画面の各設定画面からのフォーカスインポート導線
+      var focusKey = hash.replace('tpl-only-', '');
+      go('s-tpl1');
+      applyTplMode('ops');
+      initTplFocusOnly(focusKey);
     } else if (hash === 'saas') {
       go('s-saas1');
       applySaasMode('ops');
@@ -2273,38 +2279,40 @@ function refreshSaasUploadBanner() {
   banner.style.display = (cb && cb.checked) ? '' : 'none';
 }
 
-// 「管理者だけ取り込み」初期化: 必須4項目グループを非表示 + 管理者だけON
-function initTplAdminOnly() {
-  // 必須4項目はチェック外す + グループ枠ごと非表示
-  ['brand','store','emptype','employee'].forEach(function(k) {
+var TPL_FOCUS_LABELS = { brand: '業態・ブランド', store: '店舗', emptype: '雇用区分', employee: '従業員', admin: '管理者' };
+
+// 指定キーだけON、他はOFFで初期化(運用画面ごとの「フォーカスインポート」用)
+function initTplFocusOnly(key) {
+  var keys = ['brand','store','emptype','employee','admin'];
+  keys.forEach(function(k) {
     var label = document.querySelector('#s-tpl1 .source-check[data-tpl="' + k + '"]');
     if (!label) return;
     var cb = label.querySelector('input[type="checkbox"]');
-    if (cb) { cb.checked = false; }
-    label.classList.remove('checked');
-    label.style.borderColor = '#e8e8e8';
-    label.style.background = '#fff';
+    var isTarget = (k === key);
+    if (cb) cb.checked = isTarget;
+    if (isTarget) {
+      label.classList.add('checked');
+      label.style.borderColor = '#2ec4a0';
+      label.style.background = '#f7fdfb';
+    } else {
+      label.classList.remove('checked');
+      label.style.borderColor = '#e8e8e8';
+      label.style.background = '#fff';
+    }
   });
+  // 管理者の場合は必須グループ枠ごと非表示、それ以外は維持
   var requiredGroup = document.getElementById('tpl-required-group');
-  if (requiredGroup) requiredGroup.style.display = 'none';
-  // 管理者ON
-  var adminLabel = document.querySelector('#s-tpl1 .source-check[data-tpl="admin"]');
-  if (adminLabel) {
-    var adminCb = adminLabel.querySelector('input[type="checkbox"]');
-    if (adminCb) { adminCb.checked = true; }
-    adminLabel.classList.add('checked');
-    adminLabel.style.borderColor = '#2ec4a0';
-    adminLabel.style.background = '#f7fdfb';
-  }
-  // キャプションも専用文言に
+  if (requiredGroup) requiredGroup.style.display = (key === 'admin') ? 'none' : '';
+  // キャプション専用文言
   var captionEl = document.getElementById('tpl-select-caption');
   if (captionEl) {
-    captionEl.innerHTML = '<strong style="color:#7b1fa2;">管理者を一括取込</strong>します。CSVファイルをアップロードしてください。';
+    var col = (key === 'admin') ? '#7b1fa2' : '#1a73e8';
+    captionEl.innerHTML = '<strong style="color:' + col + ';">' + (TPL_FOCUS_LABELS[key] || '') + 'を取り込み</strong>します。必要に応じて他項目も追加できます。';
   }
   updateTplUploadUI();
 }
 
-// admin-only 状態を解除して通常の選択画面に戻す
+// フォーカス状態を解除(通常の運用更新画面に戻す)
 function clearTplAdminOnly() {
   var requiredGroup = document.getElementById('tpl-required-group');
   if (requiredGroup) requiredGroup.style.display = '';
