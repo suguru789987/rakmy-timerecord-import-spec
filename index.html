@@ -640,8 +640,19 @@
 <!-- SAAS: STEP 1 - 選択＆アップロード -->
 <!-- ==================== -->
 <div class="screen" id="s-saas1">
-  <div class="page-header"><h1 class="page-title">外部勤怠サービスから取り込み</h1></div>
+  <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+    <h1 class="page-title" style="margin:0;">外部勤怠サービスから取り込み</h1>
+    <!-- 🛠 デモ用モード切替(本番では非表示推奨) -->
+    <div style="display:flex;align-items:center;gap:8px;font-size:10px;background:#fff3e0;border:1px dashed #e67e22;border-radius:8px;padding:6px 10px;">
+      <span style="color:#e67e22;font-weight:700;">🛠 デモ用</span>
+      <button class="saas-mode-toggle" data-mode="setup" onclick="switchSaasMode('setup')" style="font-size:11px;padding:4px 10px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;">新規登録</button>
+      <button class="saas-mode-toggle" data-mode="ops" onclick="switchSaasMode('ops')" style="font-size:11px;padding:4px 10px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;">運用更新</button>
+    </div>
+  </div>
   <div class="content">
+
+    <!-- モード別キャプション(JSで動的更新) -->
+    <div id="saas-mode-caption" style="font-size:12px;color:#666;margin-bottom:14px;padding:10px 14px;border-radius:8px;background:#f8f8f8;border-left:3px solid #1a73e8;display:none;"></div>
 
     <div class="flow-steps">
       <div class="fs active"><span class="fs-num">1</span><span class="fs-label">選択・アップロード</span></div>
@@ -2061,7 +2072,7 @@ function applyHashRouting() {
     if (hash === 'saas-setup') {
       go('s-saas1');
       showFromSetupBanner('saas');
-      applyTplMode('setup');
+      applySaasMode('setup');
     } else if (hash === 'tpl-setup') {
       go('s-tpl1');
       showFromSetupBanner('tpl');
@@ -2074,15 +2085,60 @@ function applyHashRouting() {
       initTplAdminOnly();
     } else if (hash === 'saas') {
       go('s-saas1');
-      applyTplMode('ops');
+      applySaasMode('ops');
     } else if (hash === 'tpl') {
       go('s-tpl1');
       applyTplMode('ops');
     } else {
       // ハッシュなし: 運用更新扱い
       applyTplMode('ops');
+      applySaasMode('ops');
     }
   } catch (e) { /* no-op */ }
+}
+
+// 外部連携画面のモード切替(デモ用トグルから)
+function switchSaasMode(mode) {
+  if (mode !== 'setup' && mode !== 'ops') mode = 'ops';
+  var newHash = (mode === 'setup') ? '#saas-setup' : '#saas';
+  if (location.hash !== newHash) {
+    history.replaceState(null, '', newHash);
+  }
+  var banner = document.getElementById('from-setup-banner');
+  if (mode === 'setup') {
+    showFromSetupBanner('saas');
+  } else if (banner) {
+    banner.style.display = 'none';
+  }
+  applySaasMode(mode);
+}
+
+// 外部連携画面: 新規登録(setup) と 運用更新(ops) の出し分け
+function applySaasMode(mode) {
+  document.body.setAttribute('data-saas-mode', mode);
+  // トグルのactive表示
+  document.querySelectorAll('.saas-mode-toggle').forEach(function(btn) {
+    var isActive = btn.getAttribute('data-mode') === mode;
+    btn.style.background = isActive ? '#2ec4a0' : '#fff';
+    btn.style.color = isActive ? '#fff' : '#555';
+    btn.style.borderColor = isActive ? '#2ec4a0' : '#ccc';
+    btn.style.fontWeight = isActive ? '700' : '400';
+  });
+  // キャプション
+  var capEl = document.getElementById('saas-mode-caption');
+  if (capEl) {
+    capEl.style.display = '';
+    if (mode === 'setup') {
+      capEl.style.borderLeftColor = '#0e9077';
+      capEl.style.background = '#f0faf7';
+      capEl.innerHTML = '<strong style="color:#0e9077;">🆕 初回セットアップです。</strong> 外部勤怠サービスを選び、<strong>店舗・雇用区分・従業員</strong> を一括取込します。<br>' +
+        '<span style="font-size:10px;color:#777;">※ 業態・ブランドは外部勤怠サービスに情報がないため、別途 <strong>テンプレートで取り込み</strong> から補完登録してください(ガイドの Step 1)。</span>';
+    } else {
+      capEl.style.borderLeftColor = '#1a73e8';
+      capEl.style.background = '#f8f8f8';
+      capEl.innerHTML = '<strong style="color:#1a73e8;">追加・更新</strong> に使えます。既存の連携元から再取込・差分追加を行えます。';
+    }
+  }
 }
 
 // 「管理者だけ取り込み」初期化: 必須4項目グループを非表示 + 管理者だけON
