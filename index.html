@@ -374,42 +374,66 @@
 
     <div class="wcard">
       <div class="wcard-title"><span class="num">1</span> テンプレートを選択（複数選択可）</div>
-      <div class="alert alert-info" style="margin-bottom:12px;">☑ 取り込むテンプレートを選択してください。<strong>必須4項目（①〜④）は順序必須</strong>、<strong style="color:#7b1fa2;">⑤ 管理者は任意</strong>で選択時のみ最後に取り込まれます。既登録済み項目はチェックを外せます。</div>
-      <div style="display:flex;flex-direction:column;gap:8px;">
-        <label style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:2px solid #e8e8e8;border-radius:8px;cursor:pointer;transition:all 0.15s;" class="source-check checked" data-tpl="brand" onclick="toggleCheck(this)">
-          <input type="checkbox" checked style="accent-color:#2ec4a0;width:16px;height:16px;margin-top:2px;">
-          <div style="flex:1;">
-            <div style="font-size:13px;font-weight:600;">① 業態・ブランド</div>
-            <div style="font-size:11px;color:#888;">業態（飲食店・小売店など）と運営ブランド名を登録（3列）</div>
-          </div>
-          <a class="dl-link" href="#" onclick="event.stopPropagation();downloadBrandTemplate();" style="font-size:11px;">⬇ テンプレートDL</a>
-        </label>
-        <label style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:2px solid #e8e8e8;border-radius:8px;cursor:pointer;transition:all 0.15s;" class="source-check checked" data-tpl="store" onclick="toggleCheck(this)">
-          <input type="checkbox" checked style="accent-color:#2ec4a0;width:16px;height:16px;margin-top:2px;">
-          <div style="flex:1;">
-            <div style="font-size:13px;font-weight:600;">② 店舗</div>
-            <div style="font-size:11px;color:#888;">店舗名・所属ブランド・住所・営業時間を登録（4列）・前提: ① 業態・ブランド</div>
-          </div>
-          <a class="dl-link" href="#" onclick="event.stopPropagation();downloadStoreTemplate();" style="font-size:11px;">⬇ テンプレートDL</a>
-        </label>
-        <label style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:2px solid #e8e8e8;border-radius:8px;cursor:pointer;transition:all 0.15s;" class="source-check checked" data-tpl="emptype" onclick="toggleCheck(this)">
-          <input type="checkbox" checked style="accent-color:#2ec4a0;width:16px;height:16px;margin-top:2px;">
-          <div style="flex:1;">
-            <div style="font-size:13px;font-weight:600;">③ 雇用区分</div>
-            <div style="font-size:11px;color:#888;">雇用区分名・種別・時給単位を登録（3列）</div>
-          </div>
-          <a class="dl-link" href="#" onclick="event.stopPropagation();downloadEmptypeTemplate();" style="font-size:11px;">⬇ テンプレートDL</a>
-        </label>
-        <label style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:2px solid #e8e8e8;border-radius:8px;cursor:pointer;transition:all 0.15s;" class="source-check checked" data-tpl="employee" onclick="toggleCheck(this)">
-          <input type="checkbox" checked style="accent-color:#2ec4a0;width:16px;height:16px;margin-top:2px;">
-          <div style="flex:1;">
-            <div style="font-size:13px;font-weight:600;">④ 従業員</div>
-            <div style="font-size:11px;color:#888;">従業員情報を登録、② 店舗・③ 雇用区分と紐付け（5列）・前提: ②③</div>
-          </div>
-          <a class="dl-link" href="#" onclick="event.stopPropagation();downloadEmployeeTemplate();" style="font-size:11px;">⬇ テンプレートDL</a>
-        </label>
-        <label style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:2px solid #e8e8e8;border-radius:8px;cursor:pointer;transition:all 0.15s;" class="source-check" data-tpl="admin" onclick="toggleCheck(this)">
-          <input type="checkbox" style="accent-color:#2ec4a0;width:16px;height:16px;margin-top:2px;">
+      <div class="alert alert-info" style="margin-bottom:12px;">☑ 取り込むテンプレートを選択してください。<strong>必須4項目（Step 1〜4）は順序必須</strong>、<strong style="color:#7b1fa2;">⑤ 管理者は任意</strong>で選択時のみ最後に取り込まれます。既登録済み項目はチェックを外せます。</div>
+
+      <!-- 必須グループ（Step 1〜4・順序固定） -->
+      <div style="border:2px solid #2ec4a0;border-radius:10px;padding:14px;background:#fafffd;margin-bottom:12px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <div style="font-size:12px;font-weight:700;color:#0e9077;">✅ 必須4項目（Step 1 → 2 → 3 → 4 の順）</div>
+          <div style="font-size:10px;color:#0e9077;background:#e8f9f4;padding:2px 8px;border-radius:10px;font-weight:600;">順序必須</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <label style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:2px solid #e8e8e8;border-radius:8px;cursor:pointer;transition:all 0.15s;background:#fff;" class="source-check checked" data-tpl="brand" onclick="toggleCheck(this)">
+            <span style="background:#1a73e8;color:#fff;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;min-width:52px;text-align:center;flex-shrink:0;">Step 1</span>
+            <input type="checkbox" checked style="accent-color:#2ec4a0;width:16px;height:16px;">
+            <div style="flex:1;">
+              <div style="font-size:13px;font-weight:600;">① 業態・ブランド</div>
+              <div style="font-size:11px;color:#888;">業態（飲食店・小売店など）と運営ブランド名を登録（3列）</div>
+            </div>
+            <a class="dl-link" href="#" onclick="event.stopPropagation();downloadBrandTemplate();" style="font-size:11px;">⬇ テンプレートDL</a>
+          </label>
+          <div style="text-align:center;color:#bbb;font-size:14px;line-height:1;">↓</div>
+          <label style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:2px solid #e8e8e8;border-radius:8px;cursor:pointer;transition:all 0.15s;background:#fff;" class="source-check checked" data-tpl="store" onclick="toggleCheck(this)">
+            <span style="background:#1a73e8;color:#fff;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;min-width:52px;text-align:center;flex-shrink:0;">Step 2</span>
+            <input type="checkbox" checked style="accent-color:#2ec4a0;width:16px;height:16px;">
+            <div style="flex:1;">
+              <div style="font-size:13px;font-weight:600;">② 店舗</div>
+              <div style="font-size:11px;color:#888;">店舗名・所属ブランド・住所・営業時間を登録（4列）・前提: ① 業態・ブランド</div>
+            </div>
+            <a class="dl-link" href="#" onclick="event.stopPropagation();downloadStoreTemplate();" style="font-size:11px;">⬇ テンプレートDL</a>
+          </label>
+          <div style="text-align:center;color:#bbb;font-size:14px;line-height:1;">↓</div>
+          <label style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:2px solid #e8e8e8;border-radius:8px;cursor:pointer;transition:all 0.15s;background:#fff;" class="source-check checked" data-tpl="emptype" onclick="toggleCheck(this)">
+            <span style="background:#1a73e8;color:#fff;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;min-width:52px;text-align:center;flex-shrink:0;">Step 3</span>
+            <input type="checkbox" checked style="accent-color:#2ec4a0;width:16px;height:16px;">
+            <div style="flex:1;">
+              <div style="font-size:13px;font-weight:600;">③ 雇用区分</div>
+              <div style="font-size:11px;color:#888;">雇用区分名・種別・時給単位を登録（3列）</div>
+            </div>
+            <a class="dl-link" href="#" onclick="event.stopPropagation();downloadEmptypeTemplate();" style="font-size:11px;">⬇ テンプレートDL</a>
+          </label>
+          <div style="text-align:center;color:#bbb;font-size:14px;line-height:1;">↓</div>
+          <label style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:2px solid #e8e8e8;border-radius:8px;cursor:pointer;transition:all 0.15s;background:#fff;" class="source-check checked" data-tpl="employee" onclick="toggleCheck(this)">
+            <span style="background:#f59e0b;color:#fff;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;min-width:52px;text-align:center;flex-shrink:0;">Step 4</span>
+            <input type="checkbox" checked style="accent-color:#2ec4a0;width:16px;height:16px;">
+            <div style="flex:1;">
+              <div style="font-size:13px;font-weight:600;">④ 従業員</div>
+              <div style="font-size:11px;color:#888;">従業員情報を登録、② 店舗・③ 雇用区分と紐付け（5列）・前提: ②③</div>
+            </div>
+            <a class="dl-link" href="#" onclick="event.stopPropagation();downloadEmployeeTemplate();" style="font-size:11px;">⬇ テンプレートDL</a>
+          </label>
+        </div>
+      </div>
+
+      <!-- 任意グループ（管理者・後追加可能） -->
+      <div style="border:1px dashed #b39ddb;border-radius:10px;padding:14px;background:#faf7fd;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <div style="font-size:12px;font-weight:700;color:#7b1fa2;">📌 後追加項目（推奨）</div>
+          <div style="font-size:10px;color:#7b1fa2;background:#f3e5f5;padding:2px 8px;border-radius:10px;font-weight:600;">任意</div>
+        </div>
+        <label style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:2px solid #e8e8e8;border-radius:8px;cursor:pointer;transition:all 0.15s;background:#fff;" class="source-check" data-tpl="admin" onclick="toggleCheck(this)">
+          <span style="background:#fff;color:#7b1fa2;border:1px solid #7b1fa2;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;min-width:52px;text-align:center;flex-shrink:0;">任意</span>
+          <input type="checkbox" style="accent-color:#2ec4a0;width:16px;height:16px;">
           <div style="flex:1;">
             <div style="font-size:13px;font-weight:600;">⑤ 管理者</div>
             <div style="font-size:11px;color:#888;">管理者を一括登録、② 店舗と紐付け（4列）・前提: ② 店舗 ・<span style="color:#999;">※外部連携対象外、テンプレートのみ</span></div>
