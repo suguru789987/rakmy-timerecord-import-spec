@@ -1695,6 +1695,7 @@ function appendTplUploadedFile(item) {
   var labelKey = item.label.replace(/^[①②③④⑤]\s*/, '');
   var row = document.createElement('div');
   row.className = 'tpl-up-dynamic-row';
+  row.setAttribute('data-key', item.key);
   row.style.cssText = 'padding:10px 14px;background:#f7fdfb;border:1px solid #c5ede0;border-radius:8px;margin-bottom:6px;';
   row.innerHTML = '<div style="display:flex;align-items:center;gap:8px;">' +
     '<span style="background:' + badgeBg + ';color:' + badgeFg + ';border:' + badgeBorder + ';padding:1px 8px;border-radius:3px;font-size:9px;font-weight:700;">' + badgeText + '</span>' +
@@ -1704,6 +1705,35 @@ function appendTplUploadedFile(item) {
     '<span style="font-size:11px;color:#2ec4a0;font-weight:600;margin-left:auto;">✓ 完了</span>' +
   '</div>';
   files.appendChild(row);
+}
+
+function getUploadedKeys() {
+  return Array.prototype.map.call(
+    document.querySelectorAll('.tpl-up-dynamic-row'),
+    function(r) { return r.getAttribute('data-key'); }
+  );
+}
+
+function syncTplUploadState() {
+  // 履歴のうちチェックを外された項目を削除
+  var selected = getTplChecked();
+  document.querySelectorAll('.tpl-up-dynamic-row').forEach(function(r) {
+    if (selected.indexOf(r.getAttribute('data-key')) < 0) r.remove();
+  });
+  // 履歴に1件もなければファイル一覧コンテナを隠す
+  var files = document.getElementById('tpl-up-files');
+  if (document.querySelectorAll('.tpl-up-dynamic-row').length === 0) {
+    files.style.display = 'none';
+  }
+  // カーソルを「queueのうち未アップロード」の最初に合わせる
+  var queue = getTplUploadQueue();
+  var uploaded = getUploadedKeys();
+  var cursor = -1;
+  for (var i = 0; i < queue.length; i++) {
+    if (uploaded.indexOf(queue[i].key) < 0) { cursor = i; break; }
+  }
+  tplUploadCursor = (cursor < 0) ? queue.length : cursor;
+  applyTplUploadCurrent();
 }
 
 function demoTplUpload() {
@@ -1780,20 +1810,15 @@ function updateTplUploadUI() {
   renderTplOrderGuide(tplSelectedTypes);
   guide.style.display = '';
 
-  // single-labelは旧仕様(2項目時代)の残骸。新仕様では使わない
+  // 旧仕様(2項目時代)の残骸を確実に隠す
   var singleLabel = document.getElementById('tpl-up-single-label');
   if (singleLabel) singleLabel.style.display = 'none';
+  var f1 = document.getElementById('tpl-up-file1'); if (f1) f1.style.display = 'none';
+  var f2 = document.getElementById('tpl-up-file2'); if (f2) f2.style.display = 'none';
 
-  // アップロード状態リセット: 必須Step 1から再スタート
-  tplUploadStep = 0;
-  tplUploadCursor = 0;
-  var files = document.getElementById('tpl-up-files');
-  files.style.display = 'none';
-  files.querySelectorAll('.tpl-up-dynamic-row').forEach(function(r) { r.remove(); });
-  document.getElementById('tpl-up-file1').style.display = 'none';
-  document.getElementById('tpl-up-file2').style.display = 'none';
-  // current ラベルを必須順番の先頭(または任意のみなら任意)に
-  applyTplUploadCurrent();
+  // アップロード履歴は維持しつつ整合: チェックを外した項目は履歴から消し、
+  // 残った queue の中で未アップロードのものに current を合わせる
+  syncTplUploadState();
 }
 
 function switchSaasPreviewTab(el, idx) {
