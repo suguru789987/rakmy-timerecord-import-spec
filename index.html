@@ -388,7 +388,7 @@
       <div id="tpl-select-caption" style="font-size:11px;color:#666;margin-bottom:12px;">☑ 取り込むテンプレートを選択。必須4項目は <strong>① → ② → ③ → ④</strong> の順、⑤ 管理者は任意。</div>
 
       <!-- 必須グループ -->
-      <div style="border:1px solid #c5ede0;border-radius:10px;padding:12px 14px;margin-bottom:10px;">
+      <div id="tpl-required-group" style="border:1px solid #c5ede0;border-radius:10px;padding:12px 14px;margin-bottom:10px;">
         <div id="tpl-required-header" style="font-size:11px;font-weight:700;color:#0e9077;margin-bottom:8px;">必須4項目（順序必須）</div>
         <div style="display:flex;flex-direction:column;gap:6px;">
           <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #e8e8e8;border-radius:6px;cursor:pointer;background:#fff;" class="source-check checked" data-tpl="brand" onclick="toggleCheck(this)">
@@ -2085,8 +2085,9 @@ function applyHashRouting() {
   } catch (e) { /* no-op */ }
 }
 
-// 「管理者だけ取り込み」初期化: 必須4項目OFF + 管理者ON
+// 「管理者だけ取り込み」初期化: 必須4項目グループを非表示 + 管理者だけON
 function initTplAdminOnly() {
+  // 必須4項目はチェック外す + グループ枠ごと非表示
   ['brand','store','emptype','employee'].forEach(function(k) {
     var label = document.querySelector('#s-tpl1 .source-check[data-tpl="' + k + '"]');
     if (!label) return;
@@ -2096,6 +2097,9 @@ function initTplAdminOnly() {
     label.style.borderColor = '#e8e8e8';
     label.style.background = '#fff';
   });
+  var requiredGroup = document.getElementById('tpl-required-group');
+  if (requiredGroup) requiredGroup.style.display = 'none';
+  // 管理者ON
   var adminLabel = document.querySelector('#s-tpl1 .source-check[data-tpl="admin"]');
   if (adminLabel) {
     var adminCb = adminLabel.querySelector('input[type="checkbox"]');
@@ -2104,7 +2108,18 @@ function initTplAdminOnly() {
     adminLabel.style.borderColor = '#2ec4a0';
     adminLabel.style.background = '#f7fdfb';
   }
+  // キャプションも専用文言に
+  var captionEl = document.getElementById('tpl-select-caption');
+  if (captionEl) {
+    captionEl.innerHTML = '<strong style="color:#7b1fa2;">管理者を一括取込</strong>します。CSVファイルをアップロードしてください。';
+  }
   updateTplUploadUI();
+}
+
+// admin-only 状態を解除して通常の選択画面に戻す
+function clearTplAdminOnly() {
+  var requiredGroup = document.getElementById('tpl-required-group');
+  if (requiredGroup) requiredGroup.style.display = '';
 }
 
 // デモ用: モード切替ボタンから呼ばれる(URLハッシュも同期更新)
@@ -2121,6 +2136,8 @@ function switchTplMode(mode) {
   } else if (banner) {
     banner.style.display = 'none';
   }
+  // admin-only状態(必須グループ非表示)が残っていれば解除
+  clearTplAdminOnly();
   applyTplMode(mode);
 }
 
