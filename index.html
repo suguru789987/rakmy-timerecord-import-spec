@@ -2775,12 +2775,27 @@ function saveImportDraftWithItems(type) {
     return;
   }
   var total = (type === 'template') ? 4 : 5;
+  // 必須項目すべて完了かを判定 → 「登録前準備完了」表記
+  var requiredKeys;
+  if (type === 'template') {
+    requiredKeys = ['brand', 'store', 'emptype', 'employee'];
+  } else {
+    // SaaS: ソースに応じた必須キー(KoT/Jobcan/Other のいずれかが対応)
+    requiredKeys = ['map-kot-emp', 'map-jc-staff', 'map-other'];
+  }
+  var allRequiredDone = (type === 'template')
+    ? requiredKeys.every(function(k) { return itemsCompleted.indexOf(k) >= 0; })
+    : requiredKeys.some(function(k) { return itemsCompleted.indexOf(k) >= 0; });
+  var labelText = allRequiredDone
+    ? '✓ 必須項目すべて完了(登録前準備完了)'
+    : '取り込みデータ選択(' + itemsCompleted.length + '項目完了)';
   var info = {
     type: type,
     completed: itemsCompleted.length,
     total: total,
     currentStep: (type === 'template') ? 's-tpl1' : 's-saas1',
-    label: '取り込みデータ選択(' + itemsCompleted.length + '項目完了)',
+    label: labelText,
+    allRequiredDone: allRequiredDone,
     itemsCompleted: itemsCompleted,
     itemLabels: labels,
     savedAt: Date.now()
