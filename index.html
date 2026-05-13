@@ -1755,8 +1755,11 @@ function refreshSaveButtonsState() {
   ['s-tpl1', 's-saas1'].forEach(function(screenId) {
     var checkedNames = [];
     document.querySelectorAll('#' + screenId + ' label.source-check').forEach(function(lbl) {
-      // 非表示の連携元(display:none の親)に属するチェック項目は除外
-      if (lbl.offsetParent === null) return;
+      // 非表示の連携元グループ(source-kot/jc/other で display:none)に属するチェック項目は除外
+      var srcParent = lbl.closest('#source-kot, #source-jc, #source-other');
+      if (srcParent && srcParent.style.display === 'none') return;
+      // saas-brand-check 自体が display:none ならスキップ(setup mode のみ表示)
+      if (lbl.id === 'saas-brand-check' && lbl.style.display === 'none') return;
       var cb = lbl.querySelector('input[type="checkbox"]');
       if (!cb || !cb.checked) return;
       var nameEl = lbl.querySelector('div > div:first-child') || lbl.querySelector('div');
