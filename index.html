@@ -1652,7 +1652,33 @@ function toggleCheck(el) {
     }
     updateUploadSteps();
     if (el.hasAttribute('data-tpl')) updateTplUploadUI();
+    refreshSaveButtonsState();
   }, 0);
+}
+
+// アップロード画面(s-tpl1/s-saas1)の一時保存ボタンをチェック状態に応じて enable/disable
+function refreshSaveButtonsState() {
+  ['s-tpl1', 's-saas1'].forEach(function(screenId) {
+    var checked = 0;
+    document.querySelectorAll('#' + screenId + ' label.source-check input[type="checkbox"]').forEach(function(cb) {
+      if (cb.checked) checked++;
+    });
+    var btnIds = (screenId === 's-tpl1') ? ['tpl1-save-btn'] : ['saas1-save-btn'];
+    // ヘッダー右上の動的追加ボタン
+    var headerBtn = document.querySelector('#' + screenId + ' .save-draft-btn');
+    var btns = btnIds.map(function(id) { return document.getElementById(id); });
+    btns.push(headerBtn);
+    btns.forEach(function(btn) {
+      if (!btn) return;
+      var disabled = (checked === 0);
+      btn.disabled = disabled;
+      btn.style.opacity = disabled ? '0.4' : '';
+      btn.style.cursor = disabled ? 'not-allowed' : 'pointer';
+      btn.title = disabled
+        ? 'チェック項目またはアップロードファイルがありません'
+        : '中断地点を保存し、後で「続きから再開」できます';
+    });
+  });
 }
 
 function getVisibleSourceContainer() {
@@ -2621,6 +2647,7 @@ document.addEventListener('DOMContentLoaded', function() {
   applyHashRouting();
   ensureSaveDraftButtons();
   refreshSaveHerePanels();
+  refreshSaveButtonsState();
   // ?resume=<screenId> で中断地点から再開、チェック状態も復元
   try {
     var params = new URLSearchParams(location.search);
@@ -2640,6 +2667,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 window.addEventListener('hashchange', function() {
   refreshSaveHerePanels();
+  refreshSaveButtonsState();
 });
 
 // 各インポート画面の page-header に「💾 一時保存して中断」ボタンを動的追加
