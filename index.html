@@ -366,7 +366,7 @@
 <div class="screen" id="s-tpl1">
   <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
     <h1 class="page-title" style="margin:0;">テンプレートで取り込み</h1>
-    <!-- 🛠 デモ用モード切替+アップロード状態切替(本番では非表示推奨) -->
+    <!-- 🛠 デモ用 モード切替+モード別アップロード状態切替 -->
     <div style="display:flex;flex-direction:column;gap:6px;font-size:10px;background:#fff3e0;border:1px dashed #e67e22;border-radius:8px;padding:6px 10px;">
       <div style="display:flex;align-items:center;gap:8px;">
         <span style="color:#e67e22;font-weight:700;">🛠 デモ用 モード:</span>
@@ -374,9 +374,14 @@
         <button class="tpl-mode-toggle" data-mode="ops" onclick="switchTplMode('ops')" style="font-size:11px;padding:4px 10px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;">運用更新</button>
       </div>
       <div style="display:flex;align-items:center;gap:8px;">
-        <span style="color:#888;font-size:9px;font-weight:600;">アップ状態:</span>
-        <button onclick="bDemoTplSetAllChecked(true)" style="font-size:11px;padding:4px 10px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;">✓ 必須アップ済</button>
-        <button onclick="bDemoTplSetAllChecked(false)" style="font-size:11px;padding:4px 10px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;">✗ 未アップ</button>
+        <span style="color:#888;font-size:9px;font-weight:600;">新規登録モード:</span>
+        <button onclick="bDemoTplModeAndChecks('setup', true)" style="font-size:11px;padding:4px 10px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;">✓ アップ済</button>
+        <button onclick="bDemoTplModeAndChecks('setup', false)" style="font-size:11px;padding:4px 10px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;">✗ 未アップ</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="color:#888;font-size:9px;font-weight:600;">運用更新モード:</span>
+        <button onclick="bDemoTplModeAndChecks('ops', true)" style="font-size:11px;padding:4px 10px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;">✓ アップ済</button>
+        <button onclick="bDemoTplModeAndChecks('ops', false)" style="font-size:11px;padding:4px 10px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;">✗ 未アップ</button>
       </div>
     </div>
   </div>
@@ -671,7 +676,7 @@
 <div class="screen" id="s-saas1">
   <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
     <h1 class="page-title" style="margin:0;">外部勤怠サービスから取り込み</h1>
-    <!-- 🛠 デモ用モード切替+アップロード状態切替 -->
+    <!-- 🛠 デモ用 モード切替+モード別アップロード状態切替 -->
     <div style="display:flex;flex-direction:column;gap:6px;font-size:10px;background:#fff3e0;border:1px dashed #e67e22;border-radius:8px;padding:6px 10px;">
       <div style="display:flex;align-items:center;gap:8px;">
         <span style="color:#e67e22;font-weight:700;">🛠 デモ用 モード:</span>
@@ -679,9 +684,14 @@
         <button class="saas-mode-toggle" data-mode="ops" onclick="switchSaasMode('ops')" style="font-size:11px;padding:4px 10px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;">運用更新</button>
       </div>
       <div style="display:flex;align-items:center;gap:8px;">
-        <span style="color:#888;font-size:9px;font-weight:600;">アップ状態:</span>
-        <button onclick="bDemoSaasSetAllChecked(true)" style="font-size:11px;padding:4px 10px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;">✓ 必須アップ済</button>
-        <button onclick="bDemoSaasSetAllChecked(false)" style="font-size:11px;padding:4px 10px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;">✗ 未アップ</button>
+        <span style="color:#888;font-size:9px;font-weight:600;">新規登録モード:</span>
+        <button onclick="bDemoSaasModeAndChecks('setup', true)" style="font-size:11px;padding:4px 10px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;">✓ アップ済</button>
+        <button onclick="bDemoSaasModeAndChecks('setup', false)" style="font-size:11px;padding:4px 10px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;">✗ 未アップ</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="color:#888;font-size:9px;font-weight:600;">運用更新モード:</span>
+        <button onclick="bDemoSaasModeAndChecks('ops', true)" style="font-size:11px;padding:4px 10px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;">✓ アップ済</button>
+        <button onclick="bDemoSaasModeAndChecks('ops', false)" style="font-size:11px;padding:4px 10px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;">✗ 未アップ</button>
       </div>
     </div>
   </div>
@@ -1668,6 +1678,16 @@ function toggleCheck(el) {
     if (el.hasAttribute('data-tpl')) updateTplUploadUI();
     refreshSaveButtonsState();
   }, 0);
+}
+
+// デモ用: モード切替 + チェック状態切替を一括実行(新規/運用 × アップ済/未アップ の4組合せ)
+function bDemoTplModeAndChecks(mode, checked) {
+  if (typeof switchTplMode === 'function') switchTplMode(mode);
+  bDemoTplSetAllChecked(checked);
+}
+function bDemoSaasModeAndChecks(mode, checked) {
+  if (typeof switchSaasMode === 'function') switchSaasMode(mode);
+  bDemoSaasSetAllChecked(checked);
 }
 
 // デモ用: s-tpl1 の全チェックボックスを一括 ON/OFF (必須アップ済/未アップ切替)
