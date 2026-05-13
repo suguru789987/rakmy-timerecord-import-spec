@@ -630,9 +630,24 @@
           <div class="rd-row"><span>新規登録</span><span class="rd-val rd-green">6件</span></div>
           <div class="rd-row"><span>更新</span><span class="rd-val rd-yellow">1件</span></div>
           <div class="rd-row"><span>エラー（スキップ）</span><span class="rd-val rd-red">1件</span></div>
+          <div style="font-size:11px;font-weight:600;color:#888;padding:8px 0 4px;border-top:2px solid #e0e0e0;margin-top:8px;">③ 管理者データ(任意)</div>
+          <div class="rd-row"><span>新規アカウント</span><span class="rd-val rd-green">2件</span></div>
+          <div class="rd-row"><span>既存従業員に管理者ロール追加</span><span class="rd-val rd-yellow">1件</span></div>
         </div>
+
+        <!-- 招待メール一括送信ブロック -->
+        <div style="background:#e3f2fd;border:1px solid #90caf9;border-radius:8px;padding:14px 16px;margin:14px 0;text-align:left;">
+          <div style="font-size:12px;font-weight:700;color:#1565c0;margin-bottom:8px;">✉️ 招待メールの一括送信</div>
+          <div style="font-size:11px;color:#1565c0;line-height:1.7;margin-bottom:10px;">
+            ・<strong>従業員 新規登録 6件</strong> → 従業員招待メール(72h)<br>
+            ・<strong>管理者 新規アカウント 2件</strong> → 管理者招待メール(72h)<br>
+            ・<strong>既存従業員に管理者ロール追加 1件</strong> → 昇格通知メール(PW不要)<br>
+            <span style="color:#666;font-size:10px;">※ 同一メアドが従業員/管理者双方に存在する場合は<strong>1アカウントに統合(ロール累積)</strong>され、招待メールは1通に統合されます。</span>
+          </div>
+          <button class="btn btn-primary" style="width:100%;padding:12px;font-size:13px;">✉️ 全員に招待メールを一括送信 (合計 9 通)</button>
+        </div>
+
         <div style="display:flex;gap:8px;justify-content:center;">
-          <button class="btn btn-primary">従業員一覧を確認 →</button>
           <button class="btn btn-ghost" onclick="go('s-top')">トップへ戻る</button>
         </div>
       </div>
@@ -1439,6 +1454,16 @@
           <div class="rd-row"><span>新規登録</span><span class="rd-val rd-green">12件</span></div>
           <div class="rd-row"><span>更新</span><span class="rd-val rd-yellow">2件</span></div>
           <div class="rd-row"><span>エラー（スキップ）</span><span class="rd-val rd-red">1件</span></div>
+        </div>
+
+        <!-- 招待メール一括送信ブロック -->
+        <div style="background:#e3f2fd;border:1px solid #90caf9;border-radius:8px;padding:14px 16px;margin:14px 0;text-align:left;">
+          <div style="font-size:12px;font-weight:700;color:#1565c0;margin-bottom:8px;">✉️ 招待メールの一括送信</div>
+          <div style="font-size:11px;color:#1565c0;line-height:1.7;margin-bottom:10px;">
+            ・<strong>従業員 新規登録 12件</strong> → 従業員招待メール(72h)<br>
+            <span style="color:#666;font-size:10px;">※ メアド未入力の従業員には送信できません(下記「補完」セクション参照)。同一メアドが管理者と重複する場合は<strong>1アカウントに統合(ロール累積)</strong>されます。</span>
+          </div>
+          <button class="btn btn-primary" style="width:100%;padding:12px;font-size:13px;">✉️ 全員に招待メールを一括送信 (合計 12 通)</button>
         </div>
       </div>
     </div>
