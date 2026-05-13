@@ -2645,7 +2645,9 @@ window.addEventListener('hashchange', function() {
 // 各インポート画面の page-header に「💾 一時保存して中断」ボタンを動的追加
 // s-tpl2 (確認・実行) は実行直前の最終確認なので一時保存不要 → 除外
 function ensureSaveDraftButtons() {
-  var targets = ['s-tpl1', 's-saas1', 's-saas2', 's-saas3'];
+  // 整理: s-tpl1(アップロード) / s-saas1(項目選択) / s-saas2(マッピング) / s-saas-preview(プレビュー・マッピング修正)
+  // s-tpl2(確認・実行)/s-saas3(旧プレビュー)は対象外
+  var targets = ['s-tpl1', 's-saas1', 's-saas2', 's-saas-preview'];
   targets.forEach(function(id) {
     var scr = document.getElementById(id);
     if (!scr) return;
