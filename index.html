@@ -644,7 +644,7 @@
             ・<strong>既存従業員に管理者ロール追加 1件</strong> → 昇格通知メール(PW不要)<br>
             <span style="color:#666;font-size:10px;">※ 同一メアドが従業員/管理者双方に存在する場合は<strong>1アカウントに統合(ロール累積)</strong>され、招待メールは1通に統合されます。</span>
           </div>
-          <button class="btn btn-primary" style="width:100%;padding:12px;font-size:13px;">✉️ 全員に招待メールを一括送信 (合計 9 通)</button>
+          <button class="btn btn-primary" style="width:100%;padding:12px;font-size:13px;" onclick="showInviteSentModal(9)">✉️ 全員に招待メールを一括送信 (合計 9 通)</button>
         </div>
 
         <div style="display:flex;gap:8px;justify-content:center;">
@@ -1463,7 +1463,7 @@
             ・<strong>従業員 新規登録 12件</strong> → 従業員招待メール(72h)<br>
             <span style="color:#666;font-size:10px;">※ メアド未入力の従業員には送信できません(下記「補完」セクション参照)。同一メアドが管理者と重複する場合は<strong>1アカウントに統合(ロール累積)</strong>されます。</span>
           </div>
-          <button class="btn btn-primary" style="width:100%;padding:12px;font-size:13px;">✉️ 全員に招待メールを一括送信 (合計 12 通)</button>
+          <button class="btn btn-primary" style="width:100%;padding:12px;font-size:13px;" onclick="showInviteSentModal(12)">✉️ 全員に招待メールを一括送信 (合計 12 通)</button>
         </div>
       </div>
     </div>
@@ -1521,8 +1521,36 @@
 </div><!-- /main -->
 </div><!-- /app -->
 
+<!-- ===== 招待メール一括送信完了モーダル ===== -->
+<div id="invite-sent-overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:9999;justify-content:center;align-items:center;padding:20px;">
+  <div style="background:#fff;border-radius:12px;max-width:520px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 16px 48px rgba(0,0,0,0.18);padding:32px 28px;text-align:center;">
+    <div style="width:64px;height:64px;border-radius:50%;background:#e8f8f5;color:#1a9e7e;display:flex;align-items:center;justify-content:center;font-size:34px;margin:0 auto 16px;font-weight:700;">✓</div>
+    <h3 style="font-size:18px;font-weight:800;margin:0 0 10px;color:#0e9077;">招待メールの送信が完了しました</h3>
+    <p id="invite-sent-detail" style="font-size:12px;color:#666;line-height:1.7;margin:0 0 22px;">N通の招待メールを送信しました。<br>受信者がパスワードを設定するとアカウントが有効化されます。</p>
+    <div style="background:#f0faf7;border:1px solid #b2ebe0;border-radius:8px;padding:12px 14px;margin-bottom:18px;font-size:11px;color:#0e9077;line-height:1.6;">
+      🎉 <strong>初期セットアップ完了!</strong><br>
+      タイムレコードの運用を開始できます。
+    </div>
+    <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+      <a href="https://suguru789987.github.io/rakmy-owner-registration-mock/#b0-empty" class="btn btn-primary" style="padding:12px 22px;text-decoration:none;font-size:13px;font-weight:700;">⏱ 打刻記録画面へ進む</a>
+      <button class="btn btn-ghost" onclick="closeInviteSentModal()">この画面に留まる</button>
+    </div>
+  </div>
+</div>
 
 <script>
+function showInviteSentModal(count) {
+  var ov = document.getElementById('invite-sent-overlay');
+  if (!ov) return;
+  var detail = document.getElementById('invite-sent-detail');
+  if (detail) detail.innerHTML = '<strong>' + count + ' 通</strong> の招待メールを送信しました。<br>受信者がパスワードを設定するとアカウントが有効化されます。';
+  ov.style.display = 'flex';
+}
+function closeInviteSentModal() {
+  var ov = document.getElementById('invite-sent-overlay');
+  if (ov) ov.style.display = 'none';
+}
+
 function go(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
