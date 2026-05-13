@@ -496,9 +496,8 @@
       </div>
 
       <!-- 一時保存ステータス: アップ済みデータがある時に表示 -->
-      <div id="tpl-saved-status" style="display:none;margin-top:14px;padding:10px 14px;background:#e3f2fd;border:1px solid #90caf9;border-radius:8px;font-size:11px;color:#1565c0;">
-        ✓ <strong>アップロード済データを一時記憶しています</strong>(<span class="saved-status-count">0</span>件)<br>
-        画面下の「<strong>💾 一時保存</strong>」ボタンで中断地点を保存し、後で打刻記録画面から再開できます。
+      <div id="tpl-saved-status" style="display:none;margin-top:14px;padding:8px 12px;background:#e3f2fd;border:1px solid #90caf9;border-radius:6px;font-size:11px;color:#0d47a1;">
+        ✓ <strong>一時記憶中</strong>(<span class="saved-status-count">0</span>件): <span class="saved-status-list" style="font-weight:700;"></span>
       </div>
 
     </div>
@@ -892,9 +891,8 @@
         </div>
 
         <!-- 一時保存ステータス: アップ済みデータがある時に表示 -->
-        <div id="saas-saved-status" style="display:none;margin-top:14px;padding:10px 14px;background:#e3f2fd;border:1px solid #90caf9;border-radius:8px;font-size:11px;color:#1565c0;">
-          ✓ <strong>アップロード済データを一時記憶しています</strong>(<span class="saved-status-count">0</span>件)<br>
-          画面下の「<strong>💾 一時保存</strong>」ボタンで中断地点を保存し、後で打刻記録画面から再開できます。
+        <div id="saas-saved-status" style="display:none;margin-top:14px;padding:8px 12px;background:#e3f2fd;border:1px solid #90caf9;border-radius:6px;font-size:11px;color:#0d47a1;">
+          ✓ <strong>一時記憶中</strong>(<span class="saved-status-count">0</span>件): <span class="saved-status-list" style="font-weight:700;"></span>
         </div>
 
       </div>
@@ -1755,10 +1753,19 @@ function bDemoSaasSetAllChecked(checked) {
 // アップロード画面(s-tpl1/s-saas1)の一時保存ボタンとステータスバナーをチェック状態に応じて更新
 function refreshSaveButtonsState() {
   ['s-tpl1', 's-saas1'].forEach(function(screenId) {
-    var checked = 0;
-    document.querySelectorAll('#' + screenId + ' label.source-check input[type="checkbox"]').forEach(function(cb) {
-      if (cb.checked) checked++;
+    var checkedNames = [];
+    document.querySelectorAll('#' + screenId + ' label.source-check').forEach(function(lbl) {
+      var cb = lbl.querySelector('input[type="checkbox"]');
+      if (!cb || !cb.checked) return;
+      var nameEl = lbl.querySelector('div > div:first-child') || lbl.querySelector('div');
+      if (!nameEl) return;
+      // バッジ(必須/任意/テンプレ等)を除いた純粋な項目名を取得
+      var clone = nameEl.cloneNode(true);
+      clone.querySelectorAll('span').forEach(function(s) { s.remove(); });
+      var name = clone.textContent.replace(/\s+/g, ' ').trim();
+      if (name) checkedNames.push(name);
     });
+    var checked = checkedNames.length;
     var btnIds = (screenId === 's-tpl1') ? ['tpl1-save-btn'] : ['saas1-save-btn'];
     var headerBtn = document.querySelector('#' + screenId + ' .save-draft-btn');
     var btns = btnIds.map(function(id) { return document.getElementById(id); });
@@ -1773,13 +1780,15 @@ function refreshSaveButtonsState() {
         ? 'チェック項目またはアップロードファイルがありません'
         : '中断地点を保存し、後で「続きから再開」できます';
     });
-    // ドロップゾーン下の「一時保存ステータス」バナーも連動
+    // 一時保存ステータスバナー(件数+項目名リスト)を更新
     var statusId = (screenId === 's-tpl1') ? 'tpl-saved-status' : 'saas-saved-status';
     var statusEl = document.getElementById(statusId);
     if (statusEl) {
       statusEl.style.display = (checked > 0) ? '' : 'none';
       var countEl = statusEl.querySelector('.saved-status-count');
       if (countEl) countEl.textContent = checked;
+      var listEl = statusEl.querySelector('.saved-status-list');
+      if (listEl) listEl.textContent = checkedNames.join(' / ');
     }
   });
 }
