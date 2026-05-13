@@ -1691,6 +1691,8 @@ function toggleCheck(el) {
 }
 
 // デモ用: モード切替 + チェック状態切替を一括実行(新規/運用 × アップ済/未アップ の4組合せ)
+// 「アップ済」=チェック ON + ファイルアップロード済みフラグ ON
+// 「未アップ」=チェック OFF + ファイルアップロード済みフラグ OFF
 function bDemoTplModeAndChecks(mode, checked) {
   if (typeof switchTplMode === 'function') switchTplMode(mode);
   bDemoTplSetAllChecked(checked);
@@ -1700,12 +1702,11 @@ function bDemoSaasModeAndChecks(mode, checked) {
   bDemoSaasSetAllChecked(checked);
 }
 
-// デモ用: s-tpl1 の全チェックボックスを一括 ON/OFF (必須アップ済/未アップ切替)
+// デモ用: s-tpl1 の全チェックボックスを一括 ON/OFF + アップロードフラグも同期
 function bDemoTplSetAllChecked(checked) {
   document.querySelectorAll('#s-tpl1 label.source-check').forEach(function(lbl) {
     var key = lbl.getAttribute('data-tpl');
     if (!key) return;
-    // 必須項目のみ ON にする、admin(任意)は ON 時もチェックしない
     if (checked && key === 'admin') return;
     var cb = lbl.querySelector('input[type="checkbox"]');
     if (!cb) return;
@@ -1720,18 +1721,19 @@ function bDemoTplSetAllChecked(checked) {
       lbl.style.background = '#fff';
     }
   });
+  // モック: 「アップ済」ならアップロード完了とみなす(チェックだけではボタン非アクティブのまま)
+  window._mockTplUploaded = !!checked;
   refreshSaveButtonsState();
   if (typeof updateUploadSteps === 'function') updateUploadSteps();
   if (typeof updateTplUploadUI === 'function') updateTplUploadUI();
 }
 
-// デモ用: s-saas1 の必須項目(従業員データ/スタッフ情報/CSVファイル)を一括 ON/OFF
+// デモ用: s-saas1 の必須項目を一括 ON/OFF + アップロードフラグも同期
 function bDemoSaasSetAllChecked(checked) {
   document.querySelectorAll('#s-saas1 label.source-check').forEach(function(lbl) {
     var key = lbl.getAttribute('data-map') || lbl.getAttribute('data-saas-extra');
     if (!key) return;
     var isRequired = (key === 'map-kot-emp' || key === 'map-jc-staff' || key === 'map-other');
-    // ON時は必須項目のみチェック、OFF時は全項目アンチェック
     if (checked && !isRequired) return;
     var cb = lbl.querySelector('input[type="checkbox"]');
     if (!cb) return;
@@ -1746,6 +1748,8 @@ function bDemoSaasSetAllChecked(checked) {
       lbl.style.background = '#fff';
     }
   });
+  // モック: 「アップ済」ならアップロード完了とみなす
+  window._mockSaasUploaded = !!checked;
   refreshSaveButtonsState();
   if (typeof updateUploadSteps === 'function') updateUploadSteps();
 }
@@ -1771,25 +1775,28 @@ function refreshSaveButtonsState() {
       if (name) checkedNames.push(name);
     });
     var checked = checkedNames.length;
+    // アップロード済みフラグ(チェックだけではボタン非アクティブ、ファイルアップ完了で有効化)
+    var uploaded = (screenId === 's-tpl1') ? !!window._mockTplUploaded : !!window._mockSaasUploaded;
+    // チェック1件以上 かつ ファイルアップ済み で アクティブ
+    var canSave = (checked > 0) && uploaded;
     var btnIds = (screenId === 's-tpl1') ? ['tpl1-save-btn'] : ['saas1-save-btn'];
     var headerBtn = document.querySelector('#' + screenId + ' .save-draft-btn');
     var btns = btnIds.map(function(id) { return document.getElementById(id); });
     btns.push(headerBtn);
     btns.forEach(function(btn) {
       if (!btn) return;
-      var disabled = (checked === 0);
-      btn.disabled = disabled;
-      btn.style.opacity = disabled ? '0.4' : '';
-      btn.style.cursor = disabled ? 'not-allowed' : 'pointer';
-      btn.title = disabled
-        ? 'チェック項目またはアップロードファイルがありません'
-        : '中断地点を保存し、後で「続きから再開」できます';
+      btn.disabled = !canSave;
+      btn.style.opacity = canSave ? '' : '0.4';
+      btn.style.cursor = canSave ? 'pointer' : 'not-allowed';
+      btn.title = canSave
+        ? '中断地点を保存し、後で「続きから再開」できます'
+        : 'チェック項目+アップロード完了が必要です';
     });
-    // 一時保存ステータスバナー(件数+項目名リスト)を更新
+    // 一時保存ステータスバナー(canSaveのみ表示)
     var statusId = (screenId === 's-tpl1') ? 'tpl-saved-status' : 'saas-saved-status';
     var statusEl = document.getElementById(statusId);
     if (statusEl) {
-      statusEl.style.display = (checked > 0) ? '' : 'none';
+      statusEl.style.display = canSave ? '' : 'none';
       var countEl = statusEl.querySelector('.saved-status-count');
       if (countEl) countEl.textContent = checked;
       var listEl = statusEl.querySelector('.saved-status-list');
@@ -1901,6 +1908,9 @@ function demoUploadFile() {
   appendSaasUploadedFile(queue[uploadStep]);
   uploadStep++;
   document.getElementById('saas-up-files').style.display = '';
+  // ファイルアップロード完了 → 一時保存ボタンアクティブ化用フラグ
+  window._mockSaasUploaded = true;
+  if (typeof refreshSaveButtonsState === 'function') refreshSaveButtonsState();
   if (uploadStep < queue.length) {
     // 次の対象にラベル更新
     var col = SAAS_UPLOAD_COLORS[uploadStep] || '#888';
@@ -2091,6 +2101,9 @@ function demoTplUpload() {
   appendTplUploadedFile(current);
   tplUploadCursor++;
   applyTplUploadCurrent();
+  // ファイルアップロード完了 → 一時保存ボタンアクティブ化用フラグ
+  window._mockTplUploaded = true;
+  if (typeof refreshSaveButtonsState === 'function') refreshSaveButtonsState();
 }
 
 var tplSelectedTypes = [];
