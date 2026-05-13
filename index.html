@@ -1561,6 +1561,22 @@ function go(id) {
   if (id === 's-saas2') showMappingPanels();
   if (id === 's-saas-settings') updateSettingsScreen();
   if (id === 's-tpl2') updateTplConfirmSections();
+  // 中断検知用 localStorage 管理: 各ステップ遷移時に進捗を記録、完了画面でクリア
+  try {
+    var setupModeUrl = (location.hash || '').replace('#', '');
+    var isSetup = (setupModeUrl === 'tpl-setup' || setupModeUrl === 'saas-setup');
+    if (isSetup) {
+      if (id === 's-tpl1' || id === 's-tpl2') {
+        localStorage.setItem('import_in_progress', JSON.stringify({ type: 'template', step: id, startedAt: Date.now() }));
+      } else if (id === 's-saas1' || id === 's-saas2' || id === 's-saas3') {
+        localStorage.setItem('import_in_progress', JSON.stringify({ type: 'saas', step: id, startedAt: Date.now() }));
+      } else if (id === 's-tpl3' || id === 's-saas4') {
+        // 完了画面到達 → クリア(招待送信時に明確な完了)
+        // ただし招待送信ボタン押下で完全クリアするのが理想だが、簡略化のため到達で消す
+        localStorage.removeItem('import_in_progress');
+      }
+    }
+  } catch (e) {}
   // 画面遷移時にモードUI(setup/ops)を反映
   if (id === 's-saas1' && typeof applySaasMode === 'function') {
     var sh = (location.hash || '').replace('#', '');
