@@ -2716,7 +2716,7 @@ function saveImportDraftMappingStep(screenId) {
   showImportSaveDraftModal(info);
 }
 
-// 「💾 ここまで完了として一時保存」: 現在のチェック状態を localStorage に保存
+// 「💾 一時保存」(btn-group): 現在のチェック状態を localStorage に保存
 function saveImportDraftWithItems(type) {
   var itemsCompleted = [];
   var labels = {};
@@ -2738,6 +2738,11 @@ function saveImportDraftWithItems(type) {
       labels[key] = nameEl ? nameEl.textContent.trim() : key;
       if (cb && cb.checked) itemsCompleted.push(key);
     });
+  }
+  // アップデータなし(チェック0件)ならガード
+  if (itemsCompleted.length === 0) {
+    alert('⚠️ アップデータなしのため保存不要\n\nチェック項目やアップロードファイルがありません。\n少なくとも1項目を選択またはアップロードしてから一時保存してください。');
+    return;
   }
   var total = (type === 'template') ? 4 : 5;
   var info = {
@@ -2783,15 +2788,26 @@ function restoreItemsFromDraft() {
 
 // 「💾 一時保存して中断」ボタン押下時の処理
 function saveImportDraftAndExit() {
-  // 現在の画面IDから進捗を保存(setup モード前提)
   var activeScreen = document.querySelector('.screen.active');
   var id = activeScreen ? activeScreen.id : '';
+  // s-tpl1 / s-saas1 はチェック数 0 ならアップデータなしと判定 → ガード
+  if (id === 's-tpl1' || id === 's-saas1') {
+    var sel = (id === 's-tpl1') ? '#s-tpl1' : '#s-saas1';
+    var checkedCount = 0;
+    document.querySelectorAll(sel + ' label.source-check input[type="checkbox"]').forEach(function(cb) {
+      if (cb.checked) checkedCount++;
+    });
+    if (checkedCount === 0) {
+      alert('⚠️ アップデータなしのため保存不要\n\nチェック項目やアップロードファイルがありません。\n少なくとも1項目を選択またはアップロードしてから一時保存してください。');
+      return;
+    }
+  }
   var info = null;
   if (id === 's-tpl1') info = { type:'template', completed:0, total:4, currentStep:'s-tpl1', label:'① アップロード' };
   else if (id === 's-tpl2') info = { type:'template', completed:0, total:4, currentStep:'s-tpl2', label:'② 確認・実行' };
   else if (id === 's-saas1') info = { type:'saas', completed:0, total:5, currentStep:'s-saas1', label:'① 選択・アップロード' };
   else if (id === 's-saas2') info = { type:'saas', completed:1, total:5, currentStep:'s-saas2', label:'② マッピング設定' };
-  else if (id === 's-saas3') info = { type:'saas', completed:2, total:5, currentStep:'s-saas3', label:'③ プレビュー・確認' };
+  else if (id === 's-saas3' || id === 's-saas-preview') info = { type:'saas', completed:2, total:5, currentStep:id, label:'③ プレビュー・確認' };
   if (!info) {
     alert('保存可能な画面ではありません。');
     return;
