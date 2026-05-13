@@ -366,11 +366,18 @@
 <div class="screen" id="s-tpl1">
   <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
     <h1 class="page-title" style="margin:0;">テンプレートで取り込み</h1>
-    <!-- 🛠 デモ用モード切替(本番では非表示推奨) -->
-    <div style="display:flex;align-items:center;gap:8px;font-size:10px;background:#fff3e0;border:1px dashed #e67e22;border-radius:8px;padding:6px 10px;">
-      <span style="color:#e67e22;font-weight:700;">🛠 デモ用</span>
-      <button class="tpl-mode-toggle" data-mode="setup" onclick="switchTplMode('setup')" style="font-size:11px;padding:4px 10px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;">新規登録</button>
-      <button class="tpl-mode-toggle" data-mode="ops" onclick="switchTplMode('ops')" style="font-size:11px;padding:4px 10px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;">運用更新</button>
+    <!-- 🛠 デモ用モード切替+アップロード状態切替(本番では非表示推奨) -->
+    <div style="display:flex;flex-direction:column;gap:6px;font-size:10px;background:#fff3e0;border:1px dashed #e67e22;border-radius:8px;padding:6px 10px;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="color:#e67e22;font-weight:700;">🛠 デモ用 モード:</span>
+        <button class="tpl-mode-toggle" data-mode="setup" onclick="switchTplMode('setup')" style="font-size:11px;padding:4px 10px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;">新規登録</button>
+        <button class="tpl-mode-toggle" data-mode="ops" onclick="switchTplMode('ops')" style="font-size:11px;padding:4px 10px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;">運用更新</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="color:#888;font-size:9px;font-weight:600;">アップ状態:</span>
+        <button onclick="bDemoTplSetAllChecked(true)" style="font-size:11px;padding:4px 10px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;">✓ 必須アップ済</button>
+        <button onclick="bDemoTplSetAllChecked(false)" style="font-size:11px;padding:4px 10px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;">✗ 未アップ</button>
+      </div>
     </div>
   </div>
   <div class="content">
@@ -664,11 +671,18 @@
 <div class="screen" id="s-saas1">
   <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
     <h1 class="page-title" style="margin:0;">外部勤怠サービスから取り込み</h1>
-    <!-- 🛠 デモ用モード切替(本番では非表示推奨) -->
-    <div style="display:flex;align-items:center;gap:8px;font-size:10px;background:#fff3e0;border:1px dashed #e67e22;border-radius:8px;padding:6px 10px;">
-      <span style="color:#e67e22;font-weight:700;">🛠 デモ用</span>
-      <button class="saas-mode-toggle" data-mode="setup" onclick="switchSaasMode('setup')" style="font-size:11px;padding:4px 10px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;">新規登録</button>
-      <button class="saas-mode-toggle" data-mode="ops" onclick="switchSaasMode('ops')" style="font-size:11px;padding:4px 10px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;">運用更新</button>
+    <!-- 🛠 デモ用モード切替+アップロード状態切替 -->
+    <div style="display:flex;flex-direction:column;gap:6px;font-size:10px;background:#fff3e0;border:1px dashed #e67e22;border-radius:8px;padding:6px 10px;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="color:#e67e22;font-weight:700;">🛠 デモ用 モード:</span>
+        <button class="saas-mode-toggle" data-mode="setup" onclick="switchSaasMode('setup')" style="font-size:11px;padding:4px 10px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;">新規登録</button>
+        <button class="saas-mode-toggle" data-mode="ops" onclick="switchSaasMode('ops')" style="font-size:11px;padding:4px 10px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;">運用更新</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="color:#888;font-size:9px;font-weight:600;">アップ状態:</span>
+        <button onclick="bDemoSaasSetAllChecked(true)" style="font-size:11px;padding:4px 10px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;">✓ 必須アップ済</button>
+        <button onclick="bDemoSaasSetAllChecked(false)" style="font-size:11px;padding:4px 10px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;">✗ 未アップ</button>
+      </div>
     </div>
   </div>
   <div class="content">
@@ -1654,6 +1668,56 @@ function toggleCheck(el) {
     if (el.hasAttribute('data-tpl')) updateTplUploadUI();
     refreshSaveButtonsState();
   }, 0);
+}
+
+// デモ用: s-tpl1 の全チェックボックスを一括 ON/OFF (必須アップ済/未アップ切替)
+function bDemoTplSetAllChecked(checked) {
+  document.querySelectorAll('#s-tpl1 label.source-check').forEach(function(lbl) {
+    var key = lbl.getAttribute('data-tpl');
+    if (!key) return;
+    // 必須項目のみ ON にする、admin(任意)は ON 時もチェックしない
+    if (checked && key === 'admin') return;
+    var cb = lbl.querySelector('input[type="checkbox"]');
+    if (!cb) return;
+    cb.checked = checked;
+    if (checked) {
+      lbl.classList.add('checked');
+      lbl.style.borderColor = '#2ec4a0';
+      lbl.style.background = '#f7fdfb';
+    } else {
+      lbl.classList.remove('checked');
+      lbl.style.borderColor = '#e8e8e8';
+      lbl.style.background = '#fff';
+    }
+  });
+  refreshSaveButtonsState();
+  if (typeof updateUploadSteps === 'function') updateUploadSteps();
+  if (typeof updateTplUploadUI === 'function') updateTplUploadUI();
+}
+
+// デモ用: s-saas1 の必須項目(従業員データ/スタッフ情報/CSVファイル)を一括 ON/OFF
+function bDemoSaasSetAllChecked(checked) {
+  document.querySelectorAll('#s-saas1 label.source-check').forEach(function(lbl) {
+    var key = lbl.getAttribute('data-map') || lbl.getAttribute('data-saas-extra');
+    if (!key) return;
+    var isRequired = (key === 'map-kot-emp' || key === 'map-jc-staff' || key === 'map-other');
+    // ON時は必須項目のみチェック、OFF時は全項目アンチェック
+    if (checked && !isRequired) return;
+    var cb = lbl.querySelector('input[type="checkbox"]');
+    if (!cb) return;
+    cb.checked = checked;
+    if (checked) {
+      lbl.classList.add('checked');
+      lbl.style.borderColor = '#2ec4a0';
+      lbl.style.background = '#f7fdfb';
+    } else {
+      lbl.classList.remove('checked');
+      lbl.style.borderColor = '#e8e8e8';
+      lbl.style.background = '#fff';
+    }
+  });
+  refreshSaveButtonsState();
+  if (typeof updateUploadSteps === 'function') updateUploadSteps();
 }
 
 // アップロード画面(s-tpl1/s-saas1)の一時保存ボタンをチェック状態に応じて enable/disable
