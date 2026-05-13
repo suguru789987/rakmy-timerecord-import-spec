@@ -443,11 +443,6 @@
         </label>
       </div>
 
-      <!-- ここまで完了として一時保存(setupモード時のみ表示) -->
-      <div id="tpl-save-here" style="display:none;margin-top:12px;padding:10px 14px;background:#fff3e0;border:1px dashed #e67e22;border-radius:8px;text-align:center;">
-        <button type="button" onclick="saveImportDraftWithItems('template')" style="background:#fff;border:1px solid #e67e22;color:#e67e22;font-weight:700;padding:8px 18px;border-radius:6px;cursor:pointer;font-size:12px;">💾 ここまで完了として一時保存</button>
-        <div style="font-size:10px;color:#888;margin-top:6px;">現在チェックされている項目を「完了済み」として記録し、後で続きから再開できます。</div>
-      </div>
     </div>
 
     <div class="wcard">
@@ -486,6 +481,12 @@
       <div id="tpl-up-files" style="display:none;margin-top:10px;">
         <div id="tpl-up-file1" style="display:none;"></div>
         <div id="tpl-up-file2" style="display:none;"></div>
+      </div>
+
+      <!-- アップロード中の一時保存(setupモード時のみ表示・ドロップゾーン直下) -->
+      <div id="tpl-save-here" style="display:none;margin-top:14px;padding:10px 14px;background:#fff3e0;border:1px dashed #e67e22;border-radius:8px;text-align:center;">
+        <button type="button" onclick="saveImportDraftWithItems('template')" style="background:#fff;border:1px solid #e67e22;color:#e67e22;font-weight:700;padding:8px 18px;border-radius:6px;cursor:pointer;font-size:12px;">💾 ここまでアップロード済として一時保存</button>
+        <div style="font-size:10px;color:#888;margin-top:6px;">アップロード済みの項目を「完了済み」として記録、必須項目アップ途中で離脱しても続きから再開できます。</div>
       </div>
     </div>
 
@@ -784,11 +785,6 @@
         </div>
       </div>
 
-      <!-- ここまで完了として一時保存(setupモード時のみ表示) -->
-      <div id="saas-save-here" style="display:none;margin-top:12px;padding:10px 14px;background:#fff3e0;border:1px dashed #e67e22;border-radius:8px;text-align:center;">
-        <button type="button" onclick="saveImportDraftWithItems('saas')" style="background:#fff;border:1px solid #e67e22;color:#e67e22;font-weight:700;padding:8px 18px;border-radius:6px;cursor:pointer;font-size:12px;">💾 ここまで完了として一時保存</button>
-        <div style="font-size:10px;color:#888;margin-top:6px;">現在チェックされている項目を「完了済み」として記録し、後で続きから再開できます。</div>
-      </div>
     </div>
 
     <div class="wcard" id="saas-section-upload">
@@ -867,6 +863,12 @@
           <div class="alert alert-err" style="margin-top:8px;">
             <strong>アップロード順序エラー:</strong> 先に「<span id="saas-up-error-name">従業員データ（employee_info）</span>」をアップロードしてください。
           </div>
+        </div>
+
+        <!-- アップロード中の一時保存(setupモード時のみ表示・ドロップゾーン直下) -->
+        <div id="saas-save-here" style="display:none;margin-top:14px;padding:10px 14px;background:#fff3e0;border:1px dashed #e67e22;border-radius:8px;text-align:center;">
+          <button type="button" onclick="saveImportDraftWithItems('saas')" style="background:#fff;border:1px solid #e67e22;color:#e67e22;font-weight:700;padding:8px 18px;border-radius:6px;cursor:pointer;font-size:12px;">💾 ここまでアップロード済として一時保存</button>
+          <div style="font-size:10px;color:#888;margin-top:6px;">アップロード済みの項目を「完了済み」として記録、必須項目アップ途中で離脱しても続きから再開できます。</div>
         </div>
 
       </div>
@@ -1243,6 +1245,12 @@
       <button class="btn btn-ghost" onclick="go('s-saas1')">← 戻る</button>
       <button class="btn btn-primary" onclick="go('s-saas-preview')">マッピングを保存してプレビューへ →</button>
     </div>
+
+    <!-- マッピング設定途中の一時保存 (setupモード時のみ表示) -->
+    <div id="saas2-save-here" style="display:none;margin-top:14px;padding:10px 14px;background:#fff3e0;border:1px dashed #e67e22;border-radius:8px;text-align:center;">
+      <button type="button" onclick="saveImportDraftMappingStep('s-saas2')" style="background:#fff;border:1px solid #e67e22;color:#e67e22;font-weight:700;padding:8px 18px;border-radius:6px;cursor:pointer;font-size:12px;">💾 ここまで一時保存(マッピング設定途中)</button>
+      <div style="font-size:10px;color:#888;margin-top:6px;">マッピング設定の途中地点を記録、後で続きから再開できます。</div>
+    </div>
   </div>
 </div>
 
@@ -1377,6 +1385,12 @@
     <div class="btn-group">
       <button class="btn btn-ghost" onclick="go('s-saas1')">← 戻る</button>
       <button class="btn btn-primary" onclick="go('s-saas4')">エラー行を除いてインポート実行（14件）</button>
+    </div>
+
+    <!-- プレビュー・確認(マッピング修正)中の一時保存 -->
+    <div id="saas-preview-save-here" style="display:none;margin-top:14px;padding:10px 14px;background:#fff3e0;border:1px dashed #e67e22;border-radius:8px;text-align:center;">
+      <button type="button" onclick="saveImportDraftMappingStep('s-saas-preview')" style="background:#fff;border:1px solid #e67e22;color:#e67e22;font-weight:700;padding:8px 18px;border-radius:6px;cursor:pointer;font-size:12px;">💾 ここまで一時保存(マッピング修正中)</button>
+      <div style="font-size:10px;color:#888;margin-top:6px;">取り込みデータのマッピング修正・プレビュー確認中の地点を記録します。</div>
     </div>
   </div>
 </div>
@@ -2699,10 +2713,26 @@ window.addEventListener('beforeunload', function() {
 function refreshSaveHerePanels() {
   var setupModeUrl = (location.hash || '').replace('#', '');
   var isSetup = (setupModeUrl === 'tpl-setup' || setupModeUrl === 'saas-setup');
-  var tplSave = document.getElementById('tpl-save-here');
-  var saasSave = document.getElementById('saas-save-here');
-  if (tplSave) tplSave.style.display = (isSetup ? '' : 'none');
-  if (saasSave) saasSave.style.display = (isSetup ? '' : 'none');
+  ['tpl-save-here', 'saas-save-here', 'saas2-save-here', 'saas-preview-save-here'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.style.display = (isSetup ? '' : 'none');
+  });
+}
+
+// マッピング設定/プレビュー中の一時保存(s-saas2, s-saas-preview, s-saas3)
+function saveImportDraftMappingStep(screenId) {
+  var info = null;
+  if (screenId === 's-saas2') {
+    info = { type:'saas', completed:1, total:5, currentStep:'s-saas2', label:'② マッピング設定(途中)' };
+  } else if (screenId === 's-saas-preview') {
+    info = { type:'saas', completed:2, total:5, currentStep:'s-saas-preview', label:'③ プレビュー・マッピング修正(途中)' };
+  } else if (screenId === 's-saas3') {
+    info = { type:'saas', completed:2, total:5, currentStep:'s-saas3', label:'③ プレビュー・確認' };
+  }
+  if (!info) return;
+  info.savedAt = Date.now();
+  try { localStorage.setItem('import_in_progress', JSON.stringify(info)); } catch (e) {}
+  showImportSaveDraftModal(info);
 }
 
 // 「💾 ここまで完了として一時保存」: 現在のチェック状態を localStorage に保存
