@@ -495,6 +495,12 @@
         <div id="tpl-up-file2" style="display:none;"></div>
       </div>
 
+      <!-- 一時保存ステータス: アップ済みデータがある時に表示 -->
+      <div id="tpl-saved-status" style="display:none;margin-top:14px;padding:10px 14px;background:#e3f2fd;border:1px solid #90caf9;border-radius:8px;font-size:11px;color:#1565c0;">
+        ✓ <strong>アップロード済データを一時記憶しています</strong>(<span class="saved-status-count">0</span>件)<br>
+        画面下の「<strong>💾 一時保存</strong>」ボタンで中断地点を保存し、後で打刻記録画面から再開できます。
+      </div>
+
     </div>
 
     <div class="btn-group">
@@ -883,6 +889,12 @@
           <div class="alert alert-err" style="margin-top:8px;">
             <strong>アップロード順序エラー:</strong> 先に「<span id="saas-up-error-name">従業員データ（employee_info）</span>」をアップロードしてください。
           </div>
+        </div>
+
+        <!-- 一時保存ステータス: アップ済みデータがある時に表示 -->
+        <div id="saas-saved-status" style="display:none;margin-top:14px;padding:10px 14px;background:#e3f2fd;border:1px solid #90caf9;border-radius:8px;font-size:11px;color:#1565c0;">
+          ✓ <strong>アップロード済データを一時記憶しています</strong>(<span class="saved-status-count">0</span>件)<br>
+          画面下の「<strong>💾 一時保存</strong>」ボタンで中断地点を保存し、後で打刻記録画面から再開できます。
         </div>
 
       </div>
@@ -1740,7 +1752,7 @@ function bDemoSaasSetAllChecked(checked) {
   if (typeof updateUploadSteps === 'function') updateUploadSteps();
 }
 
-// アップロード画面(s-tpl1/s-saas1)の一時保存ボタンをチェック状態に応じて enable/disable
+// アップロード画面(s-tpl1/s-saas1)の一時保存ボタンとステータスバナーをチェック状態に応じて更新
 function refreshSaveButtonsState() {
   ['s-tpl1', 's-saas1'].forEach(function(screenId) {
     var checked = 0;
@@ -1748,7 +1760,6 @@ function refreshSaveButtonsState() {
       if (cb.checked) checked++;
     });
     var btnIds = (screenId === 's-tpl1') ? ['tpl1-save-btn'] : ['saas1-save-btn'];
-    // ヘッダー右上の動的追加ボタン
     var headerBtn = document.querySelector('#' + screenId + ' .save-draft-btn');
     var btns = btnIds.map(function(id) { return document.getElementById(id); });
     btns.push(headerBtn);
@@ -1762,6 +1773,14 @@ function refreshSaveButtonsState() {
         ? 'チェック項目またはアップロードファイルがありません'
         : '中断地点を保存し、後で「続きから再開」できます';
     });
+    // ドロップゾーン下の「一時保存ステータス」バナーも連動
+    var statusId = (screenId === 's-tpl1') ? 'tpl-saved-status' : 'saas-saved-status';
+    var statusEl = document.getElementById(statusId);
+    if (statusEl) {
+      statusEl.style.display = (checked > 0) ? '' : 'none';
+      var countEl = statusEl.querySelector('.saved-status-count');
+      if (countEl) countEl.textContent = checked;
+    }
   });
 }
 
