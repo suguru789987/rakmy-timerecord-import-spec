@@ -442,6 +442,12 @@
           <a class="dl-link" href="#" onclick="event.stopPropagation();downloadAdminTemplate();" style="font-size:11px;">⬇ テンプレートDL</a>
         </label>
       </div>
+
+      <!-- ここまで完了として一時保存(setupモード時のみ表示) -->
+      <div id="tpl-save-here" style="display:none;margin-top:12px;padding:10px 14px;background:#fff3e0;border:1px dashed #e67e22;border-radius:8px;text-align:center;">
+        <button type="button" onclick="saveImportDraftWithItems('template')" style="background:#fff;border:1px solid #e67e22;color:#e67e22;font-weight:700;padding:8px 18px;border-radius:6px;cursor:pointer;font-size:12px;">💾 ここまで完了として一時保存</button>
+        <div style="font-size:10px;color:#888;margin-top:6px;">現在チェックされている項目を「完了済み」として記録し、後で続きから再開できます。</div>
+      </div>
     </div>
 
     <div class="wcard">
@@ -776,6 +782,12 @@
             <span class="tpl-badge" style="font-size:10px;">カスタム</span>
           </label>
         </div>
+      </div>
+
+      <!-- ここまで完了として一時保存(setupモード時のみ表示) -->
+      <div id="saas-save-here" style="display:none;margin-top:12px;padding:10px 14px;background:#fff3e0;border:1px dashed #e67e22;border-radius:8px;text-align:center;">
+        <button type="button" onclick="saveImportDraftWithItems('saas')" style="background:#fff;border:1px solid #e67e22;color:#e67e22;font-weight:700;padding:8px 18px;border-radius:6px;cursor:pointer;font-size:12px;">💾 ここまで完了として一時保存</button>
+        <div style="font-size:10px;color:#888;margin-top:6px;">現在チェックされている項目を「完了済み」として記録し、後で続きから再開できます。</div>
       </div>
     </div>
 
@@ -2613,17 +2625,26 @@ document.addEventListener('DOMContentLoaded', function() {
   updateTplUploadUI();
   applyHashRouting();
   ensureSaveDraftButtons();
-  // ?resume=<screenId> で中断地点から再開
+  refreshSaveHerePanels();
+  // ?resume=<screenId> で中断地点から再開、チェック状態も復元
   try {
     var params = new URLSearchParams(location.search);
     var resumeId = params.get('resume');
     if (resumeId && document.getElementById(resumeId)) {
       setTimeout(function() {
         go(resumeId);
+        restoreItemsFromDraft(); // チェック状態+完了バッジを復元
         history.replaceState(null, '', location.pathname + (location.hash || ''));
-      }, 50);
+      }, 80);
+    } else {
+      // resume パラメータがなくても、setup mode で起動時はチェック状態を復元
+      setTimeout(function() { restoreItemsFromDraft(); }, 100);
     }
   } catch (e) {}
+});
+
+window.addEventListener('hashchange', function() {
+  refreshSaveHerePanels();
 });
 
 // 各インポート画面の page-header に「💾 一時保存して中断」ボタンを動的追加
@@ -2673,6 +2694,81 @@ window.addEventListener('beforeunload', function() {
     }
   } catch (e) {}
 });
+
+// 項目別「💾 ここまで完了として一時保存」ボタンの表示制御(setupモード時のみ)
+function refreshSaveHerePanels() {
+  var setupModeUrl = (location.hash || '').replace('#', '');
+  var isSetup = (setupModeUrl === 'tpl-setup' || setupModeUrl === 'saas-setup');
+  var tplSave = document.getElementById('tpl-save-here');
+  var saasSave = document.getElementById('saas-save-here');
+  if (tplSave) tplSave.style.display = (isSetup ? '' : 'none');
+  if (saasSave) saasSave.style.display = (isSetup ? '' : 'none');
+}
+
+// 「💾 ここまで完了として一時保存」: 現在のチェック状態を localStorage に保存
+function saveImportDraftWithItems(type) {
+  var itemsCompleted = [];
+  var labels = {};
+  if (type === 'template') {
+    document.querySelectorAll('#s-tpl1 label.source-check').forEach(function(lbl) {
+      var key = lbl.getAttribute('data-tpl');
+      if (!key) return;
+      var cb = lbl.querySelector('input[type="checkbox"]');
+      var nameEl = lbl.querySelector('div > div:first-child');
+      labels[key] = nameEl ? nameEl.textContent.trim() : key;
+      if (cb && cb.checked) itemsCompleted.push(key);
+    });
+  } else { // saas
+    document.querySelectorAll('#s-saas1 label.source-check').forEach(function(lbl) {
+      var key = lbl.getAttribute('data-map') || lbl.getAttribute('data-saas-extra');
+      if (!key) return;
+      var cb = lbl.querySelector('input[type="checkbox"]');
+      var nameEl = lbl.querySelector('div > div:first-child');
+      labels[key] = nameEl ? nameEl.textContent.trim() : key;
+      if (cb && cb.checked) itemsCompleted.push(key);
+    });
+  }
+  var total = (type === 'template') ? 4 : 5;
+  var info = {
+    type: type,
+    completed: itemsCompleted.length,
+    total: total,
+    currentStep: (type === 'template') ? 's-tpl1' : 's-saas1',
+    label: '取り込みデータ選択(' + itemsCompleted.length + '項目完了)',
+    itemsCompleted: itemsCompleted,
+    itemLabels: labels,
+    savedAt: Date.now()
+  };
+  try { localStorage.setItem('import_in_progress', JSON.stringify(info)); } catch (e) {}
+  showImportSaveDraftModal(info);
+}
+
+// 再開時にチェック状態を復元 + 完了バッジ表示
+function restoreItemsFromDraft() {
+  try {
+    var raw = localStorage.getItem('import_in_progress');
+    if (!raw) return;
+    var info = JSON.parse(raw);
+    if (!info.itemsCompleted || !Array.isArray(info.itemsCompleted)) return;
+    var sel = (info.type === 'template') ? '#s-tpl1' : '#s-saas1';
+    info.itemsCompleted.forEach(function(key) {
+      var lbl = document.querySelector(sel + ' label[data-tpl="' + key + '"], ' + sel + ' label[data-map="' + key + '"], ' + sel + ' label[data-saas-extra="' + key + '"]');
+      if (!lbl) return;
+      var cb = lbl.querySelector('input[type="checkbox"]');
+      if (cb) cb.checked = true;
+      lbl.classList.add('checked');
+      // 「✓ 一時保存時に完了済」バッジを追加
+      if (!lbl.querySelector('.restored-badge')) {
+        var badge = document.createElement('span');
+        badge.className = 'restored-badge';
+        badge.style.cssText = 'font-size:9px;padding:2px 7px;background:#e8f9f4;color:#0e9077;border-radius:10px;font-weight:700;margin-left:6px;';
+        badge.innerHTML = '✓ 一時保存時に完了済';
+        var titleDiv = lbl.querySelector('div > div:first-child') || lbl.querySelector('div');
+        if (titleDiv) titleDiv.appendChild(badge);
+      }
+    });
+  } catch (e) {}
+}
 
 // 「💾 一時保存して中断」ボタン押下時の処理
 function saveImportDraftAndExit() {
