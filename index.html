@@ -599,6 +599,7 @@
 
     <div class="btn-group">
       <button class="btn btn-ghost" onclick="go('s-tpl1')">← 戻る</button>
+      <button id="tpl2-save-btn" class="btn btn-ghost setup-only-btn" style="display:none;background:#fff3e0;border:1px solid #e67e22;color:#e67e22;font-weight:700;" onclick="saveImportDraftAndExit()">💾 一時保存</button>
       <button class="btn btn-primary" onclick="go('s-tpl3')">エラー行を除いてインポート実行</button>
     </div>
   </div>
@@ -2694,7 +2695,7 @@ window.addEventListener('beforeunload', function() {
 function refreshSaveHerePanels() {
   var setupModeUrl = (location.hash || '').replace('#', '');
   var isSetup = (setupModeUrl === 'tpl-setup' || setupModeUrl === 'saas-setup');
-  ['tpl1-save-btn', 'saas1-save-btn', 'saas2-save-btn', 'saas-preview-save-btn'].forEach(function(id) {
+  ['tpl1-save-btn', 'tpl2-save-btn', 'saas1-save-btn', 'saas2-save-btn', 'saas-preview-save-btn'].forEach(function(id) {
     var el = document.getElementById(id);
     if (el) el.style.display = (isSetup ? '' : 'none');
   });
