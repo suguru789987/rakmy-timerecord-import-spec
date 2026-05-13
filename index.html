@@ -1521,6 +1521,19 @@
 </div><!-- /main -->
 </div><!-- /app -->
 
+<!-- ===== 中断保存完了モーダル ===== -->
+<div id="import-save-draft-overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:9999;justify-content:center;align-items:center;padding:20px;">
+  <div style="background:#fff;border-radius:12px;max-width:520px;width:100%;padding:32px 28px;text-align:center;">
+    <div style="width:64px;height:64px;border-radius:50%;background:#fff3e0;color:#e67e22;display:flex;align-items:center;justify-content:center;font-size:34px;margin:0 auto 16px;">💾</div>
+    <h3 style="font-size:18px;font-weight:800;margin:0 0 10px;color:#e67e22;">中断地点を保存しました</h3>
+    <p id="import-save-draft-detail" style="font-size:12px;color:#666;line-height:1.7;margin:0 0 22px;text-align:left;"></p>
+    <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+      <a href="https://suguru789987.github.io/rakmy-owner-registration-mock/#b0-empty" class="btn btn-primary" style="padding:10px 22px;text-decoration:none;font-size:13px;font-weight:700;">📋 初期セットアップに戻る</a>
+      <button class="btn btn-ghost" onclick="closeImportSaveDraftModal()">この画面に留まる</button>
+    </div>
+  </div>
+</div>
+
 <!-- ===== 招待メール一括送信完了モーダル ===== -->
 <div id="invite-sent-overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:9999;justify-content:center;align-items:center;padding:20px;">
   <div style="background:#fff;border-radius:12px;max-width:520px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 16px 48px rgba(0,0,0,0.18);padding:32px 28px;text-align:center;">
@@ -2599,20 +2612,105 @@ document.addEventListener('DOMContentLoaded', function() {
   updateUploadSteps();
   updateTplUploadUI();
   applyHashRouting();
+  ensureSaveDraftButtons();
   // ?resume=<screenId> で中断地点から再開
   try {
     var params = new URLSearchParams(location.search);
     var resumeId = params.get('resume');
     if (resumeId && document.getElementById(resumeId)) {
-      // setup hash 由来のモード設定が走った後で該当画面へ遷移
       setTimeout(function() {
         go(resumeId);
-        // URLからresumeパラメータ除去(再リロード時の二重実行防止)
         history.replaceState(null, '', location.pathname + (location.hash || ''));
       }, 50);
     }
   } catch (e) {}
 });
+
+// 各インポート画面の page-header に「💾 一時保存して中断」ボタンを動的追加
+// (s-tpl1/s-tpl2/s-saas1/s-saas2/s-saas3 の中断保存用、完了画面 s-tpl3/s-saas4 には不要)
+function ensureSaveDraftButtons() {
+  var targets = ['s-tpl1', 's-tpl2', 's-saas1', 's-saas2', 's-saas3'];
+  targets.forEach(function(id) {
+    var scr = document.getElementById(id);
+    if (!scr) return;
+    var header = scr.querySelector('.page-header');
+    if (!header) return;
+    if (header.querySelector('.save-draft-btn')) return;
+    // page-header の display:flex 化(必要なら)
+    if (!header.style.display) {
+      header.style.cssText = 'display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;';
+    }
+    var btn = document.createElement('button');
+    btn.className = 'save-draft-btn';
+    btn.type = 'button';
+    btn.title = '中断地点を保存し、後で「続きから再開」できます。\n※ 画面遷移時・タブ閉じ時にも進捗は自動保存されます。';
+    btn.style.cssText = 'background:#fff3e0;border:1px solid #e67e22;color:#e67e22;font-weight:700;padding:8px 14px;border-radius:6px;cursor:pointer;font-size:12px;';
+    btn.innerHTML = '💾 一時保存して中断';
+    btn.onclick = saveImportDraftAndExit;
+    header.appendChild(btn);
+  });
+}
+
+// 離脱時の自動保存(必須ステップ途中離脱を想定)
+// setup mode で開いている場合のみ、現在の画面IDから進捗を localStorage に最新化
+window.addEventListener('beforeunload', function() {
+  try {
+    var setupModeUrl = (location.hash || '').replace('#', '');
+    var isSetup = (setupModeUrl === 'tpl-setup' || setupModeUrl === 'saas-setup');
+    if (!isSetup) return;
+    var activeScreen = document.querySelector('.screen.active');
+    var id = activeScreen ? activeScreen.id : '';
+    var info = null;
+    if (id === 's-tpl1') info = { type:'template', completed:0, total:4, currentStep:'s-tpl1', label:'① アップロード' };
+    else if (id === 's-tpl2') info = { type:'template', completed:0, total:4, currentStep:'s-tpl2', label:'② 確認・実行' };
+    else if (id === 's-saas1') info = { type:'saas', completed:0, total:5, currentStep:'s-saas1', label:'① 選択・アップロード' };
+    else if (id === 's-saas2') info = { type:'saas', completed:1, total:5, currentStep:'s-saas2', label:'② マッピング設定' };
+    else if (id === 's-saas3') info = { type:'saas', completed:2, total:5, currentStep:'s-saas3', label:'③ プレビュー・確認' };
+    if (info) {
+      info.savedAt = Date.now();
+      info.autoSaved = true;
+      localStorage.setItem('import_in_progress', JSON.stringify(info));
+    }
+  } catch (e) {}
+});
+
+// 「💾 一時保存して中断」ボタン押下時の処理
+function saveImportDraftAndExit() {
+  // 現在の画面IDから進捗を保存(setup モード前提)
+  var activeScreen = document.querySelector('.screen.active');
+  var id = activeScreen ? activeScreen.id : '';
+  var info = null;
+  if (id === 's-tpl1') info = { type:'template', completed:0, total:4, currentStep:'s-tpl1', label:'① アップロード' };
+  else if (id === 's-tpl2') info = { type:'template', completed:0, total:4, currentStep:'s-tpl2', label:'② 確認・実行' };
+  else if (id === 's-saas1') info = { type:'saas', completed:0, total:5, currentStep:'s-saas1', label:'① 選択・アップロード' };
+  else if (id === 's-saas2') info = { type:'saas', completed:1, total:5, currentStep:'s-saas2', label:'② マッピング設定' };
+  else if (id === 's-saas3') info = { type:'saas', completed:2, total:5, currentStep:'s-saas3', label:'③ プレビュー・確認' };
+  if (!info) {
+    alert('保存可能な画面ではありません。');
+    return;
+  }
+  info.savedAt = Date.now();
+  try { localStorage.setItem('import_in_progress', JSON.stringify(info)); } catch (e) {}
+  showImportSaveDraftModal(info);
+}
+
+// 中断保存完了モーダル
+function showImportSaveDraftModal(info) {
+  var ov = document.getElementById('import-save-draft-overlay');
+  if (!ov) return;
+  var detail = document.getElementById('import-save-draft-detail');
+  if (detail) {
+    var typeLabel = info.type === 'template' ? 'テンプレート取込' : '外部勤怠サービス取込';
+    detail.innerHTML = '<strong>' + typeLabel + '</strong> の中断地点を保存しました。<br>' +
+                       '中断地点: <strong>' + info.label + '</strong> (進捗 ' + info.completed + '/' + info.total + ')<br><br>' +
+                       '後で初期セットアップ画面の「続きから再開する」から、この地点に戻って続きが行えます。';
+  }
+  ov.style.display = 'flex';
+}
+function closeImportSaveDraftModal() {
+  var ov = document.getElementById('import-save-draft-overlay');
+  if (ov) ov.style.display = 'none';
+}
 
 // ブラウザ戻る/進む対応
 window.addEventListener('hashchange', function() {
