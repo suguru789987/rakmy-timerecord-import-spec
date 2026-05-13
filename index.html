@@ -599,7 +599,6 @@
 
     <div class="btn-group">
       <button class="btn btn-ghost" onclick="go('s-tpl1')">← 戻る</button>
-      <button id="tpl2-save-btn" class="btn btn-ghost setup-only-btn" style="display:none;background:#fff3e0;border:1px solid #e67e22;color:#e67e22;font-weight:700;" onclick="saveImportDraftAndExit()">💾 一時保存</button>
       <button class="btn btn-primary" onclick="go('s-tpl3')">エラー行を除いてインポート実行</button>
     </div>
   </div>
@@ -2644,9 +2643,9 @@ window.addEventListener('hashchange', function() {
 });
 
 // 各インポート画面の page-header に「💾 一時保存して中断」ボタンを動的追加
-// (s-tpl1/s-tpl2/s-saas1/s-saas2/s-saas3 の中断保存用、完了画面 s-tpl3/s-saas4 には不要)
+// s-tpl2 (確認・実行) は実行直前の最終確認なので一時保存不要 → 除外
 function ensureSaveDraftButtons() {
-  var targets = ['s-tpl1', 's-tpl2', 's-saas1', 's-saas2', 's-saas3'];
+  var targets = ['s-tpl1', 's-saas1', 's-saas2', 's-saas3'];
   targets.forEach(function(id) {
     var scr = document.getElementById(id);
     if (!scr) return;
@@ -2695,7 +2694,7 @@ window.addEventListener('beforeunload', function() {
 function refreshSaveHerePanels() {
   var setupModeUrl = (location.hash || '').replace('#', '');
   var isSetup = (setupModeUrl === 'tpl-setup' || setupModeUrl === 'saas-setup');
-  ['tpl1-save-btn', 'tpl2-save-btn', 'saas1-save-btn', 'saas2-save-btn', 'saas-preview-save-btn'].forEach(function(id) {
+  ['tpl1-save-btn', 'saas1-save-btn', 'saas2-save-btn', 'saas-preview-save-btn'].forEach(function(id) {
     var el = document.getElementById(id);
     if (el) el.style.display = (isSetup ? '' : 'none');
   });
