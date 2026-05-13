@@ -1561,19 +1561,23 @@ function go(id) {
   if (id === 's-saas2') showMappingPanels();
   if (id === 's-saas-settings') updateSettingsScreen();
   if (id === 's-tpl2') updateTplConfirmSections();
-  // 中断検知用 localStorage 管理: 各ステップ遷移時に進捗を記録、完了画面でクリア
+  // 中断検知用 localStorage 管理: 進捗(completed/total/currentStep/label)を記録、完了画面でクリア
   try {
     var setupModeUrl = (location.hash || '').replace('#', '');
     var isSetup = (setupModeUrl === 'tpl-setup' || setupModeUrl === 'saas-setup');
     if (isSetup) {
-      if (id === 's-tpl1' || id === 's-tpl2') {
-        localStorage.setItem('import_in_progress', JSON.stringify({ type: 'template', step: id, startedAt: Date.now() }));
-      } else if (id === 's-saas1' || id === 's-saas2' || id === 's-saas3') {
-        localStorage.setItem('import_in_progress', JSON.stringify({ type: 'saas', step: id, startedAt: Date.now() }));
-      } else if (id === 's-tpl3' || id === 's-saas4') {
-        // 完了画面到達 → クリア(招待送信時に明確な完了)
-        // ただし招待送信ボタン押下で完全クリアするのが理想だが、簡略化のため到達で消す
+      var info = null;
+      if (id === 's-tpl1') info = { type:'template', completed:0, total:4, currentStep:'s-tpl1', label:'① アップロード' };
+      else if (id === 's-tpl2') info = { type:'template', completed:0, total:4, currentStep:'s-tpl2', label:'② 確認・実行' };
+      else if (id === 's-saas1') info = { type:'saas', completed:0, total:5, currentStep:'s-saas1', label:'① 選択・アップロード' };
+      else if (id === 's-saas2') info = { type:'saas', completed:1, total:5, currentStep:'s-saas2', label:'② マッピング設定' };
+      else if (id === 's-saas3') info = { type:'saas', completed:2, total:5, currentStep:'s-saas3', label:'③ プレビュー・確認' };
+      else if (id === 's-tpl3' || id === 's-saas4') {
         localStorage.removeItem('import_in_progress');
+      }
+      if (info) {
+        info.startedAt = Date.now();
+        localStorage.setItem('import_in_progress', JSON.stringify(info));
       }
     }
   } catch (e) {}
@@ -2595,6 +2599,19 @@ document.addEventListener('DOMContentLoaded', function() {
   updateUploadSteps();
   updateTplUploadUI();
   applyHashRouting();
+  // ?resume=<screenId> で中断地点から再開
+  try {
+    var params = new URLSearchParams(location.search);
+    var resumeId = params.get('resume');
+    if (resumeId && document.getElementById(resumeId)) {
+      // setup hash 由来のモード設定が走った後で該当画面へ遷移
+      setTimeout(function() {
+        go(resumeId);
+        // URLからresumeパラメータ除去(再リロード時の二重実行防止)
+        history.replaceState(null, '', location.pathname + (location.hash || ''));
+      }, 50);
+    }
+  } catch (e) {}
 });
 
 // ブラウザ戻る/進む対応
