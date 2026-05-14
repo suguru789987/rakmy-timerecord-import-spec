@@ -1479,6 +1479,16 @@
 <div class="screen" id="s-saas-fix">
   <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
     <h1 class="page-title" style="margin:0;">エラー・未マップ項目の修正</h1>
+    <!-- 🛠 デモ用 エラー対処状態 切替 -->
+    <div style="display:flex;flex-direction:column;gap:6px;font-size:10px;background:#fff3e0;border:1px dashed #e67e22;border-radius:8px;padding:6px 10px;">
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+        <span style="color:#e67e22;font-weight:700;">🛠 デモ用 エラー対処状態:</span>
+        <button onclick="saasFixDemoReset()" style="font-size:11px;padding:4px 10px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;">🔄 処理前(初期)</button>
+        <button onclick="saasFixDemoValueChanged()" style="font-size:11px;padding:4px 10px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;">✏ 値変更済</button>
+        <button onclick="saasFixDemoExcluded()" style="font-size:11px;padding:4px 10px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;">✗ 除外済</button>
+        <button onclick="saasFixDemoMasterAdded()" style="font-size:11px;padding:4px 10px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;">⚙ マスタ追加済</button>
+      </div>
+    </div>
   </div>
   <div class="content">
     <div class="alert alert-info" style="margin-bottom:16px;">プレビューで検出された <strong>エラー / 未マップ項目</strong> を修正します。修正完了後、プレビュー画面に戻ってインポートを実行してください。</div>
@@ -2339,6 +2349,59 @@ function saasFixScrollToDefaults() {
     target.style.background = '#fff8d6';
     setTimeout(function(){ target.style.background = origBg || ''; }, 1500);
   }
+}
+
+// ===== デモ用: 状態切替 (処理前 ↔ 処理後) =====
+function saasFixDemoReset() {
+  var row = document.getElementById('saas-fix-emp006-row');
+  var excluded = document.getElementById('saas-fix-emp006-excluded');
+  var val = document.getElementById('saas-fix-emp006-value');
+  var sel = document.getElementById('saas-fix-emp006-select');
+  var status = document.getElementById('saas-fix-error-status');
+  var countEl = document.getElementById('saas-fix-error-count');
+  var card = document.getElementById('saas-fix-error-card');
+  if (row) { row.style.opacity = ''; row.style.background = '#fff'; row.style.display = ''; }
+  if (excluded) excluded.style.display = 'none';
+  if (val) {
+    val.textContent = '契約社員 (未登録)';
+    val.style.color = '#c0392b';
+    val.style.textDecoration = '';
+    val.style.display = '';
+  }
+  if (sel) { sel.style.display = 'none'; sel.value = ''; }
+  if (status) status.style.display = 'none';
+  if (countEl) countEl.textContent = '1';
+  if (card) card.style.display = '';
+}
+function saasFixDemoValueChanged() {
+  saasFixDemoReset();
+  var val = document.getElementById('saas-fix-emp006-value');
+  if (val) {
+    val.textContent = 'アルバイト (変更済)';
+    val.style.color = '#0e9077';
+  }
+  saasFixShowStatus('✏ EMP-006 の雇用区分を <strong>「アルバイト」</strong> に変更しました。プレビューに戻って <strong>「インポート実行」</strong> で全15件取り込めます。', 'green');
+}
+function saasFixDemoExcluded() {
+  saasFixDemoReset();
+  var row = document.getElementById('saas-fix-emp006-row');
+  var excluded = document.getElementById('saas-fix-emp006-excluded');
+  var val = document.getElementById('saas-fix-emp006-value');
+  if (row) { row.style.opacity = '0.5'; row.style.background = '#fafafa'; }
+  if (excluded) excluded.style.display = '';
+  if (val) val.style.textDecoration = 'line-through';
+  saasFixShowStatus('✗ EMP-006 を <strong>除外</strong>しました。プレビューに戻って <strong>「エラー行を除いてインポート実行 (14件)」</strong> を押下してください。', 'gray');
+}
+function saasFixDemoMasterAdded() {
+  saasFixDemoReset();
+  var countEl = document.getElementById('saas-fix-error-count');
+  var val = document.getElementById('saas-fix-emp006-value');
+  if (countEl) countEl.textContent = '0';
+  if (val) {
+    val.textContent = '契約社員 (マスタ追加済)';
+    val.style.color = '#0e9077';
+  }
+  saasFixShowStatus('⚙ 雇用区分マスタに <strong>「契約社員」</strong> が追加されました。エラーは解消、<strong>全15件インポート可能</strong>です。プレビューに戻って実行してください。', 'green');
 }
 // Template upload (必須Step 1-4 → 任意 admin の順に進行)
 var tplUploadStep = 0;
