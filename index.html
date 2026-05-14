@@ -1914,7 +1914,9 @@ function refreshSaveButtonsState() {
     }
   });
 
-  // === s-saas2 (マッピング設定): _mockSaasMappingChanged で活性化 ===
+  // === s-saas2 / s-saas-preview: ユーザーアクション(変更)で活性化 ===
+  // プリセットOKでそのまま離脱したい場合は「マッピング保存して→」/「エラー行を除いてインポート実行」等の進行ボタンを使う
+  // 一時保存は「変更を加えた途中状態」を保存するためのものなのでアクションがあって初めて活性化
   var saas2CanSave = !!window._mockSaasMappingChanged;
   var saas2Btns = [
     document.getElementById('saas2-save-btn'),
@@ -1926,11 +1928,9 @@ function refreshSaveButtonsState() {
     btn.style.opacity = saas2CanSave ? '' : '0.4';
     btn.style.cursor = saas2CanSave ? 'pointer' : 'not-allowed';
     btn.title = saas2CanSave
-      ? '中断地点を保存し、後で「続きから再開」できます'
-      : 'マッピング設定 (項目/デフォルト値) を変更すると一時保存できます';
+      ? '変更途中の状態を保存します'
+      : 'マッピング項目/デフォルト値を変更すると一時保存できます (変更なしならそのまま「マッピング保存してプレビューへ→」で進めます)';
   });
-
-  // === s-saas-preview (プレビュー修正): _mockSaasPreviewChanged で活性化 ===
   var pvCanSave = !!window._mockSaasPreviewChanged;
   var pvBtns = [
     document.getElementById('saas-preview-save-btn'),
@@ -1942,8 +1942,8 @@ function refreshSaveButtonsState() {
     btn.style.opacity = pvCanSave ? '' : '0.4';
     btn.style.cursor = pvCanSave ? 'pointer' : 'not-allowed';
     btn.title = pvCanSave
-      ? '中断地点を保存し、後で「続きから再開」できます'
-      : 'プレビュー (セル/重複処理/タブ/デフォルト値) を変更すると一時保存できます';
+      ? '変更途中の状態を保存します'
+      : 'セル編集/タブ切替/重複処理選択/デフォルト値変更などのアクションで一時保存できます (変更なしならそのまま「インポート実行→」で進めます)';
   });
 }
 
@@ -3030,12 +3030,23 @@ function refreshSaveHerePanels() {
 }
 
 // マッピング設定/プレビュー中の一時保存(s-saas2, s-saas-preview, s-saas3)
+// label は変更フラグの有無で出し分け: 変更あり=「変更途中」/ 変更なし=「プリセット適用済」「マッピング確認済」
 function saveImportDraftMappingStep(screenId) {
   var info = null;
   if (screenId === 's-saas2') {
-    info = { type:'saas', completed:1, total:5, currentStep:'s-saas2', label:'② マッピング設定(変更途中)', mapping_changed:true };
+    var changed2 = !!window._mockSaasMappingChanged;
+    info = {
+      type:'saas', completed:1, total:5, currentStep:'s-saas2',
+      label: changed2 ? '② マッピング設定(変更途中)' : '② マッピング設定(プリセット適用済)',
+      mapping_changed: changed2
+    };
   } else if (screenId === 's-saas-preview') {
-    info = { type:'saas', completed:2, total:5, currentStep:'s-saas-preview', label:'③ プレビュー・マッピング修正(変更途中)', preview_changed:true };
+    var changedP = !!window._mockSaasPreviewChanged;
+    info = {
+      type:'saas', completed:2, total:5, currentStep:'s-saas-preview',
+      label: changedP ? '③ プレビュー・マッピング修正(変更途中)' : '③ プレビュー(マッピング確認済)',
+      preview_changed: changedP
+    };
   } else if (screenId === 's-saas3') {
     info = { type:'saas', completed:2, total:5, currentStep:'s-saas3', label:'③ プレビュー・確認' };
   }
