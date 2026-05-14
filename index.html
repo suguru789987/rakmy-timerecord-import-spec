@@ -1914,36 +1914,21 @@ function refreshSaveButtonsState() {
     }
   });
 
-  // === s-saas2 / s-saas-preview: ユーザーアクション(変更)で活性化 ===
-  // プリセットOKでそのまま離脱したい場合は「マッピング保存して→」/「エラー行を除いてインポート実行」等の進行ボタンを使う
-  // 一時保存は「変更を加えた途中状態」を保存するためのものなのでアクションがあって初めて活性化
-  var saas2CanSave = !!window._mockSaasMappingChanged;
-  var saas2Btns = [
+  // === s-saas2 / s-saas-preview: 画面到達=常時アクティブ ===
+  // 変更フラグ(window._mockSaasMappingChanged / _mockSaasPreviewChanged)は
+  // ボタン活性化には使わず、saveImportDraftMappingStep の label 出し分けにのみ反映
+  // (操作トリガー必須は面倒なため、常時押下可能とする)
+  [
     document.getElementById('saas2-save-btn'),
-    document.querySelector('#s-saas2 .save-draft-btn')
-  ];
-  saas2Btns.forEach(function(btn) {
-    if (!btn) return;
-    btn.disabled = !saas2CanSave;
-    btn.style.opacity = saas2CanSave ? '' : '0.4';
-    btn.style.cursor = saas2CanSave ? 'pointer' : 'not-allowed';
-    btn.title = saas2CanSave
-      ? '変更途中の状態を保存します'
-      : 'マッピング項目/デフォルト値を変更すると一時保存できます (変更なしならそのまま「マッピング保存してプレビューへ→」で進めます)';
-  });
-  var pvCanSave = !!window._mockSaasPreviewChanged;
-  var pvBtns = [
+    document.querySelector('#s-saas2 .save-draft-btn'),
     document.getElementById('saas-preview-save-btn'),
     document.querySelector('#s-saas-preview .save-draft-btn')
-  ];
-  pvBtns.forEach(function(btn) {
+  ].forEach(function(btn) {
     if (!btn) return;
-    btn.disabled = !pvCanSave;
-    btn.style.opacity = pvCanSave ? '' : '0.4';
-    btn.style.cursor = pvCanSave ? 'pointer' : 'not-allowed';
-    btn.title = pvCanSave
-      ? '変更途中の状態を保存します'
-      : 'セル編集/タブ切替/重複処理選択/デフォルト値変更などのアクションで一時保存できます (変更なしならそのまま「インポート実行→」で進めます)';
+    btn.disabled = false;
+    btn.style.opacity = '';
+    btn.style.cursor = 'pointer';
+    btn.title = '現在の状態を一時保存して離脱できます (変更ありなら「変更途中」label、なしなら「プリセット適用済/確認済」label で記録)';
   });
 }
 
