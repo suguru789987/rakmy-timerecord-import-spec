@@ -1,0 +1,183 @@
+No	CSV一括インポート種別	一時保存ポイント	一時保存トリガー大項目	一時保存トリガー中項目	一時保存トリガー小項目	保存トリガー(ユーザー操作)	シナリオID	開始画面	保存先キー	保存内容(主要フィールド)	打刻記録CTA文言	再開URL	復元される状態	整合性	関連コミット	備考
+1	新規登録	設定画面登録 中断:	取込進捗ステップ	業態・ブランド登録		モーダル入力途中(自動下書き)	F2	page-brand-settings	sessionStorage.b0Draft_1	入力中の各セル値配列	▶ STEP 1 業態・ブランド(下書きN件) から再開	-	モーダル復元 (restoreDraftToModal)	✅	-	b0Draft_N機構
+2	新規登録	設定画面登録 中断:	取込進捗ステップ	業態・ブランド登録		登録ボタン押下 → done=1	-	page-brand-settings	sessionStorage.b0Done=1, b0Counts[0]+=n	-	-	-	モーダル→次STEP橋渡しCTA	✅	-	b0SubmitBatch
+3	新規登録	設定画面登録 中断:	取込進捗ステップ	業態・ブランド登録		タブ閉じ(モーダル開放中)	-	page-brand-settings	sessionStorage.b0Draft_1	入力中の値	▶ STEP 1 業態・ブランド(下書きN件) から再開	-	再オープン時 b0DraftがUI復元	✅	-	beforeunload なし、入力時に自動保存
+4	新規登録	設定画面登録 中断:	取込進捗ステップ	店舗登録		モーダル入力途中	F2	page-store-settings	sessionStorage.b0Draft_2	入力配列	▶ STEP 2 店舗(下書きN件) から再開	-	モーダル復元	✅	-
+5	新規登録	設定画面登録 中断:	取込進捗ステップ	店舗登録		登録ボタン押下	-	page-store-settings	b0Done=2, b0Counts[1]+=n	-	-	-	橋渡しCTA	✅	-
+6	新規登録	設定画面登録 中断:	取込進捗ステップ	店舗登録		タブ閉じ	-	page-store-settings	sessionStorage.b0Draft_2	入力配列	▶ STEP 2 店舗(下書きN件) から再開	-	再オープン時 復元	✅	-
+7	新規登録	設定画面登録 中断:	取込進捗ステップ	雇用区分登録		モーダル入力途中	-	page-emptype-settings	sessionStorage.b0Draft_3	入力配列	▶ STEP 3 雇用区分(下書きN件) から再開	-	モーダル復元	✅	-
+8	新規登録	設定画面登録 中断:	取込進捗ステップ	雇用区分登録		登録ボタン押下	-	page-emptype-settings	b0Done=3	-	-	-	橋渡しCTA	✅	-
+9	新規登録	設定画面登録 中断:	取込進捗ステップ	雇用区分登録		タブ閉じ	-	page-emptype-settings	b0Draft_3	入力配列	▶ STEP 3 雇用区分(下書きN件) から再開	-	復元	✅	-
+10	新規登録	設定画面登録 中断:	取込進捗ステップ	従業員登録		モーダル入力途中	-	page-emp-settings	sessionStorage.b0Draft_4	入力配列	▶ STEP 4 従業員(下書きN件) から再開	-	モーダル復元	✅	-
+11	新規登録	設定画面登録 中断:	取込進捗ステップ	従業員登録		登録ボタン押下(招待送信)	-	page-emp-settings	b0Done=4, 招待メール送信	-	-	-	橋渡しCTA→STEP5 (任意)	✅	-
+12	新規登録	設定画面登録 中断:	取込進捗ステップ	従業員登録		タブ閉じ	-	page-emp-settings	b0Draft_4	入力配列	▶ STEP 4 従業員(下書きN件) から再開	-	復元	✅	-
+13	新規登録	設定画面登録 中断:	取込進捗ステップ	管理者登録		モーダル入力途中	-	b-setup-admin-overlay	(下書き永続化なし)	-	(なし)	-	(なし、再度モーダルから)	⚠	-	下書き機構なし(任意のため)
+14	新規登録	設定画面登録 中断:	取込進捗ステップ	管理者登録		登録ボタン押下	-	b-setup-admin-overlay	b0Counts[4]+=1	-	-	-	bShowSetupAdminCompleteModal	✅	-
+15	新規登録	CSV(テンプレ) 中断:	取込項目	業態・ブランド登録		btn-group「💾 一時保存」	A1	s-tpl1	localStorage	itemsCompleted=['brand']	📥 アップ済(1/4) 一時保存中 / 📋 業態・ブランド (1件)	?resume=s-tpl1#tpl-setup	checkbox+_mockTplUploaded+復元バナー	✅	fe33a92
+16	新規登録	CSV(テンプレ) 中断:	取込項目	業態・ブランド登録		ヘッダー「💾 一時保存して中断」	A6	s-tpl1	localStorage	snapshotTplState	同上	?resume=s-tpl1#tpl-setup	同上	✅	fe33a92	saveImportDraftAndExit
+17	新規登録	CSV(テンプレ) 中断:	取込項目	業態・ブランド登録		タブ閉じ(beforeunload自動)	A7	s-tpl1	localStorage + autoSaved=true	snapshotTplState	同上	(再オープン)	同上+showRestoreToast	✅	fe33a92
+18	新規登録	CSV(テンプレ) 中断:	取込項目	業態・ブランド登録		画面遷移自動 (s-tpl1→s-tpl2)	A10	s-tpl1→s-tpl2	localStorage (attachUp保持)	currentStep=s-tpl2 + itemsCompleted保持	📥 アップ済(1/4) 一時保存中 / 📋 業態・ブランド (1件)	?resume=s-tpl2#tpl-setup	s-tpl2画面表示	✅	fe33a92
+19	新規登録	CSV(テンプレ) 中断:	取込項目	店舗登録		btn-group「💾」	A2	s-tpl1	localStorage	itemsCompleted=['store'](業態と組合せ)	📥 / 📋 店舗 (...件)	?resume=s-tpl1#tpl-setup	checkbox(store)復元	✅	fe33a92
+20	新規登録	CSV(テンプレ) 中断:	取込項目	店舗登録		ヘッダー「💾」	A6	s-tpl1	同上	snapshotTplState	同上	?resume=s-tpl1#tpl-setup	同上	✅	fe33a92
+21	新規登録	CSV(テンプレ) 中断:	取込項目	店舗登録		タブ閉じ	A7	s-tpl1	同上+autoSaved	snapshotTplState	同上	(再オープン)	同上	✅	fe33a92
+22	新規登録	CSV(テンプレ) 中断:	取込項目	店舗登録		画面遷移自動	A10	s-tpl1→s-tpl2	同上(attachUp)	itemsCompleted保持	📋 業態・店舗	?resume=s-tpl2#tpl-setup	s-tpl2	✅	fe33a92
+23	新規登録	CSV(テンプレ) 中断:	取込項目	雇用区分登録		btn-group「💾」	A3	s-tpl1	localStorage	itemsCompleted=['emptype']	📥 / 📋 雇用区分	?resume=s-tpl1#tpl-setup	checkbox(emptype)復元	✅	fe33a92
+24	新規登録	CSV(テンプレ) 中断:	取込項目	雇用区分登録		ヘッダー「💾」	A6	s-tpl1	同上	snapshotTplState	同上	?resume=s-tpl1#tpl-setup	同上	✅	fe33a92
+25	新規登録	CSV(テンプレ) 中断:	取込項目	雇用区分登録		タブ閉じ	A7	s-tpl1	同上+autoSaved	snapshotTplState	同上	(再オープン)	同上	✅	fe33a92
+26	新規登録	CSV(テンプレ) 中断:	取込項目	雇用区分登録		画面遷移自動	A10	s-tpl1→s-tpl2	同上(attachUp)	itemsCompleted保持	📋 業態・店舗・雇用区分	?resume=s-tpl2#tpl-setup	s-tpl2	✅	fe33a92
+27	新規登録	CSV(テンプレ) 中断:	取込項目	従業員登録		btn-group「💾」	A4	s-tpl1	localStorage	itemsCompleted=['employee'], allRequiredDone=true	✓ 必須項目すべて完了 / 📋 (4件)	?resume=s-tpl1#tpl-setup	checkbox(employee)復元	✅	fe33a92
+28	新規登録	CSV(テンプレ) 中断:	取込項目	従業員登録		ヘッダー「💾」	A6	s-tpl1	同上	snapshotTplState	同上	?resume=s-tpl1#tpl-setup	同上	✅	fe33a92
+29	新規登録	CSV(テンプレ) 中断:	取込項目	従業員登録		タブ閉じ	A7	s-tpl1	同上+autoSaved	snapshotTplState	同上	(再オープン)	同上	✅	fe33a92
+30	新規登録	CSV(テンプレ) 中断:	取込項目	従業員登録		画面遷移自動	A10	s-tpl1→s-tpl2	同上(attachUp)	itemsCompleted保持	✓ 必須項目すべて完了 / 📋 (4件)	?resume=s-tpl2#tpl-setup	s-tpl2	✅	fe33a92
+31	新規登録	CSV(テンプレ) 中断:	取込項目	管理者登録(任意)		btn-group「💾」	A5	s-tpl1	localStorage	itemsCompleted=['admin']	📋 / 管理者(任意)	?resume=s-tpl1#tpl-setup	checkbox(admin)復元	✅	fe33a92
+32	新規登録	CSV(テンプレ) 中断:	取込項目	管理者登録(任意)		ヘッダー「💾」	A6	s-tpl1	同上	snapshotTplState	同上	?resume=s-tpl1#tpl-setup	同上	✅	fe33a92
+33	新規登録	CSV(テンプレ) 中断:	取込項目	管理者登録(任意)		タブ閉じ	A7	s-tpl1	同上+autoSaved	snapshotTplState	同上	(再オープン)	同上	✅	fe33a92
+34	新規登録	CSV(外部勤怠) 中断:	取込項目	業態・ブランド登録(saas-brand-check)		btn-group「💾」	B14	s-saas1	localStorage	itemsCompleted=['saas-brand-check'](setup時のみ)	📥 / 📋 業態・ブランド	?resume=s-saas1#saas-setup	saas-brand-check復元	✅	fe33a92
+35	新規登録	CSV(外部勤怠) 中断:	取込項目	業態・ブランド登録(saas-brand-check)		ヘッダー「💾」	B9	s-saas1	同上	snapshotSaasState	同上	?resume=s-saas1#saas-setup	同上	✅	fe33a92
+36	新規登録	CSV(外部勤怠) 中断:	取込項目	業態・ブランド登録(saas-brand-check)		タブ閉じ	B10	s-saas1	同上+autoSaved	snapshotSaasState	同上	(再オープン)	同上+復元	✅	fe33a92
+37	新規登録	CSV(外部勤怠) 中断:	取込項目	業態・ブランド登録(saas-brand-check)		画面遷移自動	B11	s-saas1→s-saas2	localStorage(attachUp)	itemsCompleted保持	マッピング設定(プリセット適用済) / 📋	?resume=s-saas2#saas-setup	s-saas2	✅	fe33a92
+38	新規登録	CSV(外部勤怠) 中断:	取込項目	店舗登録		(該当なし)	-	-	-	-	-	-	-	⚠	-	SaaSでは店舗マスタは別、テンプレ補完で連携
+39	新規登録	CSV(外部勤怠) 中断:	取込項目	雇用区分登録		(該当なし)	-	-	-	-	-	-	-	⚠	-	SaaSでは雇用区分マスタは別、テンプレ補完
+40	新規登録	CSV(外部勤怠) 中断:	取込項目	従業員登録 (KoT 従業員データ map-kot-emp 必須)		btn-group「💾」	B1, B2, B3	s-saas1	localStorage	itemsCompleted=['map-kot-emp'], allRequiredDone=true(some判定)	✓ 必須項目すべて完了 / 📋 従業員データ	?resume=s-saas1#saas-setup	map-kot-emp checkbox復元	✅	fe33a92
+41	新規登録	CSV(外部勤怠) 中断:	取込項目	従業員登録 (KoT)		ヘッダー「💾」	B9	s-saas1	同上	snapshotSaasState	同上	?resume=s-saas1#saas-setup	同上	✅	fe33a92
+42	新規登録	CSV(外部勤怠) 中断:	取込項目	従業員登録 (KoT)		タブ閉じ	B10	s-saas1	同上+autoSaved	snapshotSaasState	同上	(再オープン)	同上	✅	fe33a92
+43	新規登録	CSV(外部勤怠) 中断:	取込項目	従業員登録 (KoT)		画面遷移自動	B11	s-saas1→s-saas2	localStorage(attachUp)	itemsCompleted保持	マッピング設定(プリセット適用済) / 📋 従業員データ	?resume=s-saas2#saas-setup	s-saas2	✅	fe33a92
+44	新規登録	CSV(外部勤怠) 中断:	取込項目	従業員登録 (Jobcan map-jc-staff 必須)		btn-group「💾」	B4, B5	s-saas1	localStorage	itemsCompleted=['map-jc-staff']	📋 スタッフ情報	?resume=s-saas1#saas-setup	map-jc-staff復元	✅	fe33a92	source切替で _mockSaasUploaded リセット
+45	新規登録	CSV(外部勤怠) 中断:	取込項目	従業員登録 (Other map-other 必須)		btn-group「💾」	B6	s-saas1	localStorage	itemsCompleted=['map-other']	📋 CSV	?resume=s-saas1#saas-setup	map-other復元	✅	fe33a92
+46	新規登録	CSV(外部勤怠) 中断:	取込項目	管理者登録 (KoT 管理者データ map-kot-admin 任意)		btn-group「💾」	B2 (組合せ含む)	s-saas1	localStorage	itemsCompleted=['map-kot-admin'](+他組合せ)	📋 ... / 管理者データ	?resume=s-saas1#saas-setup	map-kot-admin復元	✅	fe33a92
+47	新規登録	CSV(外部勤怠) 中断:	取込項目	管理者登録 (KoT)		ヘッダー「💾」	B9	s-saas1	同上	snapshotSaasState	同上	?resume=s-saas1#saas-setup	同上	✅	fe33a92
+48	新規登録	CSV(外部勤怠) 中断:	取込項目	管理者登録 (KoT)		タブ閉じ	B10	s-saas1	同上+autoSaved	snapshotSaasState	同上	(再オープン)	同上	✅	fe33a92
+49	新規登録	CSV(外部勤怠) 中断:	マッピング設定	必須項目マッピング列	名前	btn-group「💾」	C1	s-saas2	localStorage	mapping_changed=true (集約フラグ)	マッピング設定 変更途中	?resume=s-saas2#saas-setup	_mockSaasMappingChanged=true復元	✅	fe33a92	delegated change handler
+50	新規登録	CSV(外部勤怠) 中断:	マッピング設定	必須項目マッピング列	名前	ヘッダー「💾」	C7	s-saas2	同上	saveImportDraftAndExit + attachUp	同上	?resume=s-saas2#saas-setup	同上	✅	fe33a92
+51	新規登録	CSV(外部勤怠) 中断:	マッピング設定	必須項目マッピング列	名前	タブ閉じ	C8	s-saas2	同上+autoSaved	beforeunload + attachUp	同上	(再オープン)	同上	✅	fe33a92
+52	新規登録	CSV(外部勤怠) 中断:	マッピング設定	必須項目マッピング列	名前	画面遷移自動 (s-saas2→s-saas-preview)	C9	s-saas2→s-saas-preview	localStorage(prevMappingChanged保持)	mapping_changed=true(保持) + preview_changed=false	マッピング設定 変更途中(優先度: mapping > preview)	?resume=s-saas-preview#saas-setup	s-saas-preview	✅	fe33a92
+53	新規登録	CSV(外部勤怠) 中断:	マッピング設定	必須項目マッピング列	電話番号	btn-group「💾」	C1	s-saas2	localStorage	mapping_changed=true	マッピング設定 変更途中	?resume=s-saas2#saas-setup	同上	✅	fe33a92	電話番号 select 変更
+54	新規登録	CSV(外部勤怠) 中断:	マッピング設定	必須項目マッピング列	電話番号	ヘッダー「💾」	C7	s-saas2	同上	saveImportDraftAndExit	同上	?resume=s-saas2#saas-setup	同上	✅	fe33a92
+55	新規登録	CSV(外部勤怠) 中断:	マッピング設定	必須項目マッピング列	電話番号	タブ閉じ	C8	s-saas2	同上+autoSaved	beforeunload	同上	(再オープン)	同上	✅	fe33a92
+56	新規登録	CSV(外部勤怠) 中断:	マッピング設定	必須項目マッピング列	電話番号	画面遷移自動	C9	s-saas2→s-saas-preview	同上(prev保持)	mapping_changed保持	同上	?resume=s-saas-preview#saas-setup	s-saas-preview	✅	fe33a92
+57	新規登録	CSV(外部勤怠) 中断:	マッピング設定	必須項目マッピング列	メールアドレス	btn-group「💾」	C1	s-saas2	localStorage	mapping_changed=true	マッピング設定 変更途中	?resume=s-saas2#saas-setup	同上	✅	fe33a92
+58	新規登録	CSV(外部勤怠) 中断:	マッピング設定	必須項目マッピング列	メールアドレス	ヘッダー「💾」	C7	s-saas2	同上	saveImportDraftAndExit	同上	?resume=s-saas2#saas-setup	同上	✅	fe33a92
+59	新規登録	CSV(外部勤怠) 中断:	マッピング設定	必須項目マッピング列	メールアドレス	タブ閉じ	C8	s-saas2	同上+autoSaved	beforeunload	同上	(再オープン)	同上	✅	fe33a92
+60	新規登録	CSV(外部勤怠) 中断:	マッピング設定	必須項目マッピング列	メールアドレス	画面遷移自動	C9	s-saas2→s-saas-preview	同上	mapping_changed保持	同上	?resume=s-saas-preview#saas-setup	s-saas-preview	✅	fe33a92
+61	新規登録	CSV(外部勤怠) 中断:	マッピング設定	必須項目マッピング列	雇用区分名	btn-group「💾」	C1	s-saas2	localStorage	mapping_changed=true	マッピング設定 変更途中	?resume=s-saas2#saas-setup	同上	✅	fe33a92
+62	新規登録	CSV(外部勤怠) 中断:	マッピング設定	必須項目マッピング列	雇用区分名	ヘッダー「💾」	C7	s-saas2	同上	saveImportDraftAndExit	同上	?resume=s-saas2#saas-setup	同上	✅	fe33a92
+63	新規登録	CSV(外部勤怠) 中断:	マッピング設定	必須項目マッピング列	雇用区分名	タブ閉じ	C8	s-saas2	同上+autoSaved	beforeunload	同上	(再オープン)	同上	✅	fe33a92
+64	新規登録	CSV(外部勤怠) 中断:	マッピング設定	必須項目マッピング列	雇用区分名	画面遷移自動	C9	s-saas2→s-saas-preview	同上	mapping_changed保持	同上	?resume=s-saas-preview#saas-setup	s-saas-preview	✅	fe33a92
+65	新規登録	CSV(外部勤怠) 中断:	マッピング設定	必須項目マッピング列	交通費単位	btn-group「💾」	C1	s-saas2	localStorage	mapping_changed=true	マッピング設定 変更途中	?resume=s-saas2#saas-setup	同上	✅	fe33a92
+66	新規登録	CSV(外部勤怠) 中断:	マッピング設定	必須項目マッピング列	交通費単位	ヘッダー「💾」	C7	s-saas2	同上	saveImportDraftAndExit	同上	?resume=s-saas2#saas-setup	同上	✅	fe33a92
+67	新規登録	CSV(外部勤怠) 中断:	マッピング設定	必須項目マッピング列	交通費単位	タブ閉じ	C8	s-saas2	同上+autoSaved	beforeunload	同上	(再オープン)	同上	✅	fe33a92
+68	新規登録	CSV(外部勤怠) 中断:	マッピング設定	必須項目マッピング列	交通費単位	画面遷移自動	C9	s-saas2→s-saas-preview	同上	mapping_changed保持	同上	?resume=s-saas-preview#saas-setup	s-saas-preview	✅	fe33a92
+69	新規登録	CSV(外部勤怠) 中断:	マッピング設定	必須項目マッピング列	交通費	btn-group「💾」	C1	s-saas2	localStorage	mapping_changed=true	マッピング設定 変更途中	?resume=s-saas2#saas-setup	同上	✅	fe33a92
+70	新規登録	CSV(外部勤怠) 中断:	マッピング設定	必須項目マッピング列	交通費	ヘッダー「💾」	C7	s-saas2	同上	saveImportDraftAndExit	同上	?resume=s-saas2#saas-setup	同上	✅	fe33a92
+71	新規登録	CSV(外部勤怠) 中断:	マッピング設定	必須項目マッピング列	交通費	タブ閉じ	C8	s-saas2	同上+autoSaved	beforeunload	同上	(再オープン)	同上	✅	fe33a92
+72	新規登録	CSV(外部勤怠) 中断:	マッピング設定	必須項目マッピング列	交通費	画面遷移自動	C9	s-saas2→s-saas-preview	同上	mapping_changed保持	同上	?resume=s-saas-preview#saas-setup	s-saas-preview	✅	fe33a92
+73	新規登録	CSV(外部勤怠) 中断:	マッピング設定	任意項目マッピング列	従業員コード	btn-group「💾」	C1	s-saas2	localStorage	mapping_changed=true	マッピング設定 変更途中	?resume=s-saas2#saas-setup	同上	✅	fe33a92
+74	新規登録	CSV(外部勤怠) 中断:	マッピング設定	任意項目マッピング列	従業員コード	ヘッダー「💾」	C7	s-saas2	同上	saveImportDraftAndExit	同上	?resume=s-saas2#saas-setup	同上	✅	fe33a92
+75	新規登録	CSV(外部勤怠) 中断:	マッピング設定	任意項目マッピング列	従業員コード	タブ閉じ	C8	s-saas2	同上+autoSaved	beforeunload	同上	(再オープン)	同上	✅	fe33a92
+76	新規登録	CSV(外部勤怠) 中断:	マッピング設定	任意項目マッピング列	従業員コード	画面遷移自動	C9	s-saas2→s-saas-preview	同上	mapping_changed保持	同上	?resume=s-saas-preview#saas-setup	s-saas-preview	✅	fe33a92
+77	新規登録	CSV(外部勤怠) 中断:	マッピング設定	任意項目マッピング列	店舗名	btn-group「💾」	C1	s-saas2	localStorage	mapping_changed=true	マッピング設定 変更途中	?resume=s-saas2#saas-setup	同上	✅	fe33a92
+78	新規登録	CSV(外部勤怠) 中断:	マッピング設定	任意項目マッピング列	店舗名	ヘッダー「💾」	C7	s-saas2	同上	saveImportDraftAndExit	同上	?resume=s-saas2#saas-setup	同上	✅	fe33a92
+79	新規登録	CSV(外部勤怠) 中断:	マッピング設定	任意項目マッピング列	店舗名	タブ閉じ	C8	s-saas2	同上+autoSaved	beforeunload	同上	(再オープン)	同上	✅	fe33a92
+80	新規登録	CSV(外部勤怠) 中断:	マッピング設定	任意項目マッピング列	店舗名	画面遷移自動	C9	s-saas2→s-saas-preview	同上	mapping_changed保持	同上	?resume=s-saas-preview#saas-setup	s-saas-preview	✅	fe33a92
+81	新規登録	CSV(外部勤怠) 中断:	マッピング設定	任意項目マッピング列	金額(雇用区分)	btn-group「💾」	C1	s-saas2	localStorage	mapping_changed=true	マッピング設定 変更途中	?resume=s-saas2#saas-setup	同上	✅	fe33a92
+82	新規登録	CSV(外部勤怠) 中断:	マッピング設定	任意項目マッピング列	金額(雇用区分)	ヘッダー「💾」	C7	s-saas2	同上	saveImportDraftAndExit	同上	?resume=s-saas2#saas-setup	同上	✅	fe33a92
+83	新規登録	CSV(外部勤怠) 中断:	マッピング設定	任意項目マッピング列	金額(雇用区分)	タブ閉じ	C8	s-saas2	同上+autoSaved	beforeunload	同上	(再オープン)	同上	✅	fe33a92
+84	新規登録	CSV(外部勤怠) 中断:	マッピング設定	任意項目マッピング列	金額(雇用区分)	画面遷移自動	C9	s-saas2→s-saas-preview	同上	mapping_changed保持	同上	?resume=s-saas-preview#saas-setup	s-saas-preview	✅	fe33a92
+85	新規登録	CSV(外部勤怠) 中断:	マッピング設定	任意項目マッピング列	月次契約労働時間	btn-group「💾」	C1	s-saas2	localStorage	mapping_changed=true	マッピング設定 変更途中	?resume=s-saas2#saas-setup	同上	✅	fe33a92
+86	新規登録	CSV(外部勤怠) 中断:	マッピング設定	任意項目マッピング列	月次契約労働時間	ヘッダー「💾」	C7	s-saas2	同上	saveImportDraftAndExit	同上	?resume=s-saas2#saas-setup	同上	✅	fe33a92
+87	新規登録	CSV(外部勤怠) 中断:	マッピング設定	任意項目マッピング列	月次契約労働時間	タブ閉じ	C8	s-saas2	同上+autoSaved	beforeunload	同上	(再オープン)	同上	✅	fe33a92
+88	新規登録	CSV(外部勤怠) 中断:	マッピング設定	任意項目マッピング列	月次契約労働時間	画面遷移自動	C9	s-saas2→s-saas-preview	同上	mapping_changed保持	同上	?resume=s-saas-preview#saas-setup	s-saas-preview	✅	fe33a92
+89	新規登録	CSV(外部勤怠) 中断:	マッピング設定	任意項目マッピング列	月みなし残業時間	btn-group「💾」	C1	s-saas2	localStorage	mapping_changed=true	マッピング設定 変更途中	?resume=s-saas2#saas-setup	同上	✅	fe33a92
+90	新規登録	CSV(外部勤怠) 中断:	マッピング設定	任意項目マッピング列	月みなし残業時間	ヘッダー「💾」	C7	s-saas2	同上	saveImportDraftAndExit	同上	?resume=s-saas2#saas-setup	同上	✅	fe33a92
+91	新規登録	CSV(外部勤怠) 中断:	マッピング設定	任意項目マッピング列	月みなし残業時間	タブ閉じ	C8	s-saas2	同上+autoSaved	beforeunload	同上	(再オープン)	同上	✅	fe33a92
+92	新規登録	CSV(外部勤怠) 中断:	マッピング設定	任意項目マッピング列	月みなし残業時間	画面遷移自動	C9	s-saas2→s-saas-preview	同上	mapping_changed保持	同上	?resume=s-saas-preview#saas-setup	s-saas-preview	✅	fe33a92
+93	新規登録	CSV(外部勤怠) 中断:	マッピング設定	マッピング不可デフォルト値(外部勤怠側に無い項目デフォルト値)	電話番号(デフォルト)	btn-group「💾」	C2	s-saas2	localStorage	mapping_changed=true	マッピング設定 変更途中	?resume=s-saas2#saas-setup	同上	✅	fe33a92	delegated input handler
+94	新規登録	CSV(外部勤怠) 中断:	マッピング設定	マッピング不可デフォルト値	電話番号(デフォルト)	ヘッダー「💾」	C7	s-saas2	同上	saveImportDraftAndExit	同上	?resume=s-saas2#saas-setup	同上	✅	fe33a92
+95	新規登録	CSV(外部勤怠) 中断:	マッピング設定	マッピング不可デフォルト値	電話番号(デフォルト)	タブ閉じ	C8	s-saas2	同上+autoSaved	beforeunload	同上	(再オープン)	同上	✅	fe33a92
+96	新規登録	CSV(外部勤怠) 中断:	マッピング設定	マッピング不可デフォルト値	電話番号(デフォルト)	画面遷移自動	C9	s-saas2→s-saas-preview	同上	mapping_changed保持	同上	?resume=s-saas-preview#saas-setup	s-saas-preview	✅	fe33a92
+97	新規登録	CSV(外部勤怠) 中断:	マッピング設定	マッピング不可デフォルト値	メールアドレス(デフォルト)	btn-group「💾」	C2	s-saas2	localStorage	mapping_changed=true	マッピング設定 変更途中	?resume=s-saas2#saas-setup	同上	✅	fe33a92
+98	新規登録	CSV(外部勤怠) 中断:	マッピング設定	マッピング不可デフォルト値	メールアドレス(デフォルト)	ヘッダー「💾」	C7	s-saas2	同上	saveImportDraftAndExit	同上	?resume=s-saas2#saas-setup	同上	✅	fe33a92
+99	新規登録	CSV(外部勤怠) 中断:	マッピング設定	マッピング不可デフォルト値	メールアドレス(デフォルト)	タブ閉じ	C8	s-saas2	同上+autoSaved	beforeunload	同上	(再オープン)	同上	✅	fe33a92
+100	新規登録	CSV(外部勤怠) 中断:	マッピング設定	マッピング不可デフォルト値	メールアドレス(デフォルト)	画面遷移自動	C9	s-saas2→s-saas-preview	同上	mapping_changed保持	同上	?resume=s-saas-preview#saas-setup	s-saas-preview	✅	fe33a92
+101	新規登録	CSV(外部勤怠) 中断:	マッピング設定	マッピング不可デフォルト値	交通費単位(デフォルト)	btn-group「💾」	C3	s-saas2	localStorage	mapping_changed=true	マッピング設定 変更途中	?resume=s-saas2#saas-setup	同上	✅	fe33a92	delegated change handler (select)
+102	新規登録	CSV(外部勤怠) 中断:	マッピング設定	マッピング不可デフォルト値	交通費単位(デフォルト)	ヘッダー「💾」	C7	s-saas2	同上	saveImportDraftAndExit	同上	?resume=s-saas2#saas-setup	同上	✅	fe33a92
+103	新規登録	CSV(外部勤怠) 中断:	マッピング設定	マッピング不可デフォルト値	交通費単位(デフォルト)	タブ閉じ	C8	s-saas2	同上+autoSaved	beforeunload	同上	(再オープン)	同上	✅	fe33a92
+104	新規登録	CSV(外部勤怠) 中断:	マッピング設定	マッピング不可デフォルト値	交通費単位(デフォルト)	画面遷移自動	C9	s-saas2→s-saas-preview	同上	mapping_changed保持	同上	?resume=s-saas-preview#saas-setup	s-saas-preview	✅	fe33a92
+105	新規登録	CSV(外部勤怠) 中断:	マッピング設定	マッピング不可デフォルト値	交通費(デフォルト)	btn-group「💾」	C2	s-saas2	localStorage	mapping_changed=true	マッピング設定 変更途中	?resume=s-saas2#saas-setup	同上	✅	fe33a92
+106	新規登録	CSV(外部勤怠) 中断:	マッピング設定	マッピング不可デフォルト値	交通費(デフォルト)	ヘッダー「💾」	C7	s-saas2	同上	saveImportDraftAndExit	同上	?resume=s-saas2#saas-setup	同上	✅	fe33a92
+107	新規登録	CSV(外部勤怠) 中断:	マッピング設定	マッピング不可デフォルト値	交通費(デフォルト)	タブ閉じ	C8	s-saas2	同上+autoSaved	beforeunload	同上	(再オープン)	同上	✅	fe33a92
+108	新規登録	CSV(外部勤怠) 中断:	マッピング設定	マッピング不可デフォルト値	交通費(デフォルト)	画面遷移自動	C9	s-saas2→s-saas-preview	同上	mapping_changed保持	同上	?resume=s-saas-preview#saas-setup	s-saas-preview	✅	fe33a92
+109	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T1. プレビューテーブルのセル個別編集	名前	btn-group「💾」	D1	s-saas-preview	localStorage	preview_changed=true	プレビュー修正 変更途中	?resume=s-saas-preview#saas-setup	_mockSaasPreviewChanged=true復元+saasRestoreFixState+saasRefreshPreviewFromFixState	✅	fe33a92
+110	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T1. セル個別編集	名前	ヘッダー「💾」	D7	s-saas-preview	同上	saveImportDraftAndExit+attachUp	同上	?resume=s-saas-preview#saas-setup	同上	✅	fe33a92
+111	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T1. セル個別編集	名前	タブ閉じ	D8	s-saas-preview	同上+autoSaved	beforeunload+prevFixState保持	同上	(再オープン)	同上	✅	fe33a92
+112	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T1. セル個別編集	名前	画面遷移自動 (preview→fix)	D9	s-saas-preview→s-saas-fix	localStorage(preview_changed/itemsCompleted/fix_state保持)	preview_changed=true	エラー/未マップ項目 修正中(優先度最上位)	?resume=s-saas-fix#saas-setup	s-saas-fix	✅	fe33a92
+113	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T1. セル個別編集	メアド	btn-group「💾」	D1	s-saas-preview	localStorage	preview_changed=true	プレビュー修正 変更途中	?resume=s-saas-preview#saas-setup	同上	✅	fe33a92
+114	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T1. セル個別編集	メアド	ヘッダー「💾」	D7	s-saas-preview	同上	saveImportDraftAndExit	同上	?resume=s-saas-preview#saas-setup	同上	✅	fe33a92
+115	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T1. セル個別編集	メアド	タブ閉じ	D8	s-saas-preview	同上+autoSaved	beforeunload	同上	(再オープン)	同上	✅	fe33a92
+116	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T1. セル個別編集	メアド	画面遷移自動	D9	s-saas-preview→s-saas-fix	同上(prev保持)	preview_changed保持	エラー/未マップ項目 修正中	?resume=s-saas-fix#saas-setup	s-saas-fix	✅	fe33a92
+117	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T1. セル個別編集	雇用区分	btn-group「💾」	D1	s-saas-preview	localStorage	preview_changed=true	プレビュー修正 変更途中	?resume=s-saas-preview#saas-setup	同上	✅	fe33a92
+118	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T1. セル個別編集	雇用区分	ヘッダー「💾」	D7	s-saas-preview	同上	saveImportDraftAndExit	同上	?resume=s-saas-preview#saas-setup	同上	✅	fe33a92
+119	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T1. セル個別編集	雇用区分	タブ閉じ	D8	s-saas-preview	同上+autoSaved	beforeunload	同上	(再オープン)	同上	✅	fe33a92
+120	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T1. セル個別編集	雇用区分	画面遷移自動	D9	s-saas-preview→s-saas-fix	同上	preview_changed保持	エラー/未マップ項目 修正中	?resume=s-saas-fix#saas-setup	s-saas-fix	✅	fe33a92
+121	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T1. セル個別編集	店舗	btn-group「💾」	D1	s-saas-preview	localStorage	preview_changed=true	プレビュー修正 変更途中	?resume=s-saas-preview#saas-setup	同上	✅	fe33a92
+122	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T1. セル個別編集	店舗	ヘッダー「💾」	D7	s-saas-preview	同上	saveImportDraftAndExit	同上	?resume=s-saas-preview#saas-setup	同上	✅	fe33a92
+123	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T1. セル個別編集	店舗	タブ閉じ	D8	s-saas-preview	同上+autoSaved	beforeunload	同上	(再オープン)	同上	✅	fe33a92
+124	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T1. セル個別編集	店舗	画面遷移自動	D9	s-saas-preview→s-saas-fix	同上	preview_changed保持	エラー/未マップ項目 修正中	?resume=s-saas-fix#saas-setup	s-saas-fix	✅	fe33a92
+125	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T1. セル個別編集	交通費単位	btn-group「💾」	D1	s-saas-preview	localStorage	preview_changed=true	プレビュー修正 変更途中	?resume=s-saas-preview#saas-setup	同上	✅	fe33a92
+126	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T1. セル個別編集	交通費単位	ヘッダー「💾」	D7	s-saas-preview	同上	saveImportDraftAndExit	同上	?resume=s-saas-preview#saas-setup	同上	✅	fe33a92
+127	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T1. セル個別編集	交通費単位	タブ閉じ	D8	s-saas-preview	同上+autoSaved	beforeunload	同上	(再オープン)	同上	✅	fe33a92
+128	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T1. セル個別編集	交通費単位	画面遷移自動	D9	s-saas-preview→s-saas-fix	同上	preview_changed保持	エラー/未マップ項目 修正中	?resume=s-saas-fix#saas-setup	s-saas-fix	✅	fe33a92
+129	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T1. セル個別編集	交通費	btn-group「💾」	D1	s-saas-preview	localStorage	preview_changed=true	プレビュー修正 変更途中	?resume=s-saas-preview#saas-setup	同上	✅	fe33a92
+130	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T1. セル個別編集	交通費	ヘッダー「💾」	D7	s-saas-preview	同上	saveImportDraftAndExit	同上	?resume=s-saas-preview#saas-setup	同上	✅	fe33a92
+131	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T1. セル個別編集	交通費	タブ閉じ	D8	s-saas-preview	同上+autoSaved	beforeunload	同上	(再オープン)	同上	✅	fe33a92
+132	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T1. セル個別編集	交通費	画面遷移自動	D9	s-saas-preview→s-saas-fix	同上	preview_changed保持	エラー/未マップ項目 修正中	?resume=s-saas-fix#saas-setup	s-saas-fix	✅	fe33a92
+133	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T1. すべて/エラー切り替え (タブ)		btn-group「💾」	D2	s-saas-preview	localStorage	preview_changed=true	プレビュー修正 変更途中	?resume=s-saas-preview#saas-setup	同上 (タブ位置は復元されない)	⚠	fe33a92	switchSaasPreviewTab() でフラグセット
+134	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T1. すべて/エラー切り替え	タブclick	ヘッダー「💾」	D7	s-saas-preview	同上	saveImportDraftAndExit	同上	?resume=s-saas-preview#saas-setup	同上	⚠	fe33a92
+135	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T1. すべて/エラー切り替え	タブclick	タブ閉じ	D8	s-saas-preview	同上+autoSaved	beforeunload	同上	(再オープン)	同上	⚠	fe33a92
+136	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T1. すべて/エラー検索		(将来検討)	-	s-saas-preview	-	-	-	-	-	🔮 将来検討	-	UIモック範囲外 / 本番運用でプレビューデータが大規模化 (数百行以上) する場合に検索ボックスUI実装を検討。現状はタブ切替(統合/employee_info/hr_/エラー)で代替可能。
+137	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T1. すべて/エラー絞り込み操作		(将来検討)	-	s-saas-preview	-	-	-	-	-	🔮 将来検討	-	UIモック範囲外 / 本番運用で多種類のエラー絞り込みが必要になった場合に絞り込みselect UI実装を検討。現状はエラータブで代替可能。
+138	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T2. プレビュー条件の変更(フィルタ操作)		btn-group「💾」	D2	s-saas-preview	localStorage	preview_changed=true	プレビュー修正 変更途中	?resume=s-saas-preview#saas-setup	同上	✅	fe33a92	タブ切替=フィルタ操作扱い
+139	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T2. プレビュー条件の変更(フィルタ操作)		ヘッダー「💾」	D7	s-saas-preview	同上	saveImportDraftAndExit	同上	?resume=s-saas-preview#saas-setup	同上	✅	fe33a92
+140	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T2. プレビュー条件の変更(フィルタ操作)		タブ閉じ	D8	s-saas-preview	同上+autoSaved	beforeunload	同上	(再オープン)	同上	✅	fe33a92
+141	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T3. エラー行の編集・除外	値変更 (s-saas-fix 経由)	btn-group「💾」	E1, E2	s-saas-fix	localStorage	fix_state.error_action='value-changed'	エラー/未マップ項目 修正中	?resume=s-saas-fix#saas-setup	saasRestoreFixState → EMP-006値変更状態	✅	fe33a92
+142	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T3. エラー行の編集・除外	値変更	ヘッダー「💾」	E13	s-saas-fix	同上	saveImportDraftAndExit	同上	?resume=s-saas-fix#saas-setup	同上	✅	fe33a92
+143	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T3. エラー行の編集・除外	値変更	タブ閉じ	E14	s-saas-fix	同上+autoSaved	beforeunload+fix_state保持	同上	(再オープン)	同上	✅	fe33a92
+144	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T3. エラー行の編集・除外	値変更	画面遷移自動 (fix→preview)	E15	s-saas-fix→s-saas-preview	localStorage(fix_state保持)	fix_state保持+preview_changed=true	プレビュー修正 変更途中	?resume=s-saas-preview#saas-setup	s-saas-preview, saasRefreshPreviewFromFixState発火, サマリー緑「✓ 修正完了」	✅	fe33a92
+145	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T3. エラー行の編集・除外	除外 (s-saas-fix 経由)	btn-group「💾」	E3	s-saas-fix	localStorage	fix_state.error_action='excluded'	エラー/未マップ項目 修正中	?resume=s-saas-fix#saas-setup	saasFixDemoExcluded → 行グレーアウト	✅	fe33a92
+146	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T3. エラー行の編集・除外	除外	ヘッダー「💾」	E13	s-saas-fix	同上	saveImportDraftAndExit	同上	?resume=s-saas-fix#saas-setup	同上	✅	fe33a92
+147	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T3. エラー行の編集・除外	除外	タブ閉じ	E14	s-saas-fix	同上+autoSaved	beforeunload	同上	(再オープン)	同上	✅	fe33a92
+148	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T3. エラー行の編集・除外	除外	画面遷移自動	E15	s-saas-fix→s-saas-preview	localStorage	fix_state保持	プレビュー修正 変更途中	?resume=s-saas-preview#saas-setup	s-saas-preview, サマリー緑	✅	fe33a92
+149	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T3. エラー行の編集・除外	マスタ追加 (推奨)	btn-group「💾」	E4	s-saas-fix	localStorage	fix_state.error_action='master-added'	エラー/未マップ項目 修正中	?resume=s-saas-fix#saas-setup	saasFixDemoMasterAdded → エラー0件	✅	fe33a92
+150	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T3. エラー行の編集・除外	マスタ追加	ヘッダー「💾」	E13	s-saas-fix	同上	saveImportDraftAndExit	同上	?resume=s-saas-fix#saas-setup	同上	✅	fe33a92
+151	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T3. エラー行の編集・除外	マスタ追加	タブ閉じ	E14	s-saas-fix	同上+autoSaved	beforeunload	同上	(再オープン)	同上	✅	fe33a92
+152	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T3. エラー行の編集・除外	マスタ追加	画面遷移自動	E15	s-saas-fix→s-saas-preview	localStorage	fix_state保持	プレビュー修正 変更途中	?resume=s-saas-preview#saas-setup	s-saas-preview, サマリー緑	✅	fe33a92
+153	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T4. マッピング再設定(preview→s-saas2→re-preview)		画面遷移自動 (preview→s-saas2)	D10	s-saas-preview→s-saas2	localStorage(preview_changed/mapping_changed 両保持)	両フラグ保持	マッピング設定 変更途中(優先度: mapping > preview)	?resume=s-saas2#saas-setup	s-saas2	✅	fe33a92
+154	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T4. マッピング再設定		画面遷移自動 (s-saas2→preview)	C9	s-saas2→s-saas-preview	localStorage	両フラグ保持	プレビュー修正 変更途中	?resume=s-saas-preview#saas-setup	s-saas-preview	✅	fe33a92
+155	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T5. 重複時の処理選択 (上書き更新 ↔ スキップ)		btn-group「💾」	D3, D4	s-saas-preview	localStorage	preview_changed=true (選択値は永続化なし)	プレビュー修正 変更途中	?resume=s-saas-preview#saas-setup	同上 (選択値はデフォルト「上書き更新」に戻る)	⚠	fe33a92	選択値永続化なし、フラグのみ
+156	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T5. 重複時の処理選択		ヘッダー「💾」	D7	s-saas-preview	同上	saveImportDraftAndExit	同上	?resume=s-saas-preview#saas-setup	同上	⚠	fe33a92
+157	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T5. 重複時の処理選択		タブ閉じ	D8	s-saas-preview	同上+autoSaved	beforeunload	同上	(再オープン)	同上	⚠	fe33a92
+158	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T6. 外部勤怠側に無い項目デフォルト値の最終調整	(電話/メール/交通費単位/交通費の各)	btn-group「💾」	D5	s-saas-preview / s-saas-fix	localStorage	preview_changed=true	プレビュー修正 変更途中	?resume=s-saas-preview#saas-setup	同上 (値の永続化はなし)	⚠	fe33a92	値復元はs-saas2側のみ
+159	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T6. 外部勤怠側に無い項目デフォルト値の最終調整		ヘッダー「💾」	D7	s-saas-preview	同上	saveImportDraftAndExit	同上	?resume=s-saas-preview#saas-setup	同上	⚠	fe33a92
+160	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T6. 外部勤怠側に無い項目デフォルト値の最終調整		タブ閉じ	D8	s-saas-preview	同上+autoSaved	beforeunload	同上	(再オープン)	同上	⚠	fe33a92
+161	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T6. 外部勤怠側に無い項目デフォルト値の最終調整	⏭ そのまま進む (スキップ)	(自動遷移)	E5	s-saas-fix→s-saas-preview	localStorage	fix_state.defaults_skipped=true	プレビュー修正 変更途中 / s-saas-preview サマリーカード「⚠ 一部修正済」	?resume=s-saas-preview#saas-setup	saasRefreshPreviewFromFixState	✅	fe33a92	saasFixSkipDefaults
+162	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T7. プレビュー確認後・インポート実行ボタン押下直前		(タブ閉じ at 直前)	D11	s-saas-preview	localStorage+autoSaved=true	preview_changed=true	プレビュー修正 変更途中	?resume=s-saas-preview#saas-setup	同上	✅	fe33a92	beforeunloadで保存
+163	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T7. プレビュー確認後・実行直前		btn-group「💾」	D6 (確認のみ-変更なし)	s-saas-preview	localStorage	preview_changed=false (画面到達のみ)	プレビュー(マッピング確認済)	?resume=s-saas-preview#saas-setup	画面到達のみ	✅	fe33a92	確認のみ保存
+164	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T7. プレビュー確認後・実行直前		ヘッダー「💾」	D7	s-saas-preview	同上	saveImportDraftAndExit	同上	?resume=s-saas-preview#saas-setup	同上	✅	fe33a92
+165	運用更新	設定画面登録 中断:	取込項目	業態・ブランド		モーダル入力 → 「+ 追加」	-	page-brand-ops-settings	(下書き永続化なし)	-	-	-	bShowToast	⚠	-	運用モード下書き仕様未確定 (2026-05-14)
+166	運用更新	設定画面登録 中断:	取込項目	業態・ブランド		登録ボタン押下	-	page-brand-ops-settings	b0Counts[0]+=n	-	-	-	bShowToast	✅	-	ops mode
+167	運用更新	設定画面登録 中断:	取込項目	業態・ブランド		タブ閉じ	-	page-brand-ops-settings	(isSetup=false で保存スキップ)	-	-	-	-	✅	-	beforeunload スキップ
+168	運用更新	設定画面登録 中断:	取込項目	店舗		モーダル入力 → 「+ 追加」	-	page-store-ops-settings	(下書きなし)	-	-	-	bShowToast	⚠	-
+169	運用更新	設定画面登録 中断:	取込項目	店舗		登録ボタン押下	-	page-store-ops-settings	b0Counts[1]+=n	-	-	-	bShowToast	✅	-
+170	運用更新	設定画面登録 中断:	取込項目	店舗		タブ閉じ	-	page-store-ops-settings	(スキップ)	-	-	-	-	✅	-
+171	運用更新	設定画面登録 中断:	取込項目	雇用区分		モーダル入力 → 「+ 追加」	-	page-emptype-ops-settings	(下書きなし)	-	-	-	bShowToast	⚠	-
+172	運用更新	設定画面登録 中断:	取込項目	雇用区分		登録ボタン押下	-	page-emptype-ops-settings	b0Counts[2]+=n	-	-	-	bShowToast	✅	-
+173	運用更新	設定画面登録 中断:	取込項目	雇用区分		タブ閉じ	-	page-emptype-ops-settings	(スキップ)	-	-	-	-	✅	-
+174	運用更新	設定画面登録 中断:	取込項目	従業員		モーダル入力 → 「+ 追加」	-	page-emp-ops-settings	(下書きなし)	-	-	-	bShowToast	⚠	-
+175	運用更新	設定画面登録 中断:	取込項目	従業員		登録ボタン押下 (招待あり/なし分岐)	H5, H6	page-emp-ops-settings	b0Counts[3]+=n	-	-	-	bShowToast + showInviteSentModal	✅	-	ops mode 招待分岐
+176	運用更新	設定画面登録 中断:	取込項目	従業員		タブ閉じ	-	page-emp-ops-settings	(スキップ)	-	-	-	-	✅	-
+177	運用更新	設定画面登録 中断:	取込項目	管理者		モーダル入力	-	page-d1/d2	(下書きなし)	-	-	-	-	⚠	-
+178	運用更新	設定画面登録 中断:	取込項目	管理者		登録ボタン押下	-	page-d2	b0Counts[4]+=1	-	-	-	-	✅	-
+179	運用更新	CSV(テンプレ) 中断:	取込項目	(展開なし)	(各5項目)	(localStorage 書き込みなし)	-	s-tpl1#tpl	-	-	-	-	-	⚠	-	運用モードの中断CTA仕様未確定
+180	運用更新	CSV(外部勤怠) 中断:	取込項目	(展開なし)	(各5項目)	(同上)	-	s-saas1#saas	-	-	-	-	-	⚠	-	同上
+181	運用更新	CSV(外部勤怠) 中断:	マッピング設定	(展開なし)	(各15項目)	(同上)	-	s-saas2#saas	-	-	-	-	-	⚠	-	同上
+182	運用更新	CSV(外部勤怠) 中断:	プレビューマッピング修正	(展開なし)	(各T1〜T7)	(同上)	-	s-saas-preview / s-saas-fix#saas	-	-	-	-	-	⚠	-	同上
