@@ -1899,6 +1899,16 @@ function go(id) {
     var setupModeUrl = (location.hash || '').replace('#', '');
     var isSetup = (setupModeUrl === 'tpl-setup' || setupModeUrl === 'saas-setup');
     if (isSetup) {
+      // 既存 localStorage を読んで mapping_changed / preview_changed / fix_state を「false で上書き」しないよう保持
+      var existingInfo = null;
+      try {
+        var existingRaw = localStorage.getItem('import_in_progress');
+        if (existingRaw) existingInfo = JSON.parse(existingRaw);
+      } catch (e) {}
+      var prevMappingChanged = !!(existingInfo && existingInfo.mapping_changed);
+      var prevPreviewChanged = !!(existingInfo && existingInfo.preview_changed);
+      var prevFixState = (existingInfo && existingInfo.fix_state) || null;
+
       var info = null;
       if (id === 's-tpl1') {
         info = snapshotTplState() || { type:'template', completed:0, total:4, currentStep:'s-tpl1', label:'① アップロード' };
@@ -1907,9 +1917,21 @@ function go(id) {
       else if (id === 's-saas1') {
         info = snapshotSaasState() || { type:'saas', completed:0, total:5, currentStep:'s-saas1', label:'① 選択・アップロード' };
       }
-      else if (id === 's-saas2') info = { type:'saas', completed:1, total:5, currentStep:'s-saas2', label:'② マッピング設定', mapping_changed: !!window._mockSaasMappingChanged };
-      else if (id === 's-saas-preview') info = { type:'saas', completed:2, total:5, currentStep:'s-saas-preview', label:'③ プレビュー・確認', preview_changed: !!window._mockSaasPreviewChanged };
-      else if (id === 's-saas-fix') info = { type:'saas', completed:2, total:5, currentStep:'s-saas-fix', label:'③ エラー/未マップ項目 修正中', preview_changed: true, fix_state: window._saasFixState || { error_action:null, error_new_value:'', defaults_skipped:false } };
+      else if (id === 's-saas2') {
+        // 直近の win フラグ or 既存 localStorage の値どちらかが true なら保持
+        var mc = !!window._mockSaasMappingChanged || prevMappingChanged;
+        var label2 = mc ? '② マッピング設定(変更途中)' : '② マッピング設定';
+        info = { type:'saas', completed:1, total:5, currentStep:'s-saas2', label: label2, mapping_changed: mc };
+      }
+      else if (id === 's-saas-preview') {
+        var pc = !!window._mockSaasPreviewChanged || prevPreviewChanged;
+        var labelP = pc ? '③ プレビュー・マッピング修正(変更途中)' : '③ プレビュー(マッピング確認済)';
+        info = { type:'saas', completed:2, total:5, currentStep:'s-saas-preview', label: labelP, preview_changed: pc };
+      }
+      else if (id === 's-saas-fix') {
+        var fs = window._saasFixState || prevFixState || { error_action:null, error_new_value:'', defaults_skipped:false };
+        info = { type:'saas', completed:2, total:5, currentStep:'s-saas-fix', label:'③ エラー/未マップ項目 修正中', preview_changed:true, fix_state: fs };
+      }
       else if (id === 's-saas3') info = { type:'saas', completed:2, total:5, currentStep:'s-saas3', label:'③ プレビュー・確認' };
       else if (id === 's-tpl3' || id === 's-saas4') {
         localStorage.removeItem('import_in_progress');
@@ -1949,6 +1971,9 @@ function selSaasMain(el, type) {
   document.getElementById('saas-section-upload').style.display = isOther ? 'none' : '';
   document.getElementById('saas-section-buttons').style.display = isOther ? 'none' : '';
   document.getElementById('saas-mapping-hint').style.display = isOther ? 'none' : '';
+  // 連携元を切り替えたら前のソースのアップロード状態をクリア (新しいソースで未アップ扱いに戻す)
+  window._mockSaasUploaded = false;
+  if (typeof refreshSaveButtonsState === 'function') refreshSaveButtonsState();
   setTimeout(updateUploadSteps, 10);
 }
 var currentSaasType = 'kot';
@@ -3386,7 +3411,10 @@ document.addEventListener('DOMContentLoaded', function() {
   } catch (e) {}
 });
 
+// 統合: applyHashRouting (画面遷移) → refreshSaveHerePanels/refreshSaveButtonsState (UI同期) の順で実行
+// (以前は2つの hashchange リスナが分かれていたため、refreshSave* が古い hash で動いていた)
 window.addEventListener('hashchange', function() {
+  if (typeof applyHashRouting === 'function') applyHashRouting();
   refreshSaveHerePanels();
   refreshSaveButtonsState();
 });
@@ -3625,11 +3653,13 @@ function saveImportDraftAndExit() {
     }
   }
   var info = null;
-  if (id === 's-tpl1') info = { type:'template', completed:0, total:4, currentStep:'s-tpl1', label:'① アップロード' };
+  if (id === 's-tpl1') info = snapshotTplState() || { type:'template', completed:0, total:4, currentStep:'s-tpl1', label:'① アップロード' };
   else if (id === 's-tpl2') info = { type:'template', completed:0, total:4, currentStep:'s-tpl2', label:'② 確認・実行' };
-  else if (id === 's-saas1') info = { type:'saas', completed:0, total:5, currentStep:'s-saas1', label:'① 選択・アップロード' };
-  else if (id === 's-saas2') info = { type:'saas', completed:1, total:5, currentStep:'s-saas2', label:'② マッピング設定' };
-  else if (id === 's-saas3' || id === 's-saas-preview') info = { type:'saas', completed:2, total:5, currentStep:id, label:'③ プレビュー・確認' };
+  else if (id === 's-saas1') info = snapshotSaasState() || { type:'saas', completed:0, total:5, currentStep:'s-saas1', label:'① 選択・アップロード' };
+  else if (id === 's-saas2') info = { type:'saas', completed:1, total:5, currentStep:'s-saas2', label:'② マッピング設定', mapping_changed: !!window._mockSaasMappingChanged };
+  else if (id === 's-saas-preview') info = { type:'saas', completed:2, total:5, currentStep:'s-saas-preview', label:'③ プレビュー・マッピング修正', preview_changed: !!window._mockSaasPreviewChanged };
+  else if (id === 's-saas-fix') info = { type:'saas', completed:2, total:5, currentStep:'s-saas-fix', label:'③ エラー/未マップ項目 修正中', preview_changed:true, fix_state: window._saasFixState || { error_action:null, error_new_value:'', defaults_skipped:false } };
+  else if (id === 's-saas3') info = { type:'saas', completed:2, total:5, currentStep:'s-saas3', label:'③ プレビュー・確認' };
   if (!info) {
     alert('保存可能な画面ではありません。');
     return;
@@ -3657,10 +3687,8 @@ function closeImportSaveDraftModal() {
   if (ov) ov.style.display = 'none';
 }
 
-// ブラウザ戻る/進む対応
-window.addEventListener('hashchange', function() {
-  applyHashRouting();
-});
+// (旧: ブラウザ戻る/進む対応の hashchange リスナはここにあったが、
+//  上の統合リスナに移動済み。重複登録を防ぐため削除)
 </script>
 </body>
 </html>
