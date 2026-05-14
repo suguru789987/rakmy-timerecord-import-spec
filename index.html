@@ -1908,6 +1908,8 @@ function go(id) {
         info = snapshotSaasState() || { type:'saas', completed:0, total:5, currentStep:'s-saas1', label:'① 選択・アップロード' };
       }
       else if (id === 's-saas2') info = { type:'saas', completed:1, total:5, currentStep:'s-saas2', label:'② マッピング設定', mapping_changed: !!window._mockSaasMappingChanged };
+      else if (id === 's-saas-preview') info = { type:'saas', completed:2, total:5, currentStep:'s-saas-preview', label:'③ プレビュー・確認', preview_changed: !!window._mockSaasPreviewChanged };
+      else if (id === 's-saas-fix') info = { type:'saas', completed:2, total:5, currentStep:'s-saas-fix', label:'③ エラー/未マップ項目 修正中', preview_changed: true, fix_state: window._saasFixState || { error_action:null, error_new_value:'', defaults_skipped:false } };
       else if (id === 's-saas3') info = { type:'saas', completed:2, total:5, currentStep:'s-saas3', label:'③ プレビュー・確認' };
       else if (id === 's-tpl3' || id === 's-saas4') {
         localStorage.removeItem('import_in_progress');
@@ -2514,20 +2516,9 @@ function saasFixDemoMasterAdded() {
   saasFixShowStatus('⚙ 雇用区分マスタに <strong>「契約社員」</strong> が追加されました。エラーは解消、<strong>全15件インポート可能</strong>です。プレビューに戻って実行してください。', 'green');
 }
 
-// 画面到達時 s-saas-preview に来たら fix_state を反映、s-saas-fix に来たら一時保存からの復元
-(function() {
-  if (typeof window.go !== 'function') return;
-  var orig = window.go;
-  window.go = function(id) {
-    orig.apply(this, arguments);
-    if (id === 's-saas-preview' && typeof saasRefreshPreviewFromFixState === 'function') {
-      saasRefreshPreviewFromFixState();
-    }
-    if (id === 's-saas-fix' && typeof saasRestoreFixState === 'function') {
-      saasRestoreFixState();
-    }
-  };
-})();
+// (旧: 画面到達時 s-saas-preview/s-saas-fix にUI反映するための go()ラッパーがここにあったが、
+//  下方の IIFE wrapGo() と重複オーバーライドして saasRefreshPreviewFromFixState/saasRestoreFixState が
+//  失われていた。wrapGo() 側で一本化したので、ここのラッパーは削除済)
 
 // 一時保存→再開時の fix_state 復元 (info.fix_state → UI状態 + window._saasFixState 同期)
 function saasRestoreFixState() {
@@ -3329,6 +3320,14 @@ function bGoBackToSetupGuide() {
       if (id === 's-tpl3' || id === 's-saas4') {
         clearState();
       }
+      // s-saas-preview / s-saas-fix の到達時に fix_state ベースの UI 反映
+      // (重複オーバーライド防止のためここで呼ぶ。先行 IIFE のラッパーは削除済)
+      if (id === 's-saas-preview' && typeof saasRefreshPreviewFromFixState === 'function') {
+        saasRefreshPreviewFromFixState();
+      }
+      if (id === 's-saas-fix' && typeof saasRestoreFixState === 'function') {
+        saasRestoreFixState();
+      }
     };
   }
 
@@ -3434,6 +3433,7 @@ window.addEventListener('beforeunload', function() {
     else if (id === 's-saas1') info = snapshotSaasState() || { type:'saas', completed:0, total:5, currentStep:'s-saas1', label:'① 選択・アップロード' };
     else if (id === 's-saas2') info = { type:'saas', completed:1, total:5, currentStep:'s-saas2', label:'② マッピング設定', mapping_changed: !!window._mockSaasMappingChanged };
     else if (id === 's-saas-preview') info = { type:'saas', completed:2, total:5, currentStep:'s-saas-preview', label:'③ プレビュー・マッピング修正', preview_changed: !!window._mockSaasPreviewChanged };
+    else if (id === 's-saas-fix') info = { type:'saas', completed:2, total:5, currentStep:'s-saas-fix', label:'③ エラー/未マップ項目 修正中', preview_changed: true, fix_state: window._saasFixState || { error_action:null, error_new_value:'', defaults_skipped:false } };
     else if (id === 's-saas3') info = { type:'saas', completed:2, total:5, currentStep:'s-saas3', label:'③ プレビュー・確認' };
     if (info) {
       info.savedAt = Date.now();
