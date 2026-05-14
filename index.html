@@ -1537,7 +1537,25 @@
 
     <!-- ==== 未マップ項目補完セクション ==== -->
     <div class="wcard" style="border-color:#fde68a;">
-      <div class="wcard-title" style="color:#92400e;">📝 未マップ項目の補完 (4項目) — 推奨補完方法</div>
+      <div class="wcard-title" style="color:#92400e;">📝 未マップ項目の補完 (4項目)</div>
+
+      <!-- ⏭ 推奨スキップボタン (専門知識不要、デフォルト値継承で進める) -->
+      <div style="background:#e8f9f4;border:2px solid #2ec4a5;border-radius:8px;padding:14px 16px;margin-bottom:12px;">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <div style="flex:1;min-width:240px;">
+            <div style="font-size:13px;font-weight:700;color:#0e9077;margin-bottom:4px;">⏭ そのままインポート(デフォルト値を継承) — 推奨</div>
+            <div style="font-size:11px;color:#555;line-height:1.6;">前回設定したデフォルト値(電話/メアド=空欄、交通費単位=月額、交通費=0)で全員一律補完します。<strong>専門知識不要、後で個別調整も可能</strong>。</div>
+          </div>
+          <button class="btn btn-p" onclick="saasFixSkipDefaults()" style="background:#0e9077;border-color:#0e9077;font-weight:700;padding:12px 24px;">⏭ そのまま進む</button>
+        </div>
+      </div>
+
+      <!-- ▼ 個別にデフォルト値を変更する (詳細設定) -->
+      <div style="margin-bottom:12px;">
+        <button onclick="saasFixToggleDefaults(this)" style="background:none;border:none;color:#92400e;font-size:12px;font-weight:700;cursor:pointer;padding:6px 0;">▶ 個別にデフォルト値を変更する (詳細設定)</button>
+      </div>
+
+      <div id="saas-fix-defaults-detail" style="display:none;">
       <div class="alert alert-warn" style="margin-bottom:12px;">CSVに対応する列が無い項目です。<strong>性質によって最適な補完方法が異なります</strong>: 全員一律でOK → デフォルト値 / 個別バラバラ → 補完テンプレート。</div>
       <table style="width:100%;font-size:12px;border-collapse:collapse;">
         <thead>
@@ -1585,6 +1603,7 @@
         <div style="margin-bottom:6px;"><span style="display:inline-block;background:#e8f9f4;color:#0e9077;padding:2px 6px;border-radius:8px;font-size:10px;font-weight:700;margin-right:4px;">⚙ デフォルト値</span> 上の入力欄に値設定 → インポート時に全員一律で適用</div>
         <div style="font-size:10px;color:#888;">💡 少数なら、インポート完了後に <strong>従業員一覧画面</strong> で行ごとに個別編集も可能</div>
       </div>
+      </div><!-- /saas-fix-defaults-detail -->
     </div>
 
     <div class="btn-group">
@@ -2392,6 +2411,20 @@ function saasFixDemoExcluded() {
   if (val) val.style.textDecoration = 'line-through';
   saasFixShowStatus('✗ EMP-006 を <strong>除外</strong>しました。プレビューに戻って <strong>「エラー行を除いてインポート実行 (14件)」</strong> を押下してください。', 'gray');
 }
+// ⏭ そのままインポート (デフォルト値継承): プレビューへ戻る
+function saasFixSkipDefaults() {
+  saasFixShowStatus('⏭ <strong>デフォルト値継承</strong>で進めます (電話/メアド=空欄、交通費単位=月額、交通費=0)。プレビューに戻って <strong>「インポート実行」</strong> を押下してください。', 'green');
+  setTimeout(function(){ go('s-saas-preview'); }, 800);
+}
+// ▼ 詳細設定 折りたたみトグル
+function saasFixToggleDefaults(btn) {
+  var panel = document.getElementById('saas-fix-defaults-detail');
+  if (!panel) return;
+  var open = panel.style.display !== 'none';
+  panel.style.display = open ? 'none' : '';
+  if (btn) btn.textContent = (open ? '▶' : '▼') + ' 個別にデフォルト値を変更する (詳細設定)';
+}
+
 function saasFixDemoMasterAdded() {
   saasFixDemoReset();
   var countEl = document.getElementById('saas-fix-error-count');
