@@ -283,6 +283,7 @@
     <button onclick="go('s-saas-map-edit-2')">マッピング編集(2nd)</button>
     <button onclick="go('s-saas2')">初回マッピング設定</button>
     <button onclick="go('s-saas-preview')">SaaS② プレビュー・確認</button>
+    <button onclick="go('s-saas-fix')">SaaS② エラー/未マップ修正</button>
     <button onclick="go('s-saas4')">SaaS③ 完了</button>
   </div>
   <div class="sidebar-bottom"><div class="avatar-sm">👤</div><div><div style="font-weight:600">筒井</div><div style="color:#999;font-size:11px">オーナー</div></div></div>
@@ -1388,10 +1389,25 @@
       </table>
     </div>
 
-    <!-- マッピングされなかった項目 -->
-    <div class="wcard" style="border-color:#fde68a;">
-      <div class="wcard-title" style="color:#92400e;">マッピングされなかった項目 — 推奨補完方法</div>
-      <div class="alert alert-warn" style="margin-bottom:12px;">CSVに対応する列が無い項目です。<strong>性質によって最適な補完方法が異なります</strong>: 全員一律でOK → デフォルト値 / 個別バラバラ → 補完テンプレート。</div>
+    <!-- エラー対処 / 未マップ項目補完: 件数のみサマリー表示し、修正画面 (s-saas-fix) へ誘導 -->
+    <div class="wcard" style="background:#fff8ed;border-color:#fde68a;">
+      <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;">
+        <div style="flex:1;min-width:240px;">
+          <div style="font-size:14px;font-weight:700;color:#92400e;margin-bottom:6px;">⚠ 修正が必要な項目があります</div>
+          <div style="font-size:12px;color:#9c4d12;line-height:1.7;">
+            ・<strong style="color:#e74c3c;">エラー 1件</strong> (例: EMP-006 雇用区分「契約社員」が未登録)<br>
+            ・<strong>未マップ 4項目</strong> (電話番号 / メールアドレス / 交通費単位 / 交通費)
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <button class="btn btn-p" onclick="go('s-saas-fix')" style="background:#e74c3c;border-color:#e74c3c;font-weight:700;padding:10px 20px;">⚠ エラー / 未マップを修正 →</button>
+          <div style="font-size:10px;color:#888;text-align:right;">修正画面で対処方法を選択</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- (旧テーブルは修正画面 s-saas-fix に移動) -->
+    <div style="display:none;">
       <table style="width:100%;font-size:12px;border-collapse:collapse;">
         <thead>
           <tr style="background:#fff8ed;">
@@ -1453,6 +1469,103 @@
       <button class="btn btn-ghost" onclick="go('s-saas1')">← 戻る</button>
       <button id="saas-preview-save-btn" class="btn btn-ghost setup-only-btn" style="display:none;background:#fff3e0;border:1px solid #e67e22;color:#e67e22;font-weight:700;" onclick="saveImportDraftMappingStep('s-saas-preview')">💾 一時保存</button>
       <button class="btn btn-primary" onclick="go('s-saas4')">エラー行を除いてインポート実行（14件）</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== -->
+<!-- SAAS: 修正画面 (エラー対処 + 未マップ項目補完) -->
+<!-- ==================== -->
+<div class="screen" id="s-saas-fix">
+  <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+    <h1 class="page-title" style="margin:0;">エラー・未マップ項目の修正</h1>
+  </div>
+  <div class="content">
+    <div class="alert alert-info" style="margin-bottom:16px;">プレビューで検出された <strong>エラー / 未マップ項目</strong> を修正します。修正完了後、プレビュー画面に戻ってインポートを実行してください。</div>
+
+    <!-- ==== エラー対処セクション ==== -->
+    <div class="wcard" style="border-color:#f5b7b1;background:#fdf3f2;margin-bottom:18px;">
+      <div class="wcard-title" style="color:#c0392b;">⚠ エラー対処 (1件)</div>
+      <div style="background:#fff;border:1px solid #f5b7b1;border-radius:6px;padding:12px 14px;margin-bottom:12px;">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px;">
+          <span style="background:#c0392b;color:#fff;padding:3px 8px;border-radius:10px;font-size:11px;font-weight:700;">行 7</span>
+          <span style="font-weight:700;">EMP-006</span>
+          <span style="color:#c0392b;font-size:12px;">雇用区分「契約社員」が未登録</span>
+        </div>
+        <div style="font-size:12px;color:#555;margin-bottom:10px;">👇 このエラーの対処方法 (どれか1つを選択):</div>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;">
+          <button class="btn btn-p" onclick="alert('🛠 設定画面(雇用区分)を開いて「契約社員」を追加 → このプレビューに戻って再インポート\n\n(モック: 実装時は雇用区分設定画面に遷移)')" style="background:#0e9077;border-color:#0e9077;flex:1;min-width:200px;padding:12px;text-align:left;font-weight:700;">
+            ⚙ 雇用区分マスタに<br><strong>「契約社員」を追加</strong>（推奨）
+            <div style="font-size:10px;font-weight:400;margin-top:4px;opacity:0.9;">設定画面で雇用区分を追加 → 再インポート</div>
+          </button>
+          <button class="btn btn-s" onclick="alert('✏ EMP-006の雇用区分を別の値(例: アルバイト)に変更してインポート\n\n(モック: 実装時はインライン編集UI)')" style="flex:1;min-width:200px;padding:12px;text-align:left;font-weight:700;">
+            ✏ <strong>別の雇用区分に変更</strong><br>してインポート
+            <div style="font-size:10px;font-weight:400;margin-top:4px;color:#666;">既存の雇用区分(正社員/パート等)から選択</div>
+          </button>
+          <button class="btn btn-s" onclick="alert('✗ EMP-006をインポートから除外して、他の14件のみ実行\n\n(プレビューに戻って「エラー行を除いてインポート実行」を押下)')" style="flex:1;min-width:200px;padding:12px;text-align:left;font-weight:700;">
+            ✗ <strong>この行を除外</strong>して<br>インポート
+            <div style="font-size:10px;font-weight:400;margin-top:4px;color:#666;">他14件のみインポート、EMP-006は後で個別対応</div>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==== 未マップ項目補完セクション ==== -->
+    <div class="wcard" style="border-color:#fde68a;">
+      <div class="wcard-title" style="color:#92400e;">📝 未マップ項目の補完 (4項目) — 推奨補完方法</div>
+      <div class="alert alert-warn" style="margin-bottom:12px;">CSVに対応する列が無い項目です。<strong>性質によって最適な補完方法が異なります</strong>: 全員一律でOK → デフォルト値 / 個別バラバラ → 補完テンプレート。</div>
+      <table style="width:100%;font-size:12px;border-collapse:collapse;">
+        <thead>
+          <tr style="background:#fff8ed;">
+            <th style="text-align:left;padding:8px 10px;font-weight:600;color:#92400e;border-bottom:1px solid #fde68a;">未マップ項目</th>
+            <th style="text-align:left;padding:8px 10px;font-weight:600;color:#92400e;border-bottom:1px solid #fde68a;">必須</th>
+            <th style="text-align:left;padding:8px 10px;font-weight:600;color:#92400e;border-bottom:1px solid #fde68a;">推奨補完方法</th>
+            <th style="text-align:left;padding:8px 10px;font-weight:600;color:#92400e;border-bottom:1px solid #fde68a;">インポート時のデフォルト値</th>
+            <th style="text-align:left;padding:8px 10px;font-weight:600;color:#92400e;border-bottom:1px solid #fde68a;">補足</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;font-weight:600;">電話番号</td>
+            <td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;color:#e74c3c;">★ 必須</td>
+            <td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;"><span style="display:inline-block;background:#e3f2fd;color:#0d47a1;padding:3px 8px;border-radius:10px;font-size:10px;font-weight:700;">📋 補完テンプレート 推奨</span></td>
+            <td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;color:#888;font-size:11px;">空欄でインポート</td>
+            <td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;font-size:11px;color:#555;">個別バラバラのため一律不適</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;font-weight:600;">メールアドレス</td>
+            <td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;color:#e74c3c;">★ 必須</td>
+            <td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;"><span style="display:inline-block;background:#e3f2fd;color:#0d47a1;padding:3px 8px;border-radius:10px;font-size:10px;font-weight:700;">📋 補完テンプレート 推奨</span></td>
+            <td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;color:#888;font-size:11px;">空欄でインポート</td>
+            <td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;font-size:11px;color:#555;">個別バラバラのため一律不適</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;font-weight:600;">交通費単位</td>
+            <td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;color:#e74c3c;">★ 必須</td>
+            <td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;"><span style="display:inline-block;background:#e8f9f4;color:#0e9077;padding:3px 8px;border-radius:10px;font-size:10px;font-weight:700;">⚙ デフォルト値 推奨</span></td>
+            <td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;"><select style="padding:4px 8px;border:1px solid #ddd;border-radius:4px;font-size:11px;"><option>月額</option><option>日額</option></select></td>
+            <td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;font-size:11px;color:#555;">全員一律でOK</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 10px;font-weight:600;">交通費</td>
+            <td style="padding:8px 10px;color:#e74c3c;">★ 必須</td>
+            <td style="padding:8px 10px;"><span style="display:inline-block;background:#e8f9f4;color:#0e9077;padding:3px 8px;border-radius:10px;font-size:10px;font-weight:700;">⚙ デフォルト値 推奨</span></td>
+            <td style="padding:8px 10px;"><input type="text" value="0" style="padding:4px 8px;border:1px solid #ddd;border-radius:4px;font-size:11px;width:80px;"></td>
+            <td style="padding:8px 10px;font-size:11px;color:#555;">概ね一律でOK、必要なら後で個別調整</td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="margin-top:12px;padding:10px 12px;background:#fafafa;border-radius:6px;font-size:11px;line-height:1.7;color:#555;">
+        <div style="margin-bottom:6px;"><span style="display:inline-block;background:#e3f2fd;color:#0d47a1;padding:2px 6px;border-radius:8px;font-size:10px;font-weight:700;margin-right:4px;">📋 補完テンプレート</span> 完了画面で <strong>補完用テンプレート(.csv)</strong> をDL → Excel等で個別入力 → テンプレートインポート(④従業員・上書き更新)で一括補完</div>
+        <div style="margin-bottom:6px;"><span style="display:inline-block;background:#e8f9f4;color:#0e9077;padding:2px 6px;border-radius:8px;font-size:10px;font-weight:700;margin-right:4px;">⚙ デフォルト値</span> 上の入力欄に値設定 → インポート時に全員一律で適用</div>
+        <div style="font-size:10px;color:#888;">💡 少数なら、インポート完了後に <strong>従業員一覧画面</strong> で行ごとに個別編集も可能</div>
+      </div>
+    </div>
+
+    <div class="btn-group">
+      <button class="btn btn-ghost" onclick="go('s-saas-preview')">← プレビューへ戻る</button>
+      <button id="saas-fix-save-btn" class="btn btn-ghost setup-only-btn" style="display:none;background:#fff3e0;border:1px solid #e67e22;color:#e67e22;font-weight:700;" onclick="saveImportDraftMappingStep('s-saas-fix')">💾 一時保存</button>
+      <button class="btn btn-primary" onclick="go('s-saas-preview')">✓ 修正完了 → プレビューへ戻る</button>
     </div>
   </div>
 </div>
@@ -1941,15 +2054,15 @@ function refreshSaveButtonsState() {
     }
   });
 
-  // === s-saas2 / s-saas-preview: 画面到達=常時アクティブ ===
-  // 変更フラグ(window._mockSaasMappingChanged / _mockSaasPreviewChanged)は
-  // ボタン活性化には使わず、saveImportDraftMappingStep の label 出し分けにのみ反映
-  // (操作トリガー必須は面倒なため、常時押下可能とする)
+  // === s-saas2 / s-saas-preview / s-saas-fix: 画面到達=常時アクティブ ===
+  // 変更フラグはボタン活性化には使わず、saveImportDraftMappingStep の label 出し分けにのみ反映
   [
     document.getElementById('saas2-save-btn'),
     document.querySelector('#s-saas2 .save-draft-btn'),
     document.getElementById('saas-preview-save-btn'),
-    document.querySelector('#s-saas-preview .save-draft-btn')
+    document.querySelector('#s-saas-preview .save-draft-btn'),
+    document.getElementById('saas-fix-save-btn'),
+    document.querySelector('#s-saas-fix .save-draft-btn')
   ].forEach(function(btn) {
     if (!btn) return;
     btn.disabled = false;
@@ -2950,7 +3063,7 @@ document.addEventListener('DOMContentLoaded', function() {
           refreshSaveButtonsState();
         }
       }
-      if (t.closest && t.closest('#s-saas-preview')) {
+      if (t.closest && (t.closest('#s-saas-preview') || t.closest('#s-saas-fix'))) {
         if (!window._mockSaasPreviewChanged) {
           window._mockSaasPreviewChanged = true;
           refreshSaveButtonsState();
@@ -2985,7 +3098,7 @@ window.addEventListener('hashchange', function() {
 function ensureSaveDraftButtons() {
   // 整理: s-tpl1(アップロード) / s-saas1(項目選択) / s-saas2(マッピング) / s-saas-preview(プレビュー・マッピング修正)
   // s-tpl2(確認・実行)/s-saas3(旧プレビュー)は対象外
-  var targets = ['s-tpl1', 's-saas1', 's-saas2', 's-saas-preview'];
+  var targets = ['s-tpl1', 's-saas1', 's-saas2', 's-saas-preview', 's-saas-fix'];
   targets.forEach(function(id) {
     var scr = document.getElementById(id);
     if (!scr) return;
@@ -3035,7 +3148,7 @@ window.addEventListener('beforeunload', function() {
 function refreshSaveHerePanels() {
   var setupModeUrl = (location.hash || '').replace('#', '');
   var isSetup = (setupModeUrl === 'tpl-setup' || setupModeUrl === 'saas-setup');
-  ['tpl1-save-btn', 'saas1-save-btn', 'saas2-save-btn', 'saas-preview-save-btn'].forEach(function(id) {
+  ['tpl1-save-btn', 'saas1-save-btn', 'saas2-save-btn', 'saas-preview-save-btn', 'saas-fix-save-btn'].forEach(function(id) {
     var el = document.getElementById(id);
     if (el) el.style.display = (isSetup ? '' : 'none');
   });
@@ -3058,6 +3171,12 @@ function saveImportDraftMappingStep(screenId) {
       type:'saas', completed:2, total:5, currentStep:'s-saas-preview',
       label: changedP ? '③ プレビュー・マッピング修正(変更途中)' : '③ プレビュー(マッピング確認済)',
       preview_changed: changedP
+    };
+  } else if (screenId === 's-saas-fix') {
+    info = {
+      type:'saas', completed:2, total:5, currentStep:'s-saas-fix',
+      label: '③ エラー/未マップ項目 修正中',
+      preview_changed: true
     };
   } else if (screenId === 's-saas3') {
     info = { type:'saas', completed:2, total:5, currentStep:'s-saas3', label:'③ プレビュー・確認' };
