@@ -1390,17 +1390,17 @@
     </div>
 
     <!-- エラー対処 / 未マップ項目補完: 件数のみサマリー表示し、修正画面 (s-saas-fix) へ誘導 -->
-    <div class="wcard" style="background:#fff8ed;border-color:#fde68a;">
+    <div id="saas-preview-fix-summary" class="wcard" style="background:#fff8ed;border-color:#fde68a;">
       <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;">
         <div style="flex:1;min-width:240px;">
-          <div style="font-size:14px;font-weight:700;color:#92400e;margin-bottom:6px;">⚠ 修正が必要な項目があります</div>
-          <div style="font-size:12px;color:#9c4d12;line-height:1.7;">
+          <div id="saas-preview-fix-title" style="font-size:14px;font-weight:700;color:#92400e;margin-bottom:6px;">⚠ 修正が必要な項目があります</div>
+          <div id="saas-preview-fix-detail" style="font-size:12px;color:#9c4d12;line-height:1.7;">
             ・<strong style="color:#e74c3c;">エラー 1件</strong> (例: EMP-006 雇用区分「契約社員」が未登録)<br>
             ・<strong>未マップ 4項目</strong> (電話番号 / メールアドレス / 交通費単位 / 交通費)
           </div>
         </div>
         <div style="display:flex;flex-direction:column;gap:8px;">
-          <button class="btn btn-p" onclick="go('s-saas-fix')" style="background:#e74c3c;border-color:#e74c3c;font-weight:700;padding:10px 20px;">⚠ エラー / 未マップを修正 →</button>
+          <button id="saas-preview-fix-cta" class="btn btn-p" onclick="go('s-saas-fix')" style="background:#e74c3c;border-color:#e74c3c;font-weight:700;padding:10px 20px;">⚠ エラー / 未マップを修正 →</button>
           <div style="font-size:10px;color:#888;text-align:right;">修正画面で対処方法を選択</div>
         </div>
       </div>
@@ -1468,7 +1468,7 @@
     <div class="btn-group">
       <button class="btn btn-ghost" onclick="go('s-saas1')">← 戻る</button>
       <button id="saas-preview-save-btn" class="btn btn-ghost setup-only-btn" style="display:none;background:#fff3e0;border:1px solid #e67e22;color:#e67e22;font-weight:700;" onclick="saveImportDraftMappingStep('s-saas-preview')">💾 一時保存</button>
-      <button class="btn btn-primary" onclick="go('s-saas4')">エラー行を除いてインポート実行（14件）</button>
+      <button id="saas-preview-import-btn" class="btn btn-primary" onclick="go('s-saas4')">エラー行を除いてインポート実行（14件）</button>
     </div>
   </div>
 </div>
@@ -2302,7 +2302,10 @@ function selDup(el) {
   if (typeof refreshSaveButtonsState === 'function') refreshSaveButtonsState();
 }
 
-// ===== s-saas-fix エラー対処ボタンの実動線実装 =====
+// ===== s-saas-fix 修正状態管理 =====
+// window._saasFixState = { error_action: 'value-changed'|'excluded'|'master-added'|null, error_new_value: 'アルバイト', defaults_skipped: bool }
+window._saasFixState = window._saasFixState || { error_action: null, error_new_value: '', defaults_skipped: false };
+
 function saasFixShowStatus(msg, color) {
   var el = document.getElementById('saas-fix-error-status');
   if (!el) return;
@@ -2314,11 +2317,77 @@ function saasFixShowStatus(msg, color) {
   window._mockSaasPreviewChanged = true;
   if (typeof refreshSaveButtonsState === 'function') refreshSaveButtonsState();
 }
-// ⚙ マスタに追加 (推奨): owner-mock の雇用区分設定画面を別タブで開く + 再インポート案内
+// 状態に応じて s-saas-preview のサマリーカード/インポートボタン文言を更新
+function saasRefreshPreviewFromFixState() {
+  var st = window._saasFixState || {};
+  var title = document.getElementById('saas-preview-fix-title');
+  var detail = document.getElementById('saas-preview-fix-detail');
+  var cta = document.getElementById('saas-preview-fix-cta');
+  var summary = document.getElementById('saas-preview-fix-summary');
+  var importBtn = document.getElementById('saas-preview-import-btn');
+  if (!title || !detail || !cta || !importBtn) return;
+
+  var errorResolved = (st.error_action === 'master-added' || st.error_action === 'value-changed');
+  var errorExcluded = (st.error_action === 'excluded');
+  var errorLine, importLabel, importCount;
+
+  if (errorResolved) {
+    var byWhat = st.error_action === 'master-added' ? 'マスタ追加で解消' : ('値変更で解消 → ' + (st.error_new_value || '別の値'));
+    errorLine = '・<strong style="color:#0e9077;">エラー 0件 ✓</strong> <span style="color:#666;font-size:11px;">(' + byWhat + ')</span>';
+    importLabel = 'インポート実行（15件）';
+    importCount = 15;
+  } else if (errorExcluded) {
+    errorLine = '・<strong style="color:#666;">エラー 1件 → 除外済</strong> <span style="color:#666;font-size:11px;">(EMP-006を除外)</span>';
+    importLabel = 'エラー行を除いてインポート実行（14件）';
+    importCount = 14;
+  } else {
+    errorLine = '・<strong style="color:#e74c3c;">エラー 1件</strong> (例: EMP-006 雇用区分「契約社員」が未登録)';
+    importLabel = 'エラー行を除いてインポート実行（14件）';
+    importCount = 14;
+  }
+
+  var defaultsLine = st.defaults_skipped
+    ? '・<strong style="color:#0e9077;">未マップ 4項目 → デフォルト値継承で進める ✓</strong>'
+    : '・<strong>未マップ 4項目</strong> (電話番号 / メールアドレス / 交通費単位 / 交通費)';
+
+  detail.innerHTML = errorLine + '<br>' + defaultsLine;
+  importBtn.textContent = importLabel;
+
+  // 全部解消(エラー解消 + デフォルトスキップ)なら緑タイトル + CTA文言切替
+  if ((errorResolved || errorExcluded) && st.defaults_skipped) {
+    title.innerHTML = '✓ 修正完了 — そのままインポート可能';
+    title.style.color = '#0e9077';
+    summary.style.background = '#e8f9f4';
+    summary.style.borderColor = '#2ec4a5';
+    cta.style.background = '#888';
+    cta.style.borderColor = '#888';
+    cta.textContent = '修正画面を再確認 →';
+  } else if (errorResolved || errorExcluded || st.defaults_skipped) {
+    title.innerHTML = '⚠ 一部修正済 — 残り対応事項あり';
+    title.style.color = '#9c4d12';
+    summary.style.background = '#fff8ed';
+    summary.style.borderColor = '#fde68a';
+    cta.style.background = '#e67e22';
+    cta.style.borderColor = '#e67e22';
+    cta.textContent = '⚠ 残りを修正 →';
+  } else {
+    title.innerHTML = '⚠ 修正が必要な項目があります';
+    title.style.color = '#92400e';
+    summary.style.background = '#fff8ed';
+    summary.style.borderColor = '#fde68a';
+    cta.style.background = '#e74c3c';
+    cta.style.borderColor = '#e74c3c';
+    cta.textContent = '⚠ エラー / 未マップを修正 →';
+  }
+}
+
+// ⚙ マスタに追加 (推奨): owner-mock の雇用区分設定画面を別タブで開く + 状態を「マスタ追加済」に
 function saasFixAddToMaster() {
+  if (!confirm('⚙ owner-mock の雇用区分設定画面を別タブで開きます。\n「契約社員」を追加してから、このタブに戻ってください。')) return;
   var url = 'https://suguru789987.github.io/rakmy-owner-registration-mock/#emptype-settings';
   window.open(url, '_blank', 'noopener');
-  saasFixShowStatus('⚙ <strong>雇用区分設定画面</strong>を別タブで開きました。<br>「契約社員」を追加 → このタブに戻って <strong>「← プレビューへ戻る」→「←戻る」→ 再インポート</strong> でエラー解消します。', 'green');
+  // モック上は「追加した前提」でローカル状態を更新
+  saasFixDemoMasterAdded();
 }
 // ✏ 値変更: EMP-006 のセルをプルダウン化
 function saasFixShowValueSelect() {
@@ -2338,6 +2407,8 @@ function saasFixApplyValueChange() {
   val.style.color = '#0e9077';
   val.style.display = '';
   sel.style.display = 'none';
+  window._saasFixState.error_action = 'value-changed';
+  window._saasFixState.error_new_value = sel.value;
   saasFixShowStatus('✏ EMP-006 の雇用区分を <strong>「' + sel.value + '」</strong> に変更しました。プレビューに戻って <strong>「インポート実行」</strong> で全15件取り込めます。', 'green');
 }
 // ✗ 除外: 行をグレーアウト
@@ -2350,6 +2421,7 @@ function saasFixExcludeRow() {
   row.style.background = '#fafafa';
   excluded.style.display = '';
   if (val) val.style.textDecoration = 'line-through';
+  window._saasFixState.error_action = 'excluded';
   saasFixShowStatus('✗ EMP-006 を <strong>除外</strong>しました。プレビューに戻って <strong>「エラー行を除いてインポート実行 (14件)」</strong> を押下してください。', 'gray');
 }
 // 📥 CSV修正して再UP: 取り込みデータ選択画面に戻る
@@ -2362,7 +2434,6 @@ function saasFixScrollToDefaults() {
   var target = document.querySelector('#s-saas-fix .wcard[style*="border-color:#fde68a"]');
   if (target) {
     target.scrollIntoView({behavior:'smooth', block:'start'});
-    // ハイライト演出
     var origBg = target.style.background;
     target.style.transition = 'background 0.6s';
     target.style.background = '#fff8d6';
@@ -2372,6 +2443,7 @@ function saasFixScrollToDefaults() {
 
 // ===== デモ用: 状態切替 (処理前 ↔ 処理後) =====
 function saasFixDemoReset() {
+  window._saasFixState = { error_action: null, error_new_value: '', defaults_skipped: false };
   var row = document.getElementById('saas-fix-emp006-row');
   var excluded = document.getElementById('saas-fix-emp006-excluded');
   var val = document.getElementById('saas-fix-emp006-value');
@@ -2399,6 +2471,8 @@ function saasFixDemoValueChanged() {
     val.textContent = 'アルバイト (変更済)';
     val.style.color = '#0e9077';
   }
+  window._saasFixState.error_action = 'value-changed';
+  window._saasFixState.error_new_value = 'アルバイト';
   saasFixShowStatus('✏ EMP-006 の雇用区分を <strong>「アルバイト」</strong> に変更しました。プレビューに戻って <strong>「インポート実行」</strong> で全15件取り込めます。', 'green');
 }
 function saasFixDemoExcluded() {
@@ -2409,10 +2483,12 @@ function saasFixDemoExcluded() {
   if (row) { row.style.opacity = '0.5'; row.style.background = '#fafafa'; }
   if (excluded) excluded.style.display = '';
   if (val) val.style.textDecoration = 'line-through';
+  window._saasFixState.error_action = 'excluded';
   saasFixShowStatus('✗ EMP-006 を <strong>除外</strong>しました。プレビューに戻って <strong>「エラー行を除いてインポート実行 (14件)」</strong> を押下してください。', 'gray');
 }
-// ⏭ そのままインポート (デフォルト値継承): プレビューへ戻る
+// ⏭ そのままインポート (デフォルト値継承): プレビューへ戻る + state 記録
 function saasFixSkipDefaults() {
+  window._saasFixState.defaults_skipped = true;
   saasFixShowStatus('⏭ <strong>デフォルト値継承</strong>で進めます (電話/メアド=空欄、交通費単位=月額、交通費=0)。プレビューに戻って <strong>「インポート実行」</strong> を押下してください。', 'green');
   setTimeout(function(){ go('s-saas-preview'); }, 800);
 }
@@ -2434,7 +2510,51 @@ function saasFixDemoMasterAdded() {
     val.textContent = '契約社員 (マスタ追加済)';
     val.style.color = '#0e9077';
   }
+  window._saasFixState.error_action = 'master-added';
   saasFixShowStatus('⚙ 雇用区分マスタに <strong>「契約社員」</strong> が追加されました。エラーは解消、<strong>全15件インポート可能</strong>です。プレビューに戻って実行してください。', 'green');
+}
+
+// 画面到達時 s-saas-preview に来たら fix_state を反映、s-saas-fix に来たら一時保存からの復元
+(function() {
+  if (typeof window.go !== 'function') return;
+  var orig = window.go;
+  window.go = function(id) {
+    orig.apply(this, arguments);
+    if (id === 's-saas-preview' && typeof saasRefreshPreviewFromFixState === 'function') {
+      saasRefreshPreviewFromFixState();
+    }
+    if (id === 's-saas-fix' && typeof saasRestoreFixState === 'function') {
+      saasRestoreFixState();
+    }
+  };
+})();
+
+// 一時保存→再開時の fix_state 復元 (info.fix_state → UI状態 + window._saasFixState 同期)
+function saasRestoreFixState() {
+  try {
+    var raw = localStorage.getItem('import_in_progress');
+    if (!raw) return;
+    var info = JSON.parse(raw);
+    if (info.currentStep !== 's-saas-fix') return;
+    var st = info.fix_state;
+    if (!st) return;
+    // エラー対処状態を復元
+    if (st.error_action === 'value-changed' && st.error_new_value) {
+      saasFixDemoReset();
+      var val = document.getElementById('saas-fix-emp006-value');
+      if (val) { val.textContent = st.error_new_value + ' (変更済)'; val.style.color = '#0e9077'; }
+      window._saasFixState.error_action = 'value-changed';
+      window._saasFixState.error_new_value = st.error_new_value;
+      saasFixShowStatus('✏ 一時保存から復元: EMP-006 → <strong>' + st.error_new_value + '</strong>', 'green');
+    } else if (st.error_action === 'excluded') {
+      saasFixDemoExcluded();
+    } else if (st.error_action === 'master-added') {
+      saasFixDemoMasterAdded();
+    }
+    if (st.defaults_skipped) {
+      window._saasFixState.defaults_skipped = true;
+    }
+  } catch (e) {}
 }
 // Template upload (必須Step 1-4 → 任意 admin の順に進行)
 var tplUploadStep = 0;
@@ -3355,7 +3475,8 @@ function saveImportDraftMappingStep(screenId) {
     info = {
       type:'saas', completed:2, total:5, currentStep:'s-saas-fix',
       label: '③ エラー/未マップ項目 修正中',
-      preview_changed: true
+      preview_changed: true,
+      fix_state: window._saasFixState || { error_action: null, error_new_value: '', defaults_skipped: false }
     };
   } else if (screenId === 's-saas3') {
     info = { type:'saas', completed:2, total:5, currentStep:'s-saas3', label:'③ プレビュー・確認' };
