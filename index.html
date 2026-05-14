@@ -1484,16 +1484,34 @@
     <div class="alert alert-info" style="margin-bottom:16px;">プレビューで検出された <strong>エラー / 未マップ項目</strong> を修正します。修正完了後、プレビュー画面に戻ってインポートを実行してください。</div>
 
     <!-- ==== エラー対処セクション (C案: シンプル化) ==== -->
-    <div class="wcard" style="border-color:#f5b7b1;background:#fdf3f2;margin-bottom:18px;">
-      <div class="wcard-title" style="color:#c0392b;">⚠ エラー対処 (1件) — EMP-006 雇用区分「契約社員」が未登録</div>
+    <div id="saas-fix-error-card" class="wcard" style="border-color:#f5b7b1;background:#fdf3f2;margin-bottom:18px;">
+      <div class="wcard-title" style="color:#c0392b;">⚠ エラー対処 (<span id="saas-fix-error-count">1</span>件) — EMP-006 雇用区分「契約社員」が未登録</div>
+
+      <!-- 動線実装後のステータス表示エリア -->
+      <div id="saas-fix-error-status" style="display:none;margin-bottom:12px;padding:10px 12px;background:#e8f9f4;border:1px solid #2ec4a5;border-radius:6px;font-size:12px;color:#0e9077;font-weight:700;"></div>
+
+      <!-- EMP-006 行ステータス + インライン編集UI -->
+      <div id="saas-fix-emp006-row" style="margin-bottom:12px;padding:10px 12px;background:#fff;border:1px solid #f5b7b1;border-radius:6px;font-size:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <span style="background:#c0392b;color:#fff;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;">行 7</span>
+        <span style="font-weight:700;">EMP-006</span>
+        <span>雇用区分:</span>
+        <span id="saas-fix-emp006-value" style="color:#c0392b;font-weight:700;">契約社員 (未登録)</span>
+        <select id="saas-fix-emp006-select" style="display:none;padding:4px 8px;border:1px solid #ccc;border-radius:4px;font-size:11px;" onchange="saasFixApplyValueChange()">
+          <option value="">-- 選択 --</option>
+          <option>正社員</option>
+          <option>パート</option>
+          <option>アルバイト</option>
+        </select>
+        <span id="saas-fix-emp006-excluded" style="display:none;background:#888;color:#fff;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;">✗ 除外済</span>
+      </div>
 
       <!-- ▶ 1件だけ直す -->
       <div style="margin-bottom:14px;">
         <div style="font-size:12px;font-weight:700;color:#555;margin-bottom:6px;">▶ 1件だけ直す</div>
         <div style="display:flex;flex-wrap:wrap;gap:8px;">
-          <button class="btn btn-p" onclick="alert('⚙ マスタに「契約社員」を追加\n設定画面で追加 → 再インポート → 全15件取込')" style="background:#0e9077;border-color:#0e9077;font-weight:700;font-size:12px;">⚙ マスタに追加 <span style="font-size:10px;opacity:0.9;">(推奨)</span></button>
-          <button class="btn btn-s" onclick="alert('✏ EMP-006の値を変更\n既存マスタから選択して即時修正')" style="font-weight:700;font-size:12px;">✏ 値変更</button>
-          <button class="btn btn-s" onclick="alert('✗ EMP-006を除外\n他14件のみインポート、EMP-006は後で個別対応')" style="font-weight:700;font-size:12px;">✗ 除外</button>
+          <button class="btn btn-p" onclick="saasFixAddToMaster()" style="background:#0e9077;border-color:#0e9077;font-weight:700;font-size:12px;">⚙ マスタに追加 <span style="font-size:10px;opacity:0.9;">(推奨)</span></button>
+          <button class="btn btn-s" onclick="saasFixShowValueSelect()" style="font-weight:700;font-size:12px;">✏ 値変更</button>
+          <button class="btn btn-s" onclick="saasFixExcludeRow()" style="font-weight:700;font-size:12px;">✗ 除外</button>
         </div>
       </div>
 
@@ -1501,8 +1519,8 @@
       <div>
         <div style="font-size:12px;font-weight:700;color:#555;margin-bottom:6px;">▶ 一気に直す (大量エラー時)</div>
         <div style="display:flex;flex-wrap:wrap;gap:8px;">
-          <button class="btn btn-s" onclick="alert('📥 CSVを修正して再UP\nExcel等で元CSV修正 → 再アップロード → プレビュー再表示')" style="font-weight:700;font-size:12px;">📥 CSV修正して再UP</button>
-          <button class="btn btn-s" onclick="alert('⚙ 未マップ項目をデフォルト値で一括補完\n下部「未マップ項目」テーブルで値設定 → 全員一律適用')" style="font-weight:700;font-size:12px;">⚙ デフォルト値で一括補完</button>
+          <button class="btn btn-s" onclick="saasFixReUploadCsv()" style="font-weight:700;font-size:12px;">📥 CSV修正して再UP</button>
+          <button class="btn btn-s" onclick="saasFixScrollToDefaults()" style="font-weight:700;font-size:12px;">⚙ デフォルト値で一括補完</button>
         </div>
       </div>
     </div>
@@ -2253,6 +2271,74 @@ function selDup(el) {
   el.classList.add('selected');
   window._mockSaasPreviewChanged = true;
   if (typeof refreshSaveButtonsState === 'function') refreshSaveButtonsState();
+}
+
+// ===== s-saas-fix エラー対処ボタンの実動線実装 =====
+function saasFixShowStatus(msg, color) {
+  var el = document.getElementById('saas-fix-error-status');
+  if (!el) return;
+  el.style.display = '';
+  el.style.background = color === 'red' ? '#fdf3f2' : (color === 'gray' ? '#fafafa' : '#e8f9f4');
+  el.style.borderColor = color === 'red' ? '#f5b7b1' : (color === 'gray' ? '#ddd' : '#2ec4a5');
+  el.style.color = color === 'red' ? '#c0392b' : (color === 'gray' ? '#666' : '#0e9077');
+  el.innerHTML = msg;
+  window._mockSaasPreviewChanged = true;
+  if (typeof refreshSaveButtonsState === 'function') refreshSaveButtonsState();
+}
+// ⚙ マスタに追加 (推奨): owner-mock の雇用区分設定画面を別タブで開く + 再インポート案内
+function saasFixAddToMaster() {
+  var url = 'https://suguru789987.github.io/rakmy-owner-registration-mock/#emptype-settings';
+  window.open(url, '_blank', 'noopener');
+  saasFixShowStatus('⚙ <strong>雇用区分設定画面</strong>を別タブで開きました。<br>「契約社員」を追加 → このタブに戻って <strong>「← プレビューへ戻る」→「←戻る」→ 再インポート</strong> でエラー解消します。', 'green');
+}
+// ✏ 値変更: EMP-006 のセルをプルダウン化
+function saasFixShowValueSelect() {
+  var sel = document.getElementById('saas-fix-emp006-select');
+  var val = document.getElementById('saas-fix-emp006-value');
+  if (!sel || !val) return;
+  val.style.display = 'none';
+  sel.style.display = '';
+  sel.focus();
+}
+function saasFixApplyValueChange() {
+  var sel = document.getElementById('saas-fix-emp006-select');
+  var val = document.getElementById('saas-fix-emp006-value');
+  if (!sel || !val) return;
+  if (!sel.value) return;
+  val.textContent = sel.value + ' (変更済)';
+  val.style.color = '#0e9077';
+  val.style.display = '';
+  sel.style.display = 'none';
+  saasFixShowStatus('✏ EMP-006 の雇用区分を <strong>「' + sel.value + '」</strong> に変更しました。プレビューに戻って <strong>「インポート実行」</strong> で全15件取り込めます。', 'green');
+}
+// ✗ 除外: 行をグレーアウト
+function saasFixExcludeRow() {
+  var row = document.getElementById('saas-fix-emp006-row');
+  var excluded = document.getElementById('saas-fix-emp006-excluded');
+  var val = document.getElementById('saas-fix-emp006-value');
+  if (!row || !excluded) return;
+  row.style.opacity = '0.5';
+  row.style.background = '#fafafa';
+  excluded.style.display = '';
+  if (val) val.style.textDecoration = 'line-through';
+  saasFixShowStatus('✗ EMP-006 を <strong>除外</strong>しました。プレビューに戻って <strong>「エラー行を除いてインポート実行 (14件)」</strong> を押下してください。', 'gray');
+}
+// 📥 CSV修正して再UP: 取り込みデータ選択画面に戻る
+function saasFixReUploadCsv() {
+  if (!confirm('📥 取り込みデータ選択画面 (s-saas1) に戻ります。\n元CSVをExcelで修正 → 再アップロード → プレビュー再表示してください。')) return;
+  go('s-saas1');
+}
+// ⚙ デフォルト値で一括補完: 下部「未マップ項目補完」セクションへスクロール
+function saasFixScrollToDefaults() {
+  var target = document.querySelector('#s-saas-fix .wcard[style*="border-color:#fde68a"]');
+  if (target) {
+    target.scrollIntoView({behavior:'smooth', block:'start'});
+    // ハイライト演出
+    var origBg = target.style.background;
+    target.style.transition = 'background 0.6s';
+    target.style.background = '#fff8d6';
+    setTimeout(function(){ target.style.background = origBg || ''; }, 1500);
+  }
 }
 // Template upload (必須Step 1-4 → 任意 admin の順に進行)
 var tplUploadStep = 0;
