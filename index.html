@@ -1390,28 +1390,55 @@
 
     <!-- マッピングされなかった項目 -->
     <div class="wcard" style="border-color:#fde68a;">
-      <div class="wcard-title" style="color:#92400e;">マッピングされなかった項目</div>
-      <div class="alert alert-warn" style="margin-bottom:12px;">以下の項目はCSVに対応する列がありません。デフォルト値でインポートし、完了後に補完テンプレートで一括補完できます。</div>
+      <div class="wcard-title" style="color:#92400e;">マッピングされなかった項目 — 推奨補完方法</div>
+      <div class="alert alert-warn" style="margin-bottom:12px;">CSVに対応する列が無い項目です。<strong>性質によって最適な補完方法が異なります</strong>: 全員一律でOK → デフォルト値 / 個別バラバラ → 補完テンプレート。</div>
       <table style="width:100%;font-size:12px;border-collapse:collapse;">
         <thead>
           <tr style="background:#fff8ed;">
             <th style="text-align:left;padding:8px 10px;font-weight:600;color:#92400e;border-bottom:1px solid #fde68a;">未マップ項目</th>
             <th style="text-align:left;padding:8px 10px;font-weight:600;color:#92400e;border-bottom:1px solid #fde68a;">必須</th>
+            <th style="text-align:left;padding:8px 10px;font-weight:600;color:#92400e;border-bottom:1px solid #fde68a;">推奨補完方法</th>
             <th style="text-align:left;padding:8px 10px;font-weight:600;color:#92400e;border-bottom:1px solid #fde68a;">インポート時のデフォルト値</th>
-            <th style="text-align:left;padding:8px 10px;font-weight:600;color:#92400e;border-bottom:1px solid #fde68a;">補完方法</th>
+            <th style="text-align:left;padding:8px 10px;font-weight:600;color:#92400e;border-bottom:1px solid #fde68a;">補足</th>
           </tr>
         </thead>
         <tbody>
-          <tr><td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;font-weight:600;">電話番号</td><td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;color:#e74c3c;">★ 必須</td><td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;color:#888;">空欄</td><td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;font-size:11px;" rowspan="4" style="vertical-align:top;">
-            <div style="font-size:11px;line-height:1.6;padding:8px 10px;">
-              <div style="margin-bottom:4px;">完了画面で<strong>補完用テンプレート</strong>をダウンロードし、不足データを入力後、テンプレートインポート（④従業員・上書き更新）で一括補完できます。</div>
-            </div>
-          </td></tr>
-          <tr><td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;font-weight:600;">メールアドレス</td><td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;color:#e74c3c;">★ 必須</td><td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;color:#888;">空欄</td></tr>
-          <tr><td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;font-weight:600;">交通費単位</td><td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;color:#e74c3c;">★ 必須</td><td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;"><select style="padding:4px 8px;border:1px solid #ddd;border-radius:4px;font-size:11px;"><option>月額</option><option>日額</option></select></td></tr>
-          <tr><td style="padding:8px 10px;font-weight:600;">交通費</td><td style="padding:8px 10px;color:#e74c3c;">★ 必須</td><td style="padding:8px 10px;"><input type="text" value="0" style="padding:4px 8px;border:1px solid #ddd;border-radius:4px;font-size:11px;width:80px;"></td></tr>
+          <tr>
+            <td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;font-weight:600;">電話番号</td>
+            <td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;color:#e74c3c;">★ 必須</td>
+            <td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;"><span style="display:inline-block;background:#e3f2fd;color:#0d47a1;padding:3px 8px;border-radius:10px;font-size:10px;font-weight:700;">📋 補完テンプレート 推奨</span></td>
+            <td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;color:#888;font-size:11px;">空欄でインポート</td>
+            <td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;font-size:11px;color:#555;">個別バラバラのため一律不適</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;font-weight:600;">メールアドレス</td>
+            <td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;color:#e74c3c;">★ 必須</td>
+            <td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;"><span style="display:inline-block;background:#e3f2fd;color:#0d47a1;padding:3px 8px;border-radius:10px;font-size:10px;font-weight:700;">📋 補完テンプレート 推奨</span></td>
+            <td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;color:#888;font-size:11px;">空欄でインポート</td>
+            <td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;font-size:11px;color:#555;">個別バラバラのため一律不適</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;font-weight:600;">交通費単位</td>
+            <td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;color:#e74c3c;">★ 必須</td>
+            <td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;"><span style="display:inline-block;background:#e8f9f4;color:#0e9077;padding:3px 8px;border-radius:10px;font-size:10px;font-weight:700;">⚙ デフォルト値 推奨</span></td>
+            <td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;"><select style="padding:4px 8px;border:1px solid #ddd;border-radius:4px;font-size:11px;"><option>月額</option><option>日額</option></select></td>
+            <td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;font-size:11px;color:#555;">全員一律でOK</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 10px;font-weight:600;">交通費</td>
+            <td style="padding:8px 10px;color:#e74c3c;">★ 必須</td>
+            <td style="padding:8px 10px;"><span style="display:inline-block;background:#e8f9f4;color:#0e9077;padding:3px 8px;border-radius:10px;font-size:10px;font-weight:700;">⚙ デフォルト値 推奨</span></td>
+            <td style="padding:8px 10px;"><input type="text" value="0" style="padding:4px 8px;border:1px solid #ddd;border-radius:4px;font-size:11px;width:80px;"></td>
+            <td style="padding:8px 10px;font-size:11px;color:#555;">概ね一律でOK、必要なら後で個別調整</td>
+          </tr>
         </tbody>
       </table>
+      <!-- 補完方法の説明 (バッジ別) -->
+      <div style="margin-top:12px;padding:10px 12px;background:#fafafa;border-radius:6px;font-size:11px;line-height:1.7;color:#555;">
+        <div style="margin-bottom:6px;"><span style="display:inline-block;background:#e3f2fd;color:#0d47a1;padding:2px 6px;border-radius:8px;font-size:10px;font-weight:700;margin-right:4px;">📋 補完テンプレート</span> 完了画面で <strong>補完用テンプレート(.csv)</strong> をDL → Excel等で個別入力 → テンプレートインポート(④従業員・上書き更新)で一括補完</div>
+        <div style="margin-bottom:6px;"><span style="display:inline-block;background:#e8f9f4;color:#0e9077;padding:2px 6px;border-radius:8px;font-size:10px;font-weight:700;margin-right:4px;">⚙ デフォルト値</span> 上の入力欄に値設定 → インポート時に全員一律で適用</div>
+        <div style="font-size:10px;color:#888;">💡 少数なら、インポート完了後に <strong>従業員一覧画面</strong> で行ごとに個別編集も可能</div>
+      </div>
     </div>
 
     <div class="wcard">
