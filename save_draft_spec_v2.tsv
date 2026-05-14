@@ -1,0 +1,61 @@
+ID	CSV種別	一時保存ポイント	トリガー大項目	トリガー中項目	トリガー小項目	DOMイベント	セレクタ	判定フラグ／保存先	発火条件	アラート文言（owner-mock）	再開ボタン文言	遷移先	実装状況	アクション
+N-S-01	新規登録	設定画面登録 中断	取込進捗ステップ	① 業態・ブランド登録		input change / button click	#b-step-modal-1 各 input,select; #b-step-modal-1 .btn-primary	sessionStorage.b0Draft_1 / b0Done / b0Counts[0]	入力1行以上 → 下書き保存; 登録ボタン押下 → done=1	初期セットアップ進行中（1/4・あと 3 項目）不足: 店舗、雇用区分、従業員	▶ STEP 1 業態・ブランド(下書きN件) から再開	go('brand-settings') + setupActiveStep=1 + restoreDraft	✅ 実装済	-
+N-S-02	新規登録	設定画面登録 中断	取込進捗ステップ	② 店舗登録		input change / button click	#b-step-modal-2 各 input,select; #b-step-modal-2 .btn-primary	sessionStorage.b0Draft_2 / b0Done / b0Counts[1]	入力1行以上 → 下書き保存; 登録ボタン押下 → done=2	初期セットアップ進行中（2/4・あと 2 項目）不足: 雇用区分、従業員	▶ STEP 2 店舗(下書きN件) から再開	go('store-settings') + setupActiveStep=2 + restoreDraft	✅ 実装済	-
+N-S-03	新規登録	設定画面登録 中断	取込進捗ステップ	③ 雇用区分登録		input change / button click	#b-step-modal-3 各 input,select; #b-step-modal-3 .btn-primary	sessionStorage.b0Draft_3 / b0Done / b0Counts[2]	入力1行以上 → 下書き保存; 登録ボタン押下 → done=3	初期セットアップ進行中（3/4・あと 1 項目）不足: 従業員	▶ STEP 3 雇用区分(下書きN件) から再開	go('emptype-settings') + setupActiveStep=3 + restoreDraft	✅ 実装済	-
+N-S-04	新規登録	設定画面登録 中断	取込進捗ステップ	④ 従業員登録		input change / button click	#b-step-modal-4 各 input,select; #b-step-modal-4 .btn-primary	sessionStorage.b0Draft_4 / b0Done=4 / b0Counts[3] + 招待メール送信	入力1行以上 → 下書き保存; 登録&招待送信ボタン押下 → done=4	初期セットアップ進行中（4/4・必須完了。任意STEP 5 残）	▶ STEP 4 従業員(下書きN件) から再開	go('emp-settings') + setupActiveStep=4 + restoreDraft	✅ 実装済	-
+N-S-05	新規登録	設定画面登録 中断	取込進捗ステップ	⑤ 管理者登録(任意)		input / button click	#b-setup-admin-overlay 各 input,select; b0SubmitAdminEntry()	b0Counts[4] (下書きキー無し)	入力モーダル開き; 登録ボタン押下 → counts[4]++	初期セットアップ完了（管理者は任意、追加可能）	▶ STEP 5 管理者(任意) から再開	go('b0') + b0ShowStep5Panel()	⚠ 下書きなし	下書き永続化は無し（モーダル単発のため不要）。既存実装でOK
+N-T-01	新規登録	CSV(テンプレ) 中断	取込項目	① 業態・ブランド		change on checkbox + drop upload	#s-tpl1 label[data-tpl=brand] input; #tpl-up-dropzone	window._mockTplUploaded + localStorage.import_in_progress	チェックON かつ _mockTplUploaded===true で保存可	📥 CSV(テンプレ) N/4 取り込みデータ選択(N項目完了) から再開	▶ 📥 CSV(テンプレ) N/4 〇〇 から再開	import-spec/?resume=s-tpl1#tpl-setup	✅ 実装済	-
+N-T-02	新規登録	CSV(テンプレ) 中断	取込項目	② 店舗		change on checkbox + drop upload	#s-tpl1 label[data-tpl=store] input; #tpl-up-dropzone	同上	同上	同上	同上	同上 + 復元 chechbox store	✅ 実装済	-
+N-T-03	新規登録	CSV(テンプレ) 中断	取込項目	③ 雇用区分		change on checkbox + drop upload	#s-tpl1 label[data-tpl=emptype] input; #tpl-up-dropzone	同上	同上	同上	同上	同上 + 復元 emptype	✅ 実装済	-
+N-T-04	新規登録	CSV(テンプレ) 中断	取込項目	④ 従業員		change on checkbox + drop upload	#s-tpl1 label[data-tpl=employee] input; #tpl-up-dropzone	同上	同上	同上	同上	同上 + 復元 employee	✅ 実装済	-
+N-T-05	新規登録	CSV(テンプレ) 中断	取込項目	⑤ 管理者(任意)		change on checkbox + drop upload	#s-tpl1 label[data-tpl=admin] input; #tpl-up-dropzone	同上	同上	同上	同上	同上 + 復元 admin	✅ 実装済	-
+N-X-01	新規登録	CSV(外部勤怠) 中断	取込項目	業態・ブランド(setup時)		change on checkbox + drop upload	#s-saas1 #saas-brand-check input; #saas-up-dropzone	window._mockSaasUploaded + import_in_progress	チェックON かつ _mockSaasUploaded===true	📥 CSV(SaaS) N/5 取り込みデータ選択(N項目完了) から再開	▶ 📥 CSV(SaaS) N/5 〇〇 から再開	import-spec/?resume=s-saas1#saas-setup	✅ 実装済	-
+N-X-02	新規登録	CSV(外部勤怠) 中断	取込項目	従業員データ(KoT必須)		change on checkbox + drop upload	#s-saas1 label[data-map=map-kot-emp] input	同上	同上	同上	同上	同上 + 復元 map-kot-emp	✅ 実装済	-
+N-X-03	新規登録	CSV(外部勤怠) 中断	取込項目	従業員一覧(KoT任意)		change on checkbox + drop upload	#s-saas1 label[data-map=map-kot-hr] input	同上	同上	同上	同上	同上 + 復元 map-kot-hr	✅ 実装済	-
+N-X-04	新規登録	CSV(外部勤怠) 中断	取込項目	所属グループ(KoT任意)		change on checkbox + drop upload	#s-saas1 label[data-map=map-kot-group] input	同上	同上	同上	同上	同上 + 復元 map-kot-group	✅ 実装済	-
+N-X-05	新規登録	CSV(外部勤怠) 中断	取込項目	単価データ(KoT任意)		change on checkbox + drop upload	#s-saas1 label[data-map=map-kot-rate] input	同上	同上	同上	同上	同上 + 復元 map-kot-rate	✅ 実装済	-
+N-X-06	新規登録	CSV(外部勤怠) 中断	取込項目	管理者データ(KoT任意)		change on checkbox + drop upload	#s-saas1 label[data-map=map-kot-admin] input	同上	同上	同上	同上	同上 + 復元 map-kot-admin	✅ 実装済	-
+N-X-07	新規登録	CSV(外部勤怠) 中断	取込項目	スタッフ情報(JC必須)		change on checkbox + drop upload	#s-saas1 label[data-map=map-jc-staff] input	同上	同上	同上	同上	同上 + 復元 map-jc-staff	✅ 実装済	-
+N-X-08	新規登録	CSV(外部勤怠) 中断	取込項目	従業員データ(JC任意)		change on checkbox + drop upload	#s-saas1 label[data-map=map-jc-emp] input	同上	同上	同上	同上	同上 + 復元 map-jc-emp	✅ 実装済	-
+N-X-09	新規登録	CSV(外部勤怠) 中断	取込項目	カスタムCSV		change on checkbox + drop upload	#s-saas1 label[data-map=map-other] input	同上	同上	同上	同上	同上 + 復元 map-other	✅ 実装済	-
+N-M-01	新規登録	CSV(外部勤怠) 中断	マッピング設定	必須項目マッピング列	名前	change on select	#map-kot-emp tr:nth(0) select	window._mockSaasMappingChanged	初期 selected と異なる選択時	📥 CSV(SaaS) 1/5 ② マッピング設定(変更途中) から再開	▶ 📥 CSV(SaaS) 1/5 ② マッピング設定 から再開	import-spec/?resume=s-saas2#saas-setup	❌ 未実装	select 全てに onchange={ window._mockSaasMappingChanged = true; refreshSaasMappingBtn(); }
+N-M-02	新規登録	CSV(外部勤怠) 中断	マッピング設定	必須項目マッピング列	電話番号	change on select	#map-kot-emp tr:nth(1) select	window._mockSaasMappingChanged	同上	同上	同上	同上	❌ 未実装	同上
+N-M-03	新規登録	CSV(外部勤怠) 中断	マッピング設定	必須項目マッピング列	メールアドレス	change on select	#map-kot-emp tr:nth(2) select	window._mockSaasMappingChanged	同上	同上	同上	同上	❌ 未実装	同上
+N-M-04	新規登録	CSV(外部勤怠) 中断	マッピング設定	必須項目マッピング列	雇用区分名	change on select	#map-kot-emp tr:nth(4) select	window._mockSaasMappingChanged	同上	同上	同上	同上	❌ 未実装	同上
+N-M-05	新規登録	CSV(外部勤怠) 中断	マッピング設定	必須項目マッピング列	交通費単位	change on select	#map-kot-emp tr:nth(6) select	window._mockSaasMappingChanged	同上	同上	同上	同上	❌ 未実装	同上
+N-M-06	新規登録	CSV(外部勤怠) 中断	マッピング設定	必須項目マッピング列	交通費	change on select	#map-kot-emp tr:nth(7) select	window._mockSaasMappingChanged	同上	同上	同上	同上	❌ 未実装	同上
+N-M-07	新規登録	CSV(外部勤怠) 中断	マッピング設定	任意項目マッピング列	従業員コード	change on select	#map-kot-emp tr:nth(3) select	window._mockSaasMappingChanged	同上	同上	同上	同上	❌ 未実装	同上
+N-M-08	新規登録	CSV(外部勤怠) 中断	マッピング設定	任意項目マッピング列	店舗名	change on select	#map-kot-emp tr:nth(5) select	window._mockSaasMappingChanged	同上	同上	同上	同上	❌ 未実装	同上
+N-M-09	新規登録	CSV(外部勤怠) 中断	マッピング設定	任意項目マッピング列	金額（雇用区分）	change on select	#map-kot-emp tr:nth(8) select	window._mockSaasMappingChanged	同上	同上	同上	同上	❌ 未実装	同上
+N-M-10	新規登録	CSV(外部勤怠) 中断	マッピング設定	任意項目マッピング列	月次契約労働時間	change on select	#map-kot-emp tr:nth(9) select	window._mockSaasMappingChanged	同上	同上	同上	同上	❌ 未実装	同上
+N-M-11	新規登録	CSV(外部勤怠) 中断	マッピング設定	任意項目マッピング列	月みなし残業時間	change on select	#map-kot-emp tr:nth(10) select	window._mockSaasMappingChanged	同上	同上	同上	同上	❌ 未実装	同上
+N-D-01	新規登録	CSV(外部勤怠) 中断	マッピング設定	マッピング不可デフォルト値	電話番号(デフォルト)	input on text input	#map-kot-emp .dv-grid input[type=text]:nth(0)	window._mockSaasMappingChanged	値が初期空欄から変化	同上	同上	同上	❌ 未実装	全 dv-item の input/select に oninput/onchange ハンドラ追加
+N-D-02	新規登録	CSV(外部勤怠) 中断	マッピング設定	マッピング不可デフォルト値	メールアドレス(デフォルト)	input on text input	#map-kot-emp .dv-grid input[type=text]:nth(1)	window._mockSaasMappingChanged	値が初期空欄から変化	同上	同上	同上	❌ 未実装	同上
+N-D-03	新規登録	CSV(外部勤怠) 中断	マッピング設定	マッピング不可デフォルト値	交通費単位(デフォルト)	change on select	#map-kot-emp .dv-grid select	window._mockSaasMappingChanged	初期 selected から変化	同上	同上	同上	❌ 未実装	同上
+N-D-04	新規登録	CSV(外部勤怠) 中断	マッピング設定	マッピング不可デフォルト値	交通費(デフォルト)	input on text input	#map-kot-emp .dv-grid input[type=text]:nth(2)	window._mockSaasMappingChanged	値が初期 0 から変化	同上	同上	同上	❌ 未実装	同上
+N-P-01	新規登録	CSV(外部勤怠) 中断	プレビューマッピング修正	T1-1. プレビューテーブル個別編集	名前	input on contenteditable cell	#saas-pv-0 td[data-edit=name]	window._mockSaasPreviewChanged	セル編集後	📥 CSV(SaaS) 2/5 ③ プレビュー・マッピング修正(変更途中) から再開	▶ 📥 CSV(SaaS) 2/5 ③ プレビュー・マッピング修正 から再開	import-spec/?resume=s-saas-preview#saas-setup	❌ 未実装	pv-table td に contenteditable + oninput でフラグ true (デモ程度の実装でOK)
+N-P-02	新規登録	CSV(外部勤怠) 中断	プレビューマッピング修正	T1-2. プレビューテーブル個別編集	メアド	input on contenteditable cell	#saas-pv-0 td[data-edit=email]	window._mockSaasPreviewChanged	セル編集後	同上	同上	同上	❌ 未実装	同上
+N-P-03	新規登録	CSV(外部勤怠) 中断	プレビューマッピング修正	T1-3. プレビューテーブル個別編集	雇用区分	input on contenteditable cell	#saas-pv-0 td[data-edit=emptype]	window._mockSaasPreviewChanged	セル編集後	同上	同上	同上	❌ 未実装	同上
+N-P-04	新規登録	CSV(外部勤怠) 中断	プレビューマッピング修正	T1-4. プレビューテーブル個別編集	店舗	input on contenteditable cell	#saas-pv-0 td[data-edit=store]	window._mockSaasPreviewChanged	セル編集後	同上	同上	同上	❌ 未実装	同上
+N-P-05	新規登録	CSV(外部勤怠) 中断	プレビューマッピング修正	T1-5. プレビューテーブル個別編集	交通費単位	input on contenteditable cell	#saas-pv-0 td[data-edit=tu]	window._mockSaasPreviewChanged	セル編集後	同上	同上	同上	❌ 未実装	同上
+N-P-06	新規登録	CSV(外部勤怠) 中断	プレビューマッピング修正	T1-6. プレビューテーブル個別編集	交通費	input on contenteditable cell	#saas-pv-0 td[data-edit=t]	window._mockSaasPreviewChanged	セル編集後	同上	同上	同上	❌ 未実装	同上
+N-P-07	新規登録	CSV(外部勤怠) 中断	プレビューマッピング修正	T2-1. フィルタ操作	すべて/エラー切替	click on .stab	#s-saas-preview .stab	window._mockSaasPreviewChanged	タブ切替	同上	同上	同上	⚠ 部分	switchSaasPreviewTab() 内でフラグセット追加
+N-P-08	新規登録	CSV(外部勤怠) 中断	プレビューマッピング修正	T2-2. フィルタ操作	検索	input on search box	#saas-pv-search	window._mockSaasPreviewChanged	検索文字列入力	同上	同上	同上	❌ 未実装	検索ボックス自体が無いため要追加
+N-P-09	新規登録	CSV(外部勤怠) 中断	プレビューマッピング修正	T2-3. フィルタ操作	絞り込み	change on select	#saas-pv-filter	window._mockSaasPreviewChanged	絞り込み値変更	同上	同上	同上	❌ 未実装	絞り込み select 自体が無いため要追加
+N-P-10	新規登録	CSV(外部勤怠) 中断	プレビューマッピング修正	T3. エラー行 編集・除外		click on .pv-row-exclude / contenteditable td (エラー行)	#saas-pv-3 td	window._mockSaasPreviewChanged	編集/除外操作	同上	同上	同上	❌ 未実装	エラータブにアクション列追加
+N-P-11	新規登録	CSV(外部勤怠) 中断	プレビューマッピング修正	T4. マッピング再設定		click on ← 戻る → s-saas2 → 修正 → 再プレビュー	#s-saas-preview .btn-ghost (← 戻る)	window._mockSaasMappingChanged + _mockSaasPreviewChanged	往復時にフラグセット	同上	同上	同上	⚠ 部分	戻るボタン押下時に「プレビュー画面到達済」フラグセット
+N-P-12	新規登録	CSV(外部勤怠) 中断	プレビューマッピング修正	T5. 重複時処理選択(上書き↔スキップ)		click on .dup-opt	#s-saas-preview .dup-opt	window._mockSaasPreviewChanged	デフォルト「上書き更新」から変更	同上	同上	同上	⚠ 部分	selDup() 内でフラグセット追加
+N-P-13	新規登録	CSV(外部勤怠) 中断	プレビューマッピング修正	T6. 外部勤怠側に無い項目デフォルト値 最終調整		change on select / input on input (未マップ項目テーブル)	#s-saas-preview table input,select (未マップ項目)	window._mockSaasPreviewChanged	値が初期から変化	同上	同上	同上	❌ 未実装	未マップ項目table の input/select にハンドラ追加
+N-P-14	新規登録	CSV(外部勤怠) 中断	プレビューマッピング修正	T7. プレビュー確認後・実行直前		click on .btn-primary(エラー行を除いてインポート実行)	#s-saas-preview .btn-primary	(実行直前=暗黙の「変更ありに準じる」)	クリック直前(beforeunload)	同上	同上	同上	⚠ 部分	beforeunload で s-saas-preview にいる場合保存（既存）
+
+ID	CSV種別	一時保存ポイント	トリガー大項目	トリガー中項目	トリガー小項目	DOMイベント	セレクタ	判定フラグ／保存先	発火条件	アラート文言（owner-mock）	再開ボタン文言	遷移先	実装状況	アクション
+O-S-01	運用更新	設定画面登録 中断	取込項目	業態・ブランド		input change / button click	#page-brand-ops-settings 「+ 追加」モーダル内 input,select	(運用更新では進捗ステップ概念なし。取込みたいデータ項目チェックで判定)	モーダルで対象データ項目を選択 + 入力1行以上	(運用モードの中断 CTA 仕様未確定)	(運用追加) 業態・ブランド から再開	page-brand-ops-settings + 追加モーダル	⚠ 部分	進捗ステップ概念削除済(2026-05-14更新)。運用モード下書きの永続化は今後の仕様確定要
+O-S-02	運用更新	設定画面登録 中断	取込項目	店舗		同上	#page-store-ops-settings 「+ 追加」モーダル	同上	同上	同上	(運用追加) 店舗 から再開	page-store-ops-settings	⚠ 部分	同上
+O-S-03	運用更新	設定画面登録 中断	取込項目	雇用区分		同上	#page-emptype-ops-settings 「+ 追加」モーダル	同上	同上	同上	(運用追加) 雇用区分 から再開	page-emptype-ops-settings	⚠ 部分	同上
+O-S-04	運用更新	設定画面登録 中断	取込項目	従業員		同上	#page-emp-ops-settings 「+ 追加」モーダル	同上	同上	同上	(運用追加) 従業員 から再開	page-emp-ops-settings	⚠ 部分	同上
+O-S-05	運用更新	設定画面登録 中断	取込項目	管理者		input / button click	#page-d2 管理者登録モーダル	同上	同上	同上	(運用追加) 管理者 から再開	page-d2	⚠ 部分	同上
+O-T-01..05	運用更新	CSV(テンプレ) 中断	取込項目	業態/店舗/雇用区分/従業員/管理者		change on checkbox + drop upload	#s-tpl1 各 label	import_in_progress 書き込まない設計	ops mode は localStorage を使わない	(ops 中断は owner alert に出さない設計)	(該当なし)	s-tpl1#tpl	⚠ 部分	ops 中断 CTA 表示するか要仕様確定（現状は出さない）
+O-X-01..09	運用更新	CSV(外部勤怠) 中断	取込項目	(同上 9 項目)		change on checkbox + drop upload	#s-saas1 各 label	同上	同上	同上	(該当なし)	s-saas1#saas	⚠ 部分	同上
+O-M-01..11	運用更新	CSV(外部勤怠) 中断	マッピング設定	(同上 必須 6 + 任意 5 = 11 項目)		change on select	#s-saas2 各 select	同上	同上	同上	(該当なし)	s-saas2#saas	⚠ 部分	同上
+O-D-01..04	運用更新	CSV(外部勤怠) 中断	マッピング設定	マッピング不可デフォルト値(4 項目)		input / change	#s-saas2 .dv-grid	同上	同上	同上	(該当なし)	s-saas2#saas	⚠ 部分	同上
+O-P-01..14	運用更新	CSV(外部勤怠) 中断	プレビューマッピング修正	(同上 T1-T7 計 14 項目)		(同上)	#s-saas-preview	同上	同上	同上	(該当なし)	s-saas-preview#saas	⚠ 部分	同上

@@ -1129,7 +1129,17 @@
 <!-- SAAS: STEP 2 - 初回マッピング設定 -->
 <!-- ==================== -->
 <div class="screen" id="s-saas2">
-  <div class="page-header"><h1 class="page-title">初回マッピング設定</h1></div>
+  <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+    <h1 class="page-title" style="margin:0;">初回マッピング設定</h1>
+    <!-- 🛠 デモ用 マッピング変更フラグ切替 -->
+    <div style="display:flex;flex-direction:column;gap:6px;font-size:10px;background:#fff3e0;border:1px dashed #e67e22;border-radius:8px;padding:6px 10px;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="color:#e67e22;font-weight:700;">🛠 デモ用 マッピング変更:</span>
+        <button onclick="bDemoSaasMappingChanged(true)" style="font-size:11px;padding:4px 10px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;">✏️ 変更あり</button>
+        <button onclick="bDemoSaasMappingChanged(false)" style="font-size:11px;padding:4px 10px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;">○ 変更なし</button>
+      </div>
+    </div>
+  </div>
   <div class="content">
 
     <div class="alert alert-info" style="margin-bottom:16px;">初回のみこの画面でマッピングを設定します。設定後は「取り込み設定」画面から編集できます。</div>
@@ -1278,7 +1288,17 @@
 <!-- SAAS: プレビュー・確認（通常フロー） -->
 <!-- ==================== -->
 <div class="screen" id="s-saas-preview">
-  <div class="page-header"><h1 class="page-title">外部勤怠サービスから取り込み</h1></div>
+  <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+    <h1 class="page-title" style="margin:0;">外部勤怠サービスから取り込み</h1>
+    <!-- 🛠 デモ用 プレビュー変更フラグ切替 -->
+    <div style="display:flex;flex-direction:column;gap:6px;font-size:10px;background:#fff3e0;border:1px dashed #e67e22;border-radius:8px;padding:6px 10px;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="color:#e67e22;font-weight:700;">🛠 デモ用 プレビュー変更:</span>
+        <button onclick="bDemoSaasPreviewChanged(true)" style="font-size:11px;padding:4px 10px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;">✏️ 変更あり</button>
+        <button onclick="bDemoSaasPreviewChanged(false)" style="font-size:11px;padding:4px 10px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;">○ 変更なし</button>
+      </div>
+    </div>
+  </div>
   <div class="content">
 
     <div class="flow-steps">
@@ -1729,6 +1749,17 @@ function bDemoTplSetAllChecked(checked) {
 }
 
 // デモ用: s-saas1 の必須項目を一括 ON/OFF + アップロードフラグも同期
+// デモ用: s-saas2 のマッピング変更フラグを切替
+function bDemoSaasMappingChanged(flag) {
+  window._mockSaasMappingChanged = !!flag;
+  if (typeof refreshSaveButtonsState === 'function') refreshSaveButtonsState();
+}
+// デモ用: s-saas-preview のプレビュー変更フラグを切替
+function bDemoSaasPreviewChanged(flag) {
+  window._mockSaasPreviewChanged = !!flag;
+  if (typeof refreshSaveButtonsState === 'function') refreshSaveButtonsState();
+}
+
 function bDemoSaasSetAllChecked(checked) {
   document.querySelectorAll('#s-saas1 label.source-check').forEach(function(lbl) {
     var key = lbl.getAttribute('data-map') || lbl.getAttribute('data-saas-extra');
@@ -1802,6 +1833,38 @@ function refreshSaveButtonsState() {
       var listEl = statusEl.querySelector('.saved-status-list');
       if (listEl) listEl.textContent = checkedNames.join(' / ');
     }
+  });
+
+  // === s-saas2 (マッピング設定): _mockSaasMappingChanged で活性化 ===
+  var saas2CanSave = !!window._mockSaasMappingChanged;
+  var saas2Btns = [
+    document.getElementById('saas2-save-btn'),
+    document.querySelector('#s-saas2 .save-draft-btn')
+  ];
+  saas2Btns.forEach(function(btn) {
+    if (!btn) return;
+    btn.disabled = !saas2CanSave;
+    btn.style.opacity = saas2CanSave ? '' : '0.4';
+    btn.style.cursor = saas2CanSave ? 'pointer' : 'not-allowed';
+    btn.title = saas2CanSave
+      ? '中断地点を保存し、後で「続きから再開」できます'
+      : 'マッピング設定 (項目/デフォルト値) を変更すると一時保存できます';
+  });
+
+  // === s-saas-preview (プレビュー修正): _mockSaasPreviewChanged で活性化 ===
+  var pvCanSave = !!window._mockSaasPreviewChanged;
+  var pvBtns = [
+    document.getElementById('saas-preview-save-btn'),
+    document.querySelector('#s-saas-preview .save-draft-btn')
+  ];
+  pvBtns.forEach(function(btn) {
+    if (!btn) return;
+    btn.disabled = !pvCanSave;
+    btn.style.opacity = pvCanSave ? '' : '0.4';
+    btn.style.cursor = pvCanSave ? 'pointer' : 'not-allowed';
+    btn.title = pvCanSave
+      ? '中断地点を保存し、後で「続きから再開」できます'
+      : 'プレビュー (セル/重複処理/タブ/デフォルト値) を変更すると一時保存できます';
   });
 }
 
@@ -1987,6 +2050,8 @@ function selPill(el) {
 function selDup(el) {
   el.parentElement.querySelectorAll('.dup-opt').forEach(t => t.classList.remove('selected'));
   el.classList.add('selected');
+  window._mockSaasPreviewChanged = true;
+  if (typeof refreshSaveButtonsState === 'function') refreshSaveButtonsState();
 }
 // Template upload (必須Step 1-4 → 任意 admin の順に進行)
 var tplUploadStep = 0;
@@ -2215,6 +2280,8 @@ function switchSaasPreviewTab(el, idx) {
   el.classList.add('active');
   document.querySelectorAll('.saas-pv-tab').forEach(function(t) { t.style.display = 'none'; });
   document.getElementById('saas-pv-' + idx).style.display = '';
+  window._mockSaasPreviewChanged = true;
+  if (typeof refreshSaveButtonsState === 'function') refreshSaveButtonsState();
 }
 
 function switchMasterTab(el, idx) {
@@ -2778,6 +2845,28 @@ document.addEventListener('DOMContentLoaded', function() {
   ensureSaveDraftButtons();
   refreshSaveHerePanels();
   refreshSaveButtonsState();
+  // === s-saas2 / s-saas-preview: 任意の input/select/textarea 変更を「変更あり」として検出 ===
+  // 全 select/input/textarea の change/input イベントを delegate でハンドルし、
+  // 対象画面内なら _mockSaasMappingChanged / _mockSaasPreviewChanged を立てる
+  ['change', 'input'].forEach(function(ev) {
+    document.addEventListener(ev, function(e) {
+      var t = e.target;
+      if (!t || !t.matches) return;
+      if (!t.matches('select, input, textarea')) return;
+      if (t.closest && t.closest('#s-saas2')) {
+        if (!window._mockSaasMappingChanged) {
+          window._mockSaasMappingChanged = true;
+          refreshSaveButtonsState();
+        }
+      }
+      if (t.closest && t.closest('#s-saas-preview')) {
+        if (!window._mockSaasPreviewChanged) {
+          window._mockSaasPreviewChanged = true;
+          refreshSaveButtonsState();
+        }
+      }
+    }, true);
+  });
   // ?resume=<screenId> で中断地点から再開、チェック状態も復元
   try {
     var params = new URLSearchParams(location.search);
@@ -2864,9 +2953,9 @@ function refreshSaveHerePanels() {
 function saveImportDraftMappingStep(screenId) {
   var info = null;
   if (screenId === 's-saas2') {
-    info = { type:'saas', completed:1, total:5, currentStep:'s-saas2', label:'② マッピング設定(途中)' };
+    info = { type:'saas', completed:1, total:5, currentStep:'s-saas2', label:'② マッピング設定(変更途中)', mapping_changed:true };
   } else if (screenId === 's-saas-preview') {
-    info = { type:'saas', completed:2, total:5, currentStep:'s-saas-preview', label:'③ プレビュー・マッピング修正(途中)' };
+    info = { type:'saas', completed:2, total:5, currentStep:'s-saas-preview', label:'③ プレビュー・マッピング修正(変更途中)', preview_changed:true };
   } else if (screenId === 's-saas3') {
     info = { type:'saas', completed:2, total:5, currentStep:'s-saas3', label:'③ プレビュー・確認' };
   }
@@ -2934,30 +3023,66 @@ function saveImportDraftWithItems(type) {
   showImportSaveDraftModal(info);
 }
 
-// 再開時にチェック状態を復元 + 完了バッジ表示
+// 再開時にチェック状態+アップロード状態を復元 + 完了バッジ表示
 function restoreItemsFromDraft() {
   try {
     var raw = localStorage.getItem('import_in_progress');
     if (!raw) return;
     var info = JSON.parse(raw);
-    if (!info.itemsCompleted || !Array.isArray(info.itemsCompleted)) return;
     var sel = (info.type === 'template') ? '#s-tpl1' : '#s-saas1';
-    info.itemsCompleted.forEach(function(key) {
-      var lbl = document.querySelector(sel + ' label[data-tpl="' + key + '"], ' + sel + ' label[data-map="' + key + '"], ' + sel + ' label[data-saas-extra="' + key + '"]');
-      if (!lbl) return;
-      var cb = lbl.querySelector('input[type="checkbox"]');
-      if (cb) cb.checked = true;
-      lbl.classList.add('checked');
-      // 「✓ 一時保存時に完了済」バッジを追加
-      if (!lbl.querySelector('.restored-badge')) {
-        var badge = document.createElement('span');
-        badge.className = 'restored-badge';
-        badge.style.cssText = 'font-size:9px;padding:2px 7px;background:#e8f9f4;color:#0e9077;border-radius:10px;font-weight:700;margin-left:6px;';
-        badge.innerHTML = '✓ 一時保存時に完了済';
-        var titleDiv = lbl.querySelector('div > div:first-child') || lbl.querySelector('div');
-        if (titleDiv) titleDiv.appendChild(badge);
+
+    // 1. チェック状態の復元 + バッジ付与
+    if (info.itemsCompleted && Array.isArray(info.itemsCompleted)) {
+      info.itemsCompleted.forEach(function(key) {
+        var lbl = document.querySelector(sel + ' label[data-tpl="' + key + '"], ' + sel + ' label[data-map="' + key + '"], ' + sel + ' label[data-saas-extra="' + key + '"]');
+        if (!lbl) return;
+        var cb = lbl.querySelector('input[type="checkbox"]');
+        if (cb) cb.checked = true;
+        lbl.classList.add('checked');
+        if (!lbl.querySelector('.restored-badge')) {
+          var badge = document.createElement('span');
+          badge.className = 'restored-badge';
+          badge.style.cssText = 'font-size:9px;padding:2px 7px;background:#e8f9f4;color:#0e9077;border-radius:10px;font-weight:700;margin-left:6px;';
+          badge.innerHTML = '✓ 一時保存時に完了済';
+          var titleDiv = lbl.querySelector('div > div:first-child') || lbl.querySelector('div');
+          if (titleDiv) titleDiv.appendChild(badge);
+        }
+      });
+    }
+
+    // 2. アップロード済みフラグの復元 (チェックがあれば「アップ済」とみなす - モックの簡略化)
+    if (info.type === 'template') {
+      window._mockTplUploaded = true;
+    } else if (info.type === 'saas') {
+      window._mockSaasUploaded = true;
+    }
+
+    // 3. s-saas2 / s-saas-preview 復元フラグ
+    if (info.mapping_changed) window._mockSaasMappingChanged = true;
+    if (info.preview_changed) window._mockSaasPreviewChanged = true;
+
+    // 4. アップ済ファイルリストのダミー復元 (s-tpl1 / s-saas1)
+    var listSel = (info.type === 'template') ? '#tpl-up-files' : '#saas-up-files';
+    var listEl = document.querySelector(listSel);
+    if (listEl && info.itemsCompleted && info.itemsCompleted.length > 0) {
+      // 既存「完了」表示をそのまま使えるよう、復元バナーをリスト上部に挿入
+      if (!document.getElementById('restored-files-banner')) {
+        var resBanner = document.createElement('div');
+        resBanner.id = 'restored-files-banner';
+        resBanner.style.cssText = 'background:#e8f9f4;border:1px solid #2ec4a5;border-radius:6px;padding:8px 12px;margin:8px 0;font-size:11px;color:#0e9077;display:flex;align-items:center;gap:8px;';
+        var fileNames = (info.itemsCompleted || []).map(function(k) {
+          var lbl = (info.itemLabels && info.itemLabels[k]) ? info.itemLabels[k] : k;
+          return lbl.replace(/^[①②③④⑤◯●0-9]+[\s.．、・]*/, '').replace(/\s*\(.*$/, '').trim();
+        }).join(' / ');
+        resBanner.innerHTML = '<span style="font-size:14px;">✓</span><div><strong>一時保存時のアップ済データを復元</strong>（' + info.itemsCompleted.length + '件: ' + fileNames + '）— 続きを編集 or 確認画面へ進めます</div>';
+        listEl.parentNode.insertBefore(resBanner, listEl);
       }
-    });
+    }
+
+    // 5. ボタン状態を再計算 (一時保存ボタン + 「確認画面へ→」等)
+    if (typeof refreshSaveButtonsState === 'function') refreshSaveButtonsState();
+    if (typeof updateUploadSteps === 'function') updateUploadSteps();
+    if (typeof updateTplUploadUI === 'function') updateTplUploadUI();
   } catch (e) {}
 }
 
