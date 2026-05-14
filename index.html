@@ -1483,30 +1483,57 @@
   <div class="content">
     <div class="alert alert-info" style="margin-bottom:16px;">プレビューで検出された <strong>エラー / 未マップ項目</strong> を修正します。修正完了後、プレビュー画面に戻ってインポートを実行してください。</div>
 
-    <!-- ==== エラー対処セクション ==== -->
+    <!-- ==== エラー対処セクション (全体対処バー + 個別対処の2段構成) ==== -->
     <div class="wcard" style="border-color:#f5b7b1;background:#fdf3f2;margin-bottom:18px;">
       <div class="wcard-title" style="color:#c0392b;">⚠ エラー対処 (1件)</div>
-      <div style="background:#fff;border:1px solid #f5b7b1;border-radius:6px;padding:12px 14px;margin-bottom:12px;">
-        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px;">
-          <span style="background:#c0392b;color:#fff;padding:3px 8px;border-radius:10px;font-size:11px;font-weight:700;">行 7</span>
-          <span style="font-weight:700;">EMP-006</span>
-          <span style="color:#c0392b;font-size:12px;">雇用区分「契約社員」が未登録</span>
+
+      <!-- ▶ 全体対処バー: どんなエラー種別でも有効、大量エラー時の本命動線 -->
+      <div style="background:#fff;border:1px solid #f5b7b1;border-radius:6px;padding:12px 14px;margin-bottom:14px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+          <span style="background:#c0392b;color:#fff;padding:3px 8px;border-radius:10px;font-size:10px;font-weight:700;">全体対処</span>
+          <span style="font-size:12px;color:#555;">CSV側で一気に直す / 全員一律値で補完する 等の<strong>大規模対処</strong>。エラー多数の時に有効。</span>
         </div>
-        <div style="font-size:12px;color:#555;margin-bottom:10px;">👇 このエラーの対処方法 (どれか1つを選択):</div>
         <div style="display:flex;flex-wrap:wrap;gap:10px;">
-          <button class="btn btn-p" onclick="alert('🛠 設定画面(雇用区分)を開いて「契約社員」を追加 → このプレビューに戻って再インポート\n\n(モック: 実装時は雇用区分設定画面に遷移)')" style="background:#0e9077;border-color:#0e9077;flex:1;min-width:200px;padding:12px;text-align:left;font-weight:700;">
-            ⚙ 雇用区分マスタに<br><strong>「契約社員」を追加</strong>（推奨）
-            <div style="font-size:10px;font-weight:400;margin-top:4px;opacity:0.9;">設定画面で雇用区分を追加 → 再インポート</div>
+          <button class="btn btn-s" onclick="alert('📥 CSVを修正して再アップロード\n\n動線:\n1. プレビュー画面に戻る\n2. 「← 戻る」で取り込みデータ選択画面へ\n3. 元CSVファイルをExcel等で開いて編集\n4. 修正版をアップロード\n5. プレビュー再表示\n\n→ 大量のエラー(数十件)はこれが効率的')" style="flex:1;min-width:240px;padding:12px;text-align:left;font-weight:700;background:#fff;border:2px solid #2980b9;color:#2980b9;">
+            📥 <strong>CSVを修正して再アップロード</strong>
+            <div style="font-size:10px;font-weight:400;margin-top:4px;color:#555;">Excel等で元CSVを修正 → 再UP (大量エラー時に効率的)</div>
           </button>
-          <button class="btn btn-s" onclick="alert('✏ EMP-006の雇用区分を別の値(例: アルバイト)に変更してインポート\n\n(モック: 実装時はインライン編集UI)')" style="flex:1;min-width:200px;padding:12px;text-align:left;font-weight:700;">
-            ✏ <strong>別の雇用区分に変更</strong><br>してインポート
-            <div style="font-size:10px;font-weight:400;margin-top:4px;color:#666;">既存の雇用区分(正社員/パート等)から選択</div>
-          </button>
-          <button class="btn btn-s" onclick="alert('✗ EMP-006をインポートから除外して、他の14件のみ実行\n\n(プレビューに戻って「エラー行を除いてインポート実行」を押下)')" style="flex:1;min-width:200px;padding:12px;text-align:left;font-weight:700;">
-            ✗ <strong>この行を除外</strong>して<br>インポート
-            <div style="font-size:10px;font-weight:400;margin-top:4px;color:#666;">他14件のみインポート、EMP-006は後で個別対応</div>
+          <button class="btn btn-s" onclick="alert('⚙ 未マップ項目をデフォルト値で一括補完\n\n対象: 必須項目欠損(電話番号/メアド/交通費単位/交通費 等)\n動線:\n1. 下部「未マップ項目の補完」テーブルでデフォルト値を設定\n2. 「✓ 修正完了 → プレビューへ戻る」\n3. インポート実行 → 欠損項目に一律でデフォルト値が適用\n\n→ 全員一律でOKな項目(例: 交通費単位=月額)に有効')" style="flex:1;min-width:240px;padding:12px;text-align:left;font-weight:700;background:#fff;border:2px solid #0e9077;color:#0e9077;">
+            ⚙ <strong>未マップ項目をデフォルト値で一括補完</strong>
+            <div style="font-size:10px;font-weight:400;margin-top:4px;color:#555;">下部テーブルで値設定 → 全員一律で適用 (必須欠損対策)</div>
           </button>
         </div>
+      </div>
+
+      <!-- ▶ 個別対処: 1件ずつ直す。少量エラー(1-2件)の即時対処に有効 -->
+      <div style="background:#fff;border:1px solid #f5b7b1;border-radius:6px;padding:12px 14px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+          <span style="background:#9c4d12;color:#fff;padding:3px 8px;border-radius:10px;font-size:10px;font-weight:700;">個別対処</span>
+          <span style="font-size:12px;color:#555;">1件ずつ画面上で直す。<strong>少量エラー(1-2件)</strong>の即時対処に有効。</span>
+        </div>
+        <div style="background:#fafafa;border:1px solid #f0f0f0;border-radius:5px;padding:10px 12px;margin-bottom:10px;">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px;">
+            <span style="background:#c0392b;color:#fff;padding:3px 8px;border-radius:10px;font-size:11px;font-weight:700;">行 7</span>
+            <span style="font-weight:700;">EMP-006</span>
+            <span style="color:#c0392b;font-size:12px;">雇用区分「契約社員」が未登録</span>
+          </div>
+          <div style="font-size:11px;color:#555;margin-bottom:8px;">👇 このエラー1件の対処方法 (どれか1つを選択):</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;">
+            <button class="btn btn-p" onclick="alert('⚙ 雇用区分マスタに「契約社員」を追加\n\n動線:\n1. 雇用区分設定画面に遷移 (page-emptype-settings)\n2. 「+ 雇用区分を追加」モーダル展開、「契約社員」プリ入力\n3. 確認/編集 → 「登録」\n4. このプレビュー画面に自動復帰\n5. プレビュー再計算 → エラー解消 → 全15件インポート可能\n\n→ 根本解決、将来の同種エラー回避(推奨)')" style="background:#0e9077;border-color:#0e9077;flex:1;min-width:180px;padding:10px;text-align:left;font-weight:700;font-size:11px;">
+              ⚙ マスタに<strong>「契約社員」追加</strong>(推奨)
+              <div style="font-size:10px;font-weight:400;margin-top:2px;opacity:0.9;">設定画面で追加 → 再インポート</div>
+            </button>
+            <button class="btn btn-s" onclick="alert('✏ EMP-006の雇用区分を別の値に変更\n\n動線:\n1. EMP-006の雇用区分セルがプルダウン化\n2. 既存マスタ(正社員/パート/アルバイト等)から選択\n3. 確定 → エラー解消\n4. プレビューに戻ってインポート実行\n\n→ EMP-006だけ別区分として登録、マスタは変更なし')" style="flex:1;min-width:180px;padding:10px;text-align:left;font-weight:700;font-size:11px;">
+              ✏ <strong>別の雇用区分に変更</strong>
+              <div style="font-size:10px;font-weight:400;margin-top:2px;color:#666;">既存マスタから選択</div>
+            </button>
+            <button class="btn btn-s" onclick="alert('✗ この行(EMP-006)を除外してインポート\n\n動線:\n1. EMP-006に除外フラグON (グレーアウト)\n2. プレビューに戻ると「対象14件 / 除外1件」表示\n3. インポート実行 → 14件のみ登録、EMP-006はスキップ\n4. 後で別途EMP-006だけ手動対応\n\n→ 即時作業完了、EMP-006は宿題化')" style="flex:1;min-width:180px;padding:10px;text-align:left;font-weight:700;font-size:11px;">
+              ✗ <strong>この行を除外</strong>
+              <div style="font-size:10px;font-weight:400;margin-top:2px;color:#666;">他14件のみインポート</div>
+            </button>
+          </div>
+        </div>
+        <div style="font-size:10px;color:#888;line-height:1.6;">💡 <strong>権限ルール違反</strong>などの他種別エラーは、対処ボタンが異なります(例: ⚙ 設定画面で権限変更 / ✗ 除外)。</div>
       </div>
     </div>
 
