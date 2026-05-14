@@ -1625,6 +1625,80 @@ function closeInviteSentModal() {
   if (ov) ov.style.display = 'none';
 }
 
+// 現在の s-tpl1 状態をスナップショット (チェック+アップ状態を含む)。要素がまだなければ null
+function snapshotTplState() {
+  var scr = document.getElementById('s-tpl1');
+  if (!scr) return null;
+  var itemsCompleted = [];
+  var itemLabels = {};
+  scr.querySelectorAll('label.source-check').forEach(function(lbl) {
+    var key = lbl.getAttribute('data-tpl');
+    if (!key) return;
+    var nameEl = lbl.querySelector('div > div:first-child') || lbl.querySelector('div');
+    var clone = nameEl ? nameEl.cloneNode(true) : null;
+    if (clone) clone.querySelectorAll('span').forEach(function(s) { s.remove(); });
+    var nm = clone ? clone.textContent.replace(/\s+/g, ' ').trim() : key;
+    itemLabels[key] = nm;
+    var cb = lbl.querySelector('input[type="checkbox"]');
+    if (cb && cb.checked) itemsCompleted.push(key);
+  });
+  // 「未操作 (チェック0件 + アップ無し)」の場合は null を返して既存の汎用 info を使わせる
+  var uploaded = !!window._mockTplUploaded;
+  if (itemsCompleted.length === 0 && !uploaded) return null;
+  var requiredKeys = ['brand','store','emptype','employee'];
+  var allReq = requiredKeys.every(function(k) { return itemsCompleted.indexOf(k) >= 0; });
+  var label = allReq
+    ? '✓ 必須項目すべて完了(登録前準備完了)'
+    : '① 取り込みデータ選択(' + itemsCompleted.length + '項目完了)';
+  return {
+    type: 'template',
+    completed: itemsCompleted.length,
+    total: 4,
+    currentStep: 's-tpl1',
+    label: label,
+    allRequiredDone: allReq,
+    itemsCompleted: itemsCompleted,
+    itemLabels: itemLabels
+  };
+}
+function snapshotSaasState() {
+  var scr = document.getElementById('s-saas1');
+  if (!scr) return null;
+  var itemsCompleted = [];
+  var itemLabels = {};
+  scr.querySelectorAll('label.source-check').forEach(function(lbl) {
+    var srcParent = lbl.closest('#source-kot, #source-jc, #source-other');
+    if (srcParent && srcParent.style.display === 'none') return;
+    if (lbl.id === 'saas-brand-check' && lbl.style.display === 'none') return;
+    var key = lbl.getAttribute('data-map') || lbl.getAttribute('data-saas-extra');
+    if (!key) return;
+    var nameEl = lbl.querySelector('div > div:first-child') || lbl.querySelector('div');
+    var clone = nameEl ? nameEl.cloneNode(true) : null;
+    if (clone) clone.querySelectorAll('span').forEach(function(s) { s.remove(); });
+    var nm = clone ? clone.textContent.replace(/\s+/g, ' ').trim() : key;
+    itemLabels[key] = nm;
+    var cb = lbl.querySelector('input[type="checkbox"]');
+    if (cb && cb.checked) itemsCompleted.push(key);
+  });
+  var uploaded = !!window._mockSaasUploaded;
+  if (itemsCompleted.length === 0 && !uploaded) return null;
+  var requiredKeys = ['map-kot-emp','map-jc-staff','map-other'];
+  var allReq = requiredKeys.some(function(k) { return itemsCompleted.indexOf(k) >= 0; });
+  var label = allReq
+    ? '✓ 必須項目すべて完了(登録前準備完了)'
+    : '① 取り込みデータ選択(' + itemsCompleted.length + '項目完了)';
+  return {
+    type: 'saas',
+    completed: itemsCompleted.length,
+    total: 5,
+    currentStep: 's-saas1',
+    label: label,
+    allRequiredDone: allReq,
+    itemsCompleted: itemsCompleted,
+    itemLabels: itemLabels
+  };
+}
+
 function go(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -1636,15 +1710,20 @@ function go(id) {
   if (id === 's-saas-settings') updateSettingsScreen();
   if (id === 's-tpl2') updateTplConfirmSections();
   // 中断検知用 localStorage 管理: 進捗(completed/total/currentStep/label)を記録、完了画面でクリア
+  // ★ s-tpl1 / s-saas1 ではチェック状態 + アップ済データ名 もスナップショット保存(再開時に復元できるよう)
   try {
     var setupModeUrl = (location.hash || '').replace('#', '');
     var isSetup = (setupModeUrl === 'tpl-setup' || setupModeUrl === 'saas-setup');
     if (isSetup) {
       var info = null;
-      if (id === 's-tpl1') info = { type:'template', completed:0, total:4, currentStep:'s-tpl1', label:'① アップロード' };
+      if (id === 's-tpl1') {
+        info = snapshotTplState() || { type:'template', completed:0, total:4, currentStep:'s-tpl1', label:'① アップロード' };
+      }
       else if (id === 's-tpl2') info = { type:'template', completed:0, total:4, currentStep:'s-tpl2', label:'② 確認・実行' };
-      else if (id === 's-saas1') info = { type:'saas', completed:0, total:5, currentStep:'s-saas1', label:'① 選択・アップロード' };
-      else if (id === 's-saas2') info = { type:'saas', completed:1, total:5, currentStep:'s-saas2', label:'② マッピング設定' };
+      else if (id === 's-saas1') {
+        info = snapshotSaasState() || { type:'saas', completed:0, total:5, currentStep:'s-saas1', label:'① 選択・アップロード' };
+      }
+      else if (id === 's-saas2') info = { type:'saas', completed:1, total:5, currentStep:'s-saas2', label:'② マッピング設定', mapping_changed: !!window._mockSaasMappingChanged };
       else if (id === 's-saas3') info = { type:'saas', completed:2, total:5, currentStep:'s-saas3', label:'③ プレビュー・確認' };
       else if (id === 's-tpl3' || id === 's-saas4') {
         localStorage.removeItem('import_in_progress');
@@ -2926,10 +3005,11 @@ window.addEventListener('beforeunload', function() {
     var activeScreen = document.querySelector('.screen.active');
     var id = activeScreen ? activeScreen.id : '';
     var info = null;
-    if (id === 's-tpl1') info = { type:'template', completed:0, total:4, currentStep:'s-tpl1', label:'① アップロード' };
+    if (id === 's-tpl1') info = snapshotTplState() || { type:'template', completed:0, total:4, currentStep:'s-tpl1', label:'① アップロード' };
     else if (id === 's-tpl2') info = { type:'template', completed:0, total:4, currentStep:'s-tpl2', label:'② 確認・実行' };
-    else if (id === 's-saas1') info = { type:'saas', completed:0, total:5, currentStep:'s-saas1', label:'① 選択・アップロード' };
-    else if (id === 's-saas2') info = { type:'saas', completed:1, total:5, currentStep:'s-saas2', label:'② マッピング設定' };
+    else if (id === 's-saas1') info = snapshotSaasState() || { type:'saas', completed:0, total:5, currentStep:'s-saas1', label:'① 選択・アップロード' };
+    else if (id === 's-saas2') info = { type:'saas', completed:1, total:5, currentStep:'s-saas2', label:'② マッピング設定', mapping_changed: !!window._mockSaasMappingChanged };
+    else if (id === 's-saas-preview') info = { type:'saas', completed:2, total:5, currentStep:'s-saas-preview', label:'③ プレビュー・マッピング修正', preview_changed: !!window._mockSaasPreviewChanged };
     else if (id === 's-saas3') info = { type:'saas', completed:2, total:5, currentStep:'s-saas3', label:'③ プレビュー・確認' };
     if (info) {
       info.savedAt = Date.now();
