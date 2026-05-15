@@ -284,6 +284,7 @@
     <button onclick="go('s-saas2')">初回マッピング設定</button>
     <button onclick="go('s-saas-preview')">SaaS② プレビュー・確認</button>
     <button onclick="go('s-saas-fix')">SaaS② エラー/未マップ修正</button>
+    <button onclick="go('s-tpl-complete')">📋 補完用CSV取込</button>
     <button onclick="go('s-saas4')">SaaS③ 完了</button>
   </div>
   <div class="sidebar-bottom"><div class="avatar-sm">👤</div><div><div style="font-weight:600">筒井</div><div style="color:#999;font-size:11px">オーナー</div></div></div>
@@ -618,6 +619,49 @@
     <div class="btn-group">
       <button class="btn btn-ghost" onclick="go('s-tpl1')">← 戻る</button>
       <button class="btn btn-primary" onclick="go('s-tpl3')">エラー行を除いてインポート実行</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== -->
+<!-- TEMPLATE: 補完用CSV取込 (専用画面) -->
+<!-- SaaS取込後の不足項目補完専用。通常の s-tpl1 と完全分離して混在回避 -->
+<!-- ==================== -->
+<div class="screen" id="s-tpl-complete">
+  <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+    <h1 class="page-title" style="margin:0;">📋 補完用CSV取込</h1>
+    <span style="background:#fff3e0;border:1px solid #e67e22;color:#e67e22;border-radius:6px;padding:6px 12px;font-size:11px;font-weight:700;">SaaS取込後の不足項目補完専用</span>
+  </div>
+  <div class="content">
+    <div class="alert alert-info" style="margin-bottom:14px;">
+      SaaS取込時に不足していたデータ (電話番号 / メールアドレス / 交通費単位 / 交通費) を一括補完します。<br>
+      <strong>従業員コードをキーに既存データを上書き更新</strong> します。
+    </div>
+
+    <div class="wcard">
+      <div class="wcard-title">補完仕様 (固定)</div>
+      <div style="display:flex;flex-direction:column;gap:8px;font-size:12px;line-height:1.7;">
+        <div>・対象データ: <strong>④ 従業員データ のみ</strong></div>
+        <div>・重複時の処理: <strong>上書き更新</strong> (既存従業員の不足項目を補完)</div>
+        <div>・対象項目: 電話番号 / メールアドレス / 交通費単位 / 交通費</div>
+        <div style="color:#888;">手順: 補完用テンプレ(.csv)を Excel 等で開いて不足データ入力 → このページでアップロード → 確認 → 実行</div>
+      </div>
+    </div>
+
+    <div class="wcard">
+      <div class="wcard-title">📥 補完用テンプレートをアップロード</div>
+      <div id="tpl-complete-dropzone" class="upload-box" style="padding:24px;">
+        <div class="ub-icon" style="font-size:28px;">📁</div>
+        <div class="ub-text" style="font-size:13px;">ファイルをドラッグ&ドロップ</div>
+        <div class="ub-btn" style="font-size:12px;padding:6px 16px;" onclick="demoTplCompleteUpload()">ファイルを選択</div>
+        <div class="ub-hint">TSV / CSV (最大10MB)</div>
+      </div>
+      <div id="tpl-complete-files" style="display:none;margin-top:10px;"></div>
+    </div>
+
+    <div class="btn-group">
+      <button class="btn btn-ghost" onclick="go('s-saas4')">← 完了画面へ戻る</button>
+      <button id="tpl-complete-exec-btn" class="btn btn-primary" onclick="goTplCompleteExec()" disabled style="opacity:0.4;cursor:not-allowed;">補完を実行 →</button>
     </div>
   </div>
 </div>
@@ -2910,25 +2954,31 @@ function clearSavedFormat() {
   document.getElementById('saved-format-applied').style.display = 'none';
 }
 
+// SaaSインポート後の不足項目補完 → 専用画面 s-tpl-complete に遷移
+// (混在回避: 通常のs-tpl1 と完全分離)
 function goTplWithEmployeeSelected() {
-  go('s-tpl1');
-  // Uncheck master, check employee
-  var checks = document.querySelectorAll('#s-tpl1 .source-check');
-  checks.forEach(function(el) {
-    var cb = el.querySelector('input[type="checkbox"]');
-    if (el.getAttribute('data-tpl') === 'employee') {
-      cb.checked = true;
-      el.classList.add('checked');
-      el.style.borderColor = '#2ec4a0';
-      el.style.background = '#f7fdfb';
-    } else {
-      cb.checked = false;
-      el.classList.remove('checked');
-      el.style.borderColor = '#e8e8e8';
-      el.style.background = '#fff';
-    }
-  });
-  updateTplUploadUI();
+  go('s-tpl-complete');
+}
+
+// 補完用CSV取込 専用: ファイル選択時にアップ状態をUIに反映 + 実行ボタン活性化
+function demoTplCompleteUpload() {
+  var files = document.getElementById('tpl-complete-files');
+  if (files) {
+    files.style.display = '';
+    files.innerHTML = '<div style="padding:10px 14px;background:#e8f9f4;border:1px solid #2ec4a5;border-radius:6px;font-size:12px;color:#0e9077;display:flex;align-items:center;justify-content:space-between;gap:10px;">' +
+                      '<div>📄 <strong>従業員補完_20260515.csv</strong> <span style="color:#888;font-size:11px;">(2.4 KB)</span></div>' +
+                      '<span style="font-weight:700;">✓ 完了</span></div>';
+  }
+  var btn = document.getElementById('tpl-complete-exec-btn');
+  if (btn) {
+    btn.disabled = false;
+    btn.style.opacity = '';
+    btn.style.cursor = 'pointer';
+  }
+}
+// 補完実行: 完了画面 (s-tpl3) に遷移
+function goTplCompleteExec() {
+  go('s-tpl3');
 }
 
 // ① 業態・ブランド テンプレート
