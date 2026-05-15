@@ -3756,9 +3756,11 @@ function showImportSaveDraftModal(info) {
   var detail = document.getElementById('import-save-draft-detail');
   if (detail) {
     var typeLabel = info.type === 'template' ? 'テンプレート取込' : '外部勤怠サービス取込';
+    // 文言整合性: owner-mock 側 (bShowSetupSaveDraftModal) と統一
+    // 再開動線は「打刻記録画面の上部にある「続きから再開」ボタン」が正
     detail.innerHTML = '<strong>' + typeLabel + '</strong> の中断地点を保存しました。<br>' +
                        '中断地点: <strong>' + info.label + '</strong> (進捗 ' + info.completed + '/' + info.total + ')<br><br>' +
-                       '後で初期セットアップ画面の「続きから再開する」から、この地点に戻って続きが行えます。';
+                       '後で<strong>打刻記録画面の上部</strong>にある「続きから再開」ボタンから、この地点に戻って続きが行えます。';
   }
   ov.style.display = 'flex';
 }
