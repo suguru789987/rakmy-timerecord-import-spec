@@ -3648,7 +3648,12 @@ function saveImportDraftMappingStep(screenId) {
   }
   if (!info) return;
   info.savedAt = Date.now();
-  try { localStorage.setItem('import_in_progress', JSON.stringify(info)); } catch (e) {}
+  try {
+    localStorage.setItem('import_in_progress', JSON.stringify(info));
+    // ★ シナリオ排他: CSV保存時に sessionStorage の設定画面シナリオシグナルを無効化
+    //   (同origin同タブで来ている場合のみ機能。別タブからの場合は次回 b0-empty 到達時に refreshB0ResumeBanner で savedAt 比較で排他される)
+    sessionStorage.removeItem('b0DraftSavedAt');
+  } catch (e) {}
   showImportSaveDraftModal(info);
 }
 
