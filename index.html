@@ -1923,14 +1923,16 @@ function go(id) {
 
       var info = null;
       if (id === 's-tpl1') {
-        info = snapshotTplState() || { type:'template', completed:0, total:4, currentStep:'s-tpl1', label:'① アップロード' };
+        // ★ アップ済/チェック有 のときのみ snapshot を返す。未操作なら null → localStorage 書き込まない
+        //   (画面到達だけで「アップ済データ 一時保存中」と誤表示されるのを防ぐ)
+        info = snapshotTplState();
       }
       else if (id === 's-tpl2') {
         info = { type:'template', completed:0, total:4, currentStep:'s-tpl2', label:'② 確認・実行' };
         attachUpstreamItems(info);
       }
       else if (id === 's-saas1') {
-        info = snapshotSaasState() || { type:'saas', completed:0, total:5, currentStep:'s-saas1', label:'① 選択・アップロード' };
+        info = snapshotSaasState();
       }
       else if (id === 's-saas2') {
         var mc = !!window._mockSaasMappingChanged || prevMappingChanged;
@@ -2271,6 +2273,17 @@ function demoUploadFile() {
   // ファイルアップロード完了 → 一時保存ボタンアクティブ化用フラグ
   window._mockSaasUploaded = true;
   if (typeof refreshSaveButtonsState === 'function') refreshSaveButtonsState();
+  // ★ アップ完了時に localStorage を更新 (打刻記録バナーに「アップ済データ一時保存中」を反映するため)
+  try {
+    var setupModeUrl = (location.hash || '').replace('#', '');
+    if (setupModeUrl === 'saas-setup') {
+      var info = snapshotSaasState();
+      if (info) {
+        info.startedAt = Date.now();
+        localStorage.setItem('import_in_progress', JSON.stringify(info));
+      }
+    }
+  } catch (e) {}
   if (uploadStep < queue.length) {
     // 次の対象にラベル更新
     var col = SAAS_UPLOAD_COLORS[uploadStep] || '#888';
@@ -2713,6 +2726,18 @@ function demoTplUpload() {
   // ファイルアップロード完了 → 一時保存ボタンアクティブ化用フラグ
   window._mockTplUploaded = true;
   if (typeof refreshSaveButtonsState === 'function') refreshSaveButtonsState();
+  // ★ アップ完了時に localStorage を更新 (打刻記録バナーに「アップ済データ一時保存中」を反映するため)
+  //   setup mode 時のみ書き込み (ops mode は対象外)
+  try {
+    var setupModeUrl = (location.hash || '').replace('#', '');
+    if (setupModeUrl === 'tpl-setup') {
+      var info = snapshotTplState();
+      if (info) {
+        info.startedAt = Date.now();
+        localStorage.setItem('import_in_progress', JSON.stringify(info));
+      }
+    }
+  } catch (e) {}
 }
 
 var tplSelectedTypes = [];
@@ -3502,12 +3527,12 @@ window.addEventListener('beforeunload', function() {
     }
 
     var info = null;
-    if (id === 's-tpl1') info = snapshotTplState() || { type:'template', completed:0, total:4, currentStep:'s-tpl1', label:'① アップロード' };
+    if (id === 's-tpl1') info = snapshotTplState(); // null なら何もしない (未操作時の誤保存防止)
     else if (id === 's-tpl2') {
       info = { type:'template', completed:0, total:4, currentStep:'s-tpl2', label:'② 確認・実行' };
       attachUp(info);
     }
-    else if (id === 's-saas1') info = snapshotSaasState() || { type:'saas', completed:0, total:5, currentStep:'s-saas1', label:'① 選択・アップロード' };
+    else if (id === 's-saas1') info = snapshotSaasState();
     else if (id === 's-saas2') {
       info = { type:'saas', completed:1, total:5, currentStep:'s-saas2', label:'② マッピング設定', mapping_changed: !!window._mockSaasMappingChanged };
       attachUp(info);
@@ -3733,9 +3758,10 @@ function saveImportDraftAndExit() {
   }
 
   var info = null;
-  if (id === 's-tpl1') info = snapshotTplState() || { type:'template', completed:0, total:4, currentStep:'s-tpl1', label:'① アップロード' };
+  // s-tpl1/s-saas1: snapshot が null なら入力なし → 既存ガード alert で止まっているので原則ここには来ないが、念のため null チェック
+  if (id === 's-tpl1') info = snapshotTplState();
   else if (id === 's-tpl2') { info = { type:'template', completed:0, total:4, currentStep:'s-tpl2', label:'② 確認・実行' }; attachUp2(info); }
-  else if (id === 's-saas1') info = snapshotSaasState() || { type:'saas', completed:0, total:5, currentStep:'s-saas1', label:'① 選択・アップロード' };
+  else if (id === 's-saas1') info = snapshotSaasState();
   else if (id === 's-saas2') { info = { type:'saas', completed:1, total:5, currentStep:'s-saas2', label:'② マッピング設定', mapping_changed: !!window._mockSaasMappingChanged }; attachUp2(info); }
   else if (id === 's-saas-preview') { info = { type:'saas', completed:2, total:5, currentStep:'s-saas-preview', label:'③ プレビュー・マッピング修正', preview_changed: !!window._mockSaasPreviewChanged }; attachUp2(info); if (prevFs2 && !info.fix_state) info.fix_state = prevFs2; }
   else if (id === 's-saas-fix') { info = { type:'saas', completed:2, total:5, currentStep:'s-saas-fix', label:'③ エラー/未マップ項目 修正中', preview_changed:true, fix_state: window._saasFixState || prevFs2 || { error_action:null, error_new_value:'', defaults_skipped:false } }; attachUp2(info); }
