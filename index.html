@@ -396,32 +396,32 @@
       <div class="fs"><span class="fs-num">3</span><span class="fs-label">完了</span></div>
     </div>
 
-    <!-- 1. 対象データ (全項目表示・該当のみチェック ON) -->
+    <!-- 1. 対象データ (全項目表示・起点のみ初期チェック ON、追加チェック自由) -->
     <div class="wcard">
       <div class="wcard-title"><span class="num">1</span> 対象データを選択</div>
-      <div style="font-size:11px;color:#888;margin-bottom:10px;">設定画面起点で初期チェック済。必要なら他のデータも追加可能 (順番ガイドなし)。</div>
+      <div style="font-size:11px;color:#888;margin-bottom:10px;">設定画面起点で初期チェック済。必要なら他のデータも追加可能。チェックされた順に、起点を1番としてアップロード口が切り替わります。</div>
       <div style="display:flex;flex-direction:column;gap:6px;">
-        <label class="single-check" data-tpl="brand" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #e8e8e8;border-radius:6px;cursor:pointer;background:#fff;">
+        <label class="single-check" data-tpl="brand" onclick="setTimeout(updateSingleTplUploadOrder,0);" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #e8e8e8;border-radius:6px;cursor:pointer;background:#fff;">
           <input type="checkbox" style="accent-color:#2ec4a0;width:16px;height:16px;">
           <div style="flex:1;"><div style="font-size:13px;font-weight:600;">業態・ブランド</div></div>
           <a class="dl-link" href="#" onclick="event.stopPropagation();downloadBrandTemplate();" style="font-size:11px;">⬇ テンプレートDL</a>
         </label>
-        <label class="single-check" data-tpl="store" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #e8e8e8;border-radius:6px;cursor:pointer;background:#fff;">
+        <label class="single-check" data-tpl="store" onclick="setTimeout(updateSingleTplUploadOrder,0);" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #e8e8e8;border-radius:6px;cursor:pointer;background:#fff;">
           <input type="checkbox" style="accent-color:#2ec4a0;width:16px;height:16px;">
           <div style="flex:1;"><div style="font-size:13px;font-weight:600;">店舗</div></div>
           <a class="dl-link" href="#" onclick="event.stopPropagation();downloadStoreTemplate();" style="font-size:11px;">⬇ テンプレートDL</a>
         </label>
-        <label class="single-check" data-tpl="emptype" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #e8e8e8;border-radius:6px;cursor:pointer;background:#fff;">
+        <label class="single-check" data-tpl="emptype" onclick="setTimeout(updateSingleTplUploadOrder,0);" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #e8e8e8;border-radius:6px;cursor:pointer;background:#fff;">
           <input type="checkbox" style="accent-color:#2ec4a0;width:16px;height:16px;">
           <div style="flex:1;"><div style="font-size:13px;font-weight:600;">雇用区分</div></div>
           <a class="dl-link" href="#" onclick="event.stopPropagation();downloadEmptypeTemplate();" style="font-size:11px;">⬇ テンプレートDL</a>
         </label>
-        <label class="single-check" data-tpl="employee" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #e8e8e8;border-radius:6px;cursor:pointer;background:#fff;">
+        <label class="single-check" data-tpl="employee" onclick="setTimeout(updateSingleTplUploadOrder,0);" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #e8e8e8;border-radius:6px;cursor:pointer;background:#fff;">
           <input type="checkbox" style="accent-color:#2ec4a0;width:16px;height:16px;">
           <div style="flex:1;"><div style="font-size:13px;font-weight:600;">従業員</div></div>
           <a class="dl-link" href="#" onclick="event.stopPropagation();downloadEmployeeTemplate();" style="font-size:11px;">⬇ テンプレートDL</a>
         </label>
-        <label class="single-check" data-tpl="admin" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #e8e8e8;border-radius:6px;cursor:pointer;background:#fff;">
+        <label class="single-check" data-tpl="admin" onclick="setTimeout(updateSingleTplUploadOrder,0);" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #e8e8e8;border-radius:6px;cursor:pointer;background:#fff;">
           <input type="checkbox" style="accent-color:#2ec4a0;width:16px;height:16px;">
           <div style="flex:1;"><div style="font-size:13px;font-weight:600;">管理者</div></div>
           <a class="dl-link" href="#" onclick="event.stopPropagation();downloadAdminTemplate();" style="font-size:11px;">⬇ テンプレートDL</a>
@@ -429,13 +429,20 @@
       </div>
     </div>
 
-    <!-- 2. ファイルアップロード (単一アップ口) -->
+    <!-- 2. ファイルアップロード (順次切替) -->
     <div class="wcard">
-      <div class="wcard-title"><span class="num">2</span> <span id="single-tpl-upload-label">対象データ</span> ファイルをアップロード</div>
+      <div class="wcard-title"><span class="num">2</span> ファイルをアップロード</div>
+      <!-- アップロード進捗チップ (起点を1番) -->
+      <div id="single-tpl-order-chips" style="background:#f5f5f5;border-radius:6px;padding:10px 12px;margin-bottom:12px;font-size:11px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;"></div>
+      <!-- 現在のターゲット表示 + アップ口 -->
+      <div style="margin-bottom:8px;font-size:12px;color:#0e9077;font-weight:700;">
+        <span id="single-tpl-current-badge" style="background:#2ec4a0;color:#fff;padding:2px 8px;border-radius:10px;margin-right:6px;">1/1</span>
+        <span id="single-tpl-current-label">対象データ</span> をアップロードしてください
+      </div>
       <div style="border:2px dashed #ccc;border-radius:8px;padding:30px;text-align:center;color:#888;background:#fafafa;">
         <div style="font-size:32px;margin-bottom:8px;">📎</div>
         <div style="font-size:13px;">ファイルをドラッグ&ドロップ または</div>
-        <div style="margin-top:10px;"><button class="btn btn-primary" style="font-size:12px;">ファイルを選択</button></div>
+        <div style="margin-top:10px;"><button class="btn btn-primary" style="font-size:12px;" onclick="singleTplAdvance()">ファイルを選択 (デモ: 次のアップ口へ)</button></div>
         <div style="margin-top:8px;font-size:10px;color:#aaa;">CSV / TSV (最大10MB)</div>
       </div>
     </div>
@@ -494,33 +501,38 @@
       </div>
     </div>
 
-    <!-- 2. 対象データ (admin/employee 関連項目のみ表示) -->
+    <!-- 2. 対象データ (admin/employee 関連項目のみ表示・起点を1番) -->
     <div class="wcard">
       <div class="wcard-title"><span class="num">2</span> 対象データを選択</div>
-      <div style="font-size:11px;color:#888;margin-bottom:10px;">設定画面起点で初期チェック済。必要なら他のデータも追加可能。</div>
+      <div style="font-size:11px;color:#888;margin-bottom:10px;">設定画面起点で初期チェック済。必要なら他のデータも追加可能。チェックされた順に、起点を1番としてアップロード口が切り替わります。</div>
       <div style="display:flex;flex-direction:column;gap:6px;">
-        <label class="single-check" data-map="map-kot-emp" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #e8e8e8;border-radius:6px;cursor:pointer;background:#fff;">
+        <label class="single-check" data-map="map-kot-emp" onclick="setTimeout(updateSingleSaasUploadOrder,0);" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #e8e8e8;border-radius:6px;cursor:pointer;background:#fff;">
           <input type="checkbox" style="accent-color:#2ec4a0;width:16px;height:16px;">
           <div style="flex:1;font-size:13px;font-weight:600;">従業員データ <span style="font-size:9px;padding:1px 7px;background:#e8f9f4;color:#0e9077;border-radius:10px;font-weight:600;margin-left:6px;">必須</span></div>
         </label>
-        <label class="single-check" data-map="map-kot-hr" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #e8e8e8;border-radius:6px;cursor:pointer;background:#fff;">
+        <label class="single-check" data-map="map-kot-hr" onclick="setTimeout(updateSingleSaasUploadOrder,0);" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #e8e8e8;border-radius:6px;cursor:pointer;background:#fff;">
           <input type="checkbox" style="accent-color:#2ec4a0;width:16px;height:16px;">
           <div style="flex:1;font-size:13px;font-weight:600;">従業員一覧 (補完) <span style="font-size:9px;padding:1px 7px;background:#fef3e2;color:#e67e22;border-radius:10px;font-weight:600;margin-left:6px;">任意</span></div>
         </label>
-        <label class="single-check" data-map="map-kot-admin" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #e8e8e8;border-radius:6px;cursor:pointer;background:#fff;">
+        <label class="single-check" data-map="map-kot-admin" onclick="setTimeout(updateSingleSaasUploadOrder,0);" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #e8e8e8;border-radius:6px;cursor:pointer;background:#fff;">
           <input type="checkbox" style="accent-color:#2ec4a0;width:16px;height:16px;">
           <div style="flex:1;font-size:13px;font-weight:600;">管理者データ <span style="font-size:9px;padding:1px 7px;background:#fef3e2;color:#e67e22;border-radius:10px;font-weight:600;margin-left:6px;">任意</span></div>
         </label>
       </div>
     </div>
 
-    <!-- 3. ファイルアップロード -->
+    <!-- 3. ファイルアップロード (順次切替) -->
     <div class="wcard">
-      <div class="wcard-title"><span class="num">3</span> <span id="single-saas-upload-label">対象データ</span> ファイルをアップロード</div>
+      <div class="wcard-title"><span class="num">3</span> ファイルをアップロード</div>
+      <div id="single-saas-order-chips" style="background:#f5f5f5;border-radius:6px;padding:10px 12px;margin-bottom:12px;font-size:11px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;"></div>
+      <div style="margin-bottom:8px;font-size:12px;color:#0e9077;font-weight:700;">
+        <span id="single-saas-current-badge" style="background:#2ec4a0;color:#fff;padding:2px 8px;border-radius:10px;margin-right:6px;">1/1</span>
+        <span id="single-saas-current-label">対象データ</span> をアップロードしてください
+      </div>
       <div style="border:2px dashed #ccc;border-radius:8px;padding:30px;text-align:center;color:#888;background:#fafafa;">
         <div style="font-size:32px;margin-bottom:8px;">📎</div>
         <div style="font-size:13px;">ファイルをドラッグ&ドロップ または</div>
-        <div style="margin-top:10px;"><button class="btn btn-primary" style="font-size:12px;">ファイルを選択</button></div>
+        <div style="margin-top:10px;"><button class="btn btn-primary" style="font-size:12px;" onclick="singleSaasAdvance()">ファイルを選択 (デモ: 次のアップ口へ)</button></div>
         <div style="margin-top:8px;font-size:10px;color:#aaa;">CSV / TSV (最大10MB)</div>
       </div>
     </div>
@@ -2228,6 +2240,121 @@ function singleSwitchToSaas() {
   } catch (e) {}
 }
 
+// ===== 専用画面 アップロード順番制御 (2026-05-18) =====
+// 起点 (URLパラメータの type) を必ず1番、他のチェックされたデータを順次
+var TPL_TYPE_LABEL = { brand:'業態・ブランド', store:'店舗', emptype:'雇用区分', employee:'従業員', admin:'管理者' };
+var SAAS_TYPE_LABEL = { 'map-kot-emp':'従業員データ', 'map-kot-hr':'従業員一覧(補完)', 'map-kot-admin':'管理者データ' };
+var _singleTplCurrentIdx = 0;
+var _singleSaasCurrentIdx = 0;
+
+function getSingleTplOrder() {
+  var params = new URLSearchParams(window.location.search);
+  var origin = params.get('type') || '';
+  var checked = [];
+  document.querySelectorAll('#s-tpl-single .single-check[data-tpl]').forEach(function(lbl) {
+    var cb = lbl.querySelector('input[type=checkbox]');
+    if (cb && cb.checked) checked.push(lbl.getAttribute('data-tpl'));
+  });
+  // 起点を1番に
+  if (origin && checked.indexOf(origin) !== -1) {
+    checked = [origin].concat(checked.filter(function(t){ return t !== origin; }));
+  }
+  return checked;
+}
+
+function updateSingleTplUploadOrder() {
+  var order = getSingleTplOrder();
+  var chipsEl = document.getElementById('single-tpl-order-chips');
+  if (chipsEl) {
+    if (order.length === 0) {
+      chipsEl.innerHTML = '<span style="color:#999;">対象データを1つ以上選択してください</span>';
+    } else {
+      chipsEl.innerHTML = '<span style="color:#666;font-weight:700;">アップ順:</span>' + order.map(function(t, i) {
+        var isActive = (i === _singleTplCurrentIdx);
+        var bg = isActive ? '#2ec4a0' : '#fff';
+        var color = isActive ? '#fff' : '#555';
+        return '<span style="background:' + bg + ';color:' + color + ';border:1px solid #2ec4a0;padding:2px 8px;border-radius:10px;font-weight:700;">' + (i+1) + '. ' + (TPL_TYPE_LABEL[t]||t) + '</span>';
+      }).join(' → ');
+    }
+  }
+  var curBadge = document.getElementById('single-tpl-current-badge');
+  var curLabel = document.getElementById('single-tpl-current-label');
+  if (order.length > 0) {
+    if (_singleTplCurrentIdx >= order.length) _singleTplCurrentIdx = 0;
+    if (curBadge) curBadge.textContent = (_singleTplCurrentIdx + 1) + '/' + order.length;
+    if (curLabel) curLabel.textContent = TPL_TYPE_LABEL[order[_singleTplCurrentIdx]] || order[_singleTplCurrentIdx];
+  } else {
+    if (curBadge) curBadge.textContent = '0/0';
+    if (curLabel) curLabel.textContent = '(未選択)';
+  }
+}
+
+function singleTplAdvance() {
+  var order = getSingleTplOrder();
+  if (order.length === 0) { alert('対象データを選択してください'); return; }
+  if (_singleTplCurrentIdx + 1 < order.length) {
+    _singleTplCurrentIdx++;
+    updateSingleTplUploadOrder();
+  } else {
+    alert('✓ 全 ' + order.length + ' データのアップロード完了 (デモ)\n\n確認画面に進みます');
+    _singleTplCurrentIdx = 0;
+  }
+}
+
+function getSingleSaasOrder() {
+  var params = new URLSearchParams(window.location.search);
+  var origin = params.get('type') || ''; // admin or employee
+  var originMap = (origin === 'admin') ? 'map-kot-admin' : (origin === 'employee') ? 'map-kot-emp' : '';
+  var checked = [];
+  document.querySelectorAll('#s-saas-single .single-check[data-map]').forEach(function(lbl) {
+    var cb = lbl.querySelector('input[type=checkbox]');
+    if (cb && cb.checked) checked.push(lbl.getAttribute('data-map'));
+  });
+  if (originMap && checked.indexOf(originMap) !== -1) {
+    checked = [originMap].concat(checked.filter(function(t){ return t !== originMap; }));
+  }
+  return checked;
+}
+
+function updateSingleSaasUploadOrder() {
+  var order = getSingleSaasOrder();
+  var chipsEl = document.getElementById('single-saas-order-chips');
+  if (chipsEl) {
+    if (order.length === 0) {
+      chipsEl.innerHTML = '<span style="color:#999;">対象データを1つ以上選択してください</span>';
+    } else {
+      chipsEl.innerHTML = '<span style="color:#666;font-weight:700;">アップ順:</span>' + order.map(function(t, i) {
+        var isActive = (i === _singleSaasCurrentIdx);
+        var bg = isActive ? '#2ec4a0' : '#fff';
+        var color = isActive ? '#fff' : '#555';
+        return '<span style="background:' + bg + ';color:' + color + ';border:1px solid #2ec4a0;padding:2px 8px;border-radius:10px;font-weight:700;">' + (i+1) + '. ' + (SAAS_TYPE_LABEL[t]||t) + '</span>';
+      }).join(' → ');
+    }
+  }
+  var curBadge = document.getElementById('single-saas-current-badge');
+  var curLabel = document.getElementById('single-saas-current-label');
+  if (order.length > 0) {
+    if (_singleSaasCurrentIdx >= order.length) _singleSaasCurrentIdx = 0;
+    if (curBadge) curBadge.textContent = (_singleSaasCurrentIdx + 1) + '/' + order.length;
+    if (curLabel) curLabel.textContent = SAAS_TYPE_LABEL[order[_singleSaasCurrentIdx]] || order[_singleSaasCurrentIdx];
+  } else {
+    if (curBadge) curBadge.textContent = '0/0';
+    if (curLabel) curLabel.textContent = '(未選択)';
+  }
+}
+
+function singleSaasAdvance() {
+  var order = getSingleSaasOrder();
+  if (order.length === 0) { alert('対象データを選択してください'); return; }
+  if (_singleSaasCurrentIdx + 1 < order.length) {
+    _singleSaasCurrentIdx++;
+    updateSingleSaasUploadOrder();
+  } else {
+    alert('✓ 全 ' + order.length + ' データのアップロード完了 (デモ)\n\nマッピング画面に進みます');
+    _singleSaasCurrentIdx = 0;
+  }
+}
+
 // 専用画面の種別ラベル + 該当データのみチェック ON
 function applySinglePage(screenId) {
   try {
@@ -2265,6 +2392,11 @@ function applySinglePage(screenId) {
       var ulbl2 = document.getElementById("single-saas-upload-label");
       if (ulbl2) ulbl2.textContent = label;
     }
+    // 順番進捗 (起点を1番) 初期化
+    _singleTplCurrentIdx = 0;
+    _singleSaasCurrentIdx = 0;
+    if (screenId === 's-tpl-single') updateSingleTplUploadOrder();
+    if (screenId === 's-saas-single') updateSingleSaasUploadOrder();
   } catch (e) { console.error("applySinglePage error:", e); }
 }
 // ページロード時 URLパラメータで遷移先決定 (DOMContentLoaded 発火後も対応)
