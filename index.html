@@ -2256,9 +2256,11 @@ function applySingleImportMode(screenId) {
         if (mode === 'tpl' || type === 'brand' || type === 'store' || type === 'emptype') {
           // テンプレ取込専用画面に直行 (brand/store/emptype は外部勤怠では取れない)
           setTimeout(function(){ go('s-tpl-single'); }, 100);
+        } else if (mode === 'saas') {
+          // 外部勤怠取込専用画面に直行 (admin/employee のみ対応)
+          setTimeout(function(){ go('s-saas-single'); }, 100);
         } else if (type === 'admin' || type === 'employee') {
           // TOPに留まる → ユーザーが「テンプレ or 外部勤怠」方式選択 → 該当の single 画面へ
-          // (s-top の import-card クリック時に s-tpl-single or s-saas-single へ遷移する制御を追加済み)
         }
       });
     }
