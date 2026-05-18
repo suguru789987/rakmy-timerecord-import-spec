@@ -1423,11 +1423,35 @@
       <div class="fs"><span class="fs-num">3</span><span class="fs-label">完了</span></div>
     </div>
 
-    <!-- ★ 取り込みデータ種別タブ (2026-05-18 追加・大タブ) -->
+    <!-- ★ 取り込みデータ種別タブ (2026-05-18 追加・大タブ・テンプレ取込と統一) -->
     <div class="wcard" style="padding:0;margin-bottom:16px;background:#f5f7f9;border:1px solid #e0e0e0;">
       <div style="display:flex;align-items:stretch;gap:0;">
+        <button onclick="switchSaasDataTypeTab('master')" id="saas-typetab-master" style="flex:1;padding:14px 16px;border:none;background:#f5f7f9;border-bottom:3px solid transparent;cursor:pointer;font-size:13px;font-weight:600;color:#555;">① 設定マスタ <span style="font-size:10px;color:#888;font-weight:400;">(取得不可)</span></button>
         <button onclick="switchSaasDataTypeTab('employee')" id="saas-typetab-employee" style="flex:1;padding:14px 16px;border:none;background:#fff;border-bottom:3px solid #2ec4a0;cursor:pointer;font-size:13px;font-weight:700;color:#0e9077;">② 従業員 <span style="font-size:10px;color:#888;font-weight:400;">(15件 / エラー1)</span></button>
         <button onclick="switchSaasDataTypeTab('admin')" id="saas-typetab-admin" style="flex:1;padding:14px 16px;border:none;background:#f5f7f9;border-bottom:3px solid transparent;cursor:pointer;font-size:13px;font-weight:600;color:#555;">③ 管理者 <span style="font-size:10px;color:#888;font-weight:400;">(任意・5件)</span></button>
+      </div>
+    </div>
+
+    <!-- ① 設定マスタセクション (外部勤怠サービスからは取得不可・案内表示) -->
+    <div id="saas-confirm-master" style="display:none;">
+      <div class="map-section-header"><span style="background:#2ec4a0;color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;">①</span> 設定マスタ <span style="font-size:10px;color:#888;font-weight:400;margin-left:6px;">(業態・店舗・雇用区分)</span></div>
+      <div class="wcard" style="padding:30px 40px;text-align:center;">
+        <div style="font-size:42px;margin-bottom:14px;">⚠️</div>
+        <h3 style="font-size:16px;font-weight:700;margin:0 0 10px 0;color:#555;">外部勤怠サービスからは取得できません</h3>
+        <div style="font-size:13px;color:#666;line-height:1.8;margin-bottom:20px;">
+          業態・ブランド / 店舗 / 雇用区分 のデータは外部勤怠サービス (KoT / ジョブカン等) からは<br>
+          通常取得できないため、別途<strong>「テンプレートで取り込み」</strong>からアップロードしてください。
+        </div>
+        <div style="background:#fff8ed;border:1px solid #fde68a;border-radius:6px;padding:14px 18px;font-size:12px;color:#9c4d12;text-align:left;display:inline-block;line-height:1.7;">
+          <strong>必要な手順:</strong><br>
+          1. 一旦この外部勤怠インポートを完了<br>
+          2. 別途「テンプレートで取り込み」を選択<br>
+          3. 業態/店舗/雇用区分の CSV テンプレートをDL + 入力<br>
+          4. アップロード → 登録
+        </div>
+        <div style="margin-top:20px;">
+          <button class="btn btn-primary" onclick="go('s-tpl1')">➡️ テンプレートで取り込みへ移動</button>
+        </div>
       </div>
     </div>
 
@@ -3048,8 +3072,8 @@ function switchTplDataTypeTab(type) {
 
 // 外部勤怠サービス (s-saas-preview) 用 取り込みデータ種別タブ切替
 function switchSaasDataTypeTab(type) {
-  var tabs = { employee:'saas-typetab-employee', admin:'saas-typetab-admin' };
-  var sections = { employee:'saas-confirm-employee', admin:'saas-confirm-admin' };
+  var tabs = { master:'saas-typetab-master', employee:'saas-typetab-employee', admin:'saas-typetab-admin' };
+  var sections = { master:'saas-confirm-master', employee:'saas-confirm-employee', admin:'saas-confirm-admin' };
   Object.keys(tabs).forEach(function(k) {
     var btn = document.getElementById(tabs[k]);
     if (btn) {
