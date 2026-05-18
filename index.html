@@ -1432,27 +1432,60 @@
       </div>
     </div>
 
-    <!-- ① 設定マスタセクション (外部勤怠サービスからは取得不可・案内表示) -->
+    <!-- ① 設定マスタセクション (派生取込結果プレビュー) -->
     <div id="saas-confirm-master" style="display:none;">
-      <div class="map-section-header"><span style="background:#2ec4a0;color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;">①</span> 設定マスタ <span style="font-size:10px;color:#888;font-weight:400;margin-left:6px;">(業態・店舗・雇用区分)</span></div>
-      <div class="wcard" style="padding:30px 40px;text-align:center;">
-        <div style="font-size:42px;margin-bottom:14px;">⚠️</div>
-        <h3 style="font-size:16px;font-weight:700;margin:0 0 10px 0;color:#555;">外部勤怠サービスからは取得できません</h3>
-        <div style="font-size:13px;color:#666;line-height:1.8;margin-bottom:20px;">
-          業態・ブランド / 店舗 / 雇用区分 のデータは外部勤怠サービス (KoT / ジョブカン等) からは<br>
-          通常取得できないため、別途<strong>「テンプレートで取り込み」</strong>からアップロードしてください。
-        </div>
-        <div style="background:#fff8ed;border:1px solid #fde68a;border-radius:6px;padding:14px 18px;font-size:12px;color:#9c4d12;text-align:left;display:inline-block;line-height:1.7;">
-          <strong>必要な手順:</strong><br>
-          1. 一旦この外部勤怠インポートを完了<br>
-          2. 別途「テンプレートで取り込み」を選択<br>
-          3. 業態/店舗/雇用区分の CSV テンプレートをDL + 入力<br>
-          4. アップロード → 登録
-        </div>
-        <div style="margin-top:20px;">
-          <button class="btn btn-primary" onclick="go('s-tpl1')">➡️ テンプレートで取り込みへ移動</button>
+      <div class="map-section-header"><span style="background:#2ec4a0;color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;">①</span> 設定マスタ <span style="font-size:10px;color:#888;font-weight:400;margin-left:6px;">(KoT 従業員データから派生取込される項目)</span></div>
+      <div class="alert alert-info">KoT の従業員レコードから派生して、ラクミー側のマスタテーブルに自動登録される項目です。</div>
+
+      <!-- 派生取込サマリ -->
+      <div class="pv-summary">
+        <div class="pv-box" style="background:#ffebee;border:1px solid #ffcdd2;color:#c62828;border-radius:6px;padding:8px 12px;text-align:center;min-width:100px;"><div style="font-size:18px;font-weight:700;">❌</div><div style="font-size:10px;">業態 (取得不可)</div></div>
+        <div class="pv-box" style="background:#e8f8f5;border:1px solid #b8e6d6;color:#0e9077;border-radius:6px;padding:8px 12px;text-align:center;min-width:100px;"><div style="font-size:18px;font-weight:700;">2</div><div style="font-size:10px;">店舗 (派生取込)</div></div>
+        <div class="pv-box" style="background:#e8f8f5;border:1px solid #b8e6d6;color:#0e9077;border-radius:6px;padding:8px 12px;text-align:center;min-width:100px;"><div style="font-size:18px;font-weight:700;">3</div><div style="font-size:10px;">雇用区分 (派生取込)</div></div>
+      </div>
+
+      <!-- 業態 (取得不可案内) -->
+      <div class="wcard" style="padding:20px 24px;margin-bottom:14px;background:#fff8ed;border:1px solid #fde68a;">
+        <div style="display:flex;align-items:start;gap:14px;">
+          <span style="font-size:28px;">⚠️</span>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:700;color:#9c4d12;margin-bottom:6px;">🏷 業態・ブランド: 取得不可</div>
+            <div style="font-size:12px;color:#666;line-height:1.7;margin-bottom:10px;">
+              KoT (および多くの外部勤怠サービス) は業態・ブランドのデータを提供しません。<br>
+              <strong>テンプレートで取り込み</strong> から別途登録してください。
+            </div>
+            <button class="btn btn-ghost" style="font-size:11px;padding:5px 12px;" onclick="go('s-tpl1')">➡️ テンプレートで取り込みへ</button>
+          </div>
         </div>
       </div>
+
+      <!-- 店舗 (派生取込結果) -->
+      <div class="wcard" style="padding:0;overflow-x:auto;margin-bottom:14px;">
+        <div style="padding:10px 14px;border-bottom:1px solid #eee;font-size:13px;font-weight:700;color:#0e9077;">🏠 店舗: 2件を派生取込 → ラクミー側に登録</div>
+        <table class="pv-table">
+          <thead><tr><th style="width:60px;">状態</th><th>店舗名</th><th>業態・ブランド</th><th>備考</th></tr></thead>
+          <tbody>
+            <tr><td class="st-new">● 新規</td><td>渋谷店</td><td><span style="color:#c62828;font-size:10px;">未紐付け</span></td><td style="font-size:11px;color:#888;">KoT.location_name から派生</td></tr>
+            <tr><td class="st-new">● 新規</td><td>新宿店</td><td><span style="color:#c62828;font-size:10px;">未紐付け</span></td><td style="font-size:11px;color:#888;">KoT.location_name から派生</td></tr>
+          </tbody>
+        </table>
+        <div style="padding:8px 14px;font-size:10px;color:#888;">※ 業態・ブランドが未紐付けです。テンプレ取込で業態登録後、自動的に紐付けされます。</div>
+      </div>
+
+      <!-- 雇用区分 (派生取込結果) -->
+      <div class="wcard" style="padding:0;overflow-x:auto;">
+        <div style="padding:10px 14px;border-bottom:1px solid #eee;font-size:13px;font-weight:700;color:#0e9077;">📋 雇用区分: 3件を派生取込 → ラクミー側に登録</div>
+        <table class="pv-table">
+          <thead><tr><th style="width:60px;">状態</th><th>雇用区分名</th><th>雇用区分コード</th><th>備考</th></tr></thead>
+          <tbody>
+            <tr><td class="st-new">● 新規</td><td>正社員</td><td>EMP-T-001</td><td style="font-size:11px;color:#888;">KoT.employment_type から派生 (給与体系/金額は ② 従業員データの hr_補完から)</td></tr>
+            <tr><td class="st-new">● 新規</td><td>パート</td><td>EMP-T-002</td><td style="font-size:11px;color:#888;">KoT.employment_type から派生</td></tr>
+            <tr><td class="st-upd">● 既存・紐付け</td><td>アルバイト</td><td>EMP-T-003</td><td style="font-size:11px;color:#888;">既存マスタと紐付け (新規発行なし)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="margin-top:12px;font-size:10px;color:#888;padding:0 4px;">※ 設定マスタはサービスごとに取得可能な範囲が異なります (現在: KingOfTime)。マッピング詳細は <a href="#s-saas2" onclick="go('s-saas2');return false;" style="color:#2ec4a0;">マッピング設定画面</a> で確認可能。</div>
     </div>
 
     <!-- ② 従業員データセクション (既存) -->
@@ -1465,76 +1498,43 @@
       <div class="pv-box pv-err"><div class="num">1</div><div class="lbl">エラー</div></div>
     </div>
 
-    <!-- データソース別タブ -->
+    <!-- ★ ラクミー従業員テーブル形式プレビュー (2026-05-18: 取り込み後の最終状態) -->
     <div class="wcard" style="padding:0;overflow-x:auto;">
       <div class="stabs" style="padding:0 14px;">
-        <div class="stab active" onclick="switchSaasPreviewTab(this,0)">統合プレビュー (15)</div>
-        <div class="stab" onclick="switchSaasPreviewTab(this,1)">1st: employee_info (15)</div>
-        <div class="stab" onclick="switchSaasPreviewTab(this,2)">2nd: hr_ 補完 (15)</div>
-        <div class="stab" style="color:#e74c3c" onclick="switchSaasPreviewTab(this,3)">エラー (1)</div>
+        <div class="stab active">すべて (15)</div>
+        <div class="stab" style="color:#e74c3c">エラー (1)</div>
       </div>
-
-      <!-- 統合プレビュー -->
-      <table class="pv-table saas-pv-tab" id="saas-pv-0">
+      <div style="padding:8px 14px;font-size:11px;color:#666;background:#f5fbf9;border-bottom:1px solid #d5eee5;">📋 <strong>ラクミー従業員テーブル形式</strong>: 取り込み後にラクミー側に登録される最終状態 (KoT + hr_補完 を統合済)</div>
+      <table class="pv-table">
         <thead>
           <tr>
-            <th>行</th><th>状態</th><th>名前</th><th>従業員コード</th><th>雇用区分</th><th>店舗</th>
-            <th style="background:#e8f0fe;">給与体系<br><span style="font-size:9px;color:#1a73e8;">2nd補完</span></th>
-            <th>金額</th>
-            <th style="background:#e8f0fe;">通勤手当<br><span style="font-size:9px;color:#1a73e8;">2nd補完</span></th>
-            <th>備考</th>
+            <th>行</th><th>状態</th><th>名前</th><th>従業員コード</th><th>雇用区分</th><th>店舗</th><th>給与体系</th><th>金額</th><th>通勤手当</th><th>備考</th>
           </tr>
         </thead>
         <tbody>
-          <tr><td>2</td><td class="st-new">● 新規</td><td>山田太郎</td><td>EMP-001</td><td>正社員</td><td>渋谷店</td><td style="background:#f5f8ff;">月給</td><td>¥200,000</td><td style="background:#f5f8ff;">¥30,000</td><td></td></tr>
-          <tr><td>3</td><td class="st-new">● 新規</td><td>佐藤花子</td><td>EMP-002</td><td>正社員</td><td>渋谷店</td><td style="background:#f5f8ff;">月給</td><td>¥200,000</td><td style="background:#f5f8ff;">¥50,000</td><td></td></tr>
-          <tr><td>4</td><td class="st-new">● 新規</td><td>田中一郎</td><td>EMP-003</td><td>パート</td><td>渋谷店</td><td style="background:#f5f8ff;">時給</td><td>¥1,200</td><td style="background:#f5f8ff;">¥500</td><td></td></tr>
-          <tr><td>5</td><td class="st-upd">● 更新</td><td>鈴木次郎</td><td>EMP-004</td><td>正社員</td><td>新宿店</td><td style="background:#f5f8ff;">月給</td><td>¥200,000</td><td style="background:#f5f8ff;">¥30,000</td><td>雇用区分を変更</td></tr>
-          <tr><td>6</td><td class="st-upd">● 更新</td><td>高橋美咲</td><td>EMP-005</td><td>パート</td><td>新宿店</td><td style="background:#f5f8ff;">時給</td><td>¥1,200</td><td style="background:#f5f8ff;">¥500</td><td>店舗を変更</td></tr>
+          <tr><td>2</td><td class="st-new">● 新規</td><td>山田太郎</td><td>EMP-001</td><td>正社員</td><td>渋谷店</td><td>月給</td><td>¥200,000</td><td>¥30,000</td><td></td></tr>
+          <tr><td>3</td><td class="st-new">● 新規</td><td>佐藤花子</td><td>EMP-002</td><td>正社員</td><td>渋谷店</td><td>月給</td><td>¥200,000</td><td>¥50,000</td><td></td></tr>
+          <tr><td>4</td><td class="st-new">● 新規</td><td>田中一郎</td><td>EMP-003</td><td>パート</td><td>渋谷店</td><td>時給</td><td>¥1,200</td><td>¥500</td><td></td></tr>
+          <tr><td>5</td><td class="st-upd">● 更新</td><td>鈴木次郎</td><td>EMP-004</td><td>正社員</td><td>新宿店</td><td>月給</td><td>¥200,000</td><td>¥30,000</td><td>雇用区分を変更</td></tr>
+          <tr><td>6</td><td class="st-upd">● 更新</td><td>高橋美咲</td><td>EMP-005</td><td>パート</td><td>新宿店</td><td>時給</td><td>¥1,200</td><td>¥500</td><td>店舗を変更</td></tr>
           <tr><td>7</td><td class="st-err">✗ エラー</td><td>-</td><td>EMP-006</td><td style="color:#e74c3c">契約社員</td><td>渋谷店</td><td>-</td><td>-</td><td>-</td><td style="color:#e74c3c;font-size:11px">雇用区分「契約社員」が未登録</td></tr>
         </tbody>
       </table>
-
-      <!-- 1st: employee_info のみ -->
-      <table class="pv-table saas-pv-tab" id="saas-pv-1" style="display:none;">
-        <thead>
-          <tr><th>行</th><th>状態</th><th>名前</th><th>従業員コード</th><th>雇用区分</th><th>店舗</th><th>金額</th><th>月次契約労働時間</th><th>月みなし残業</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>2</td><td class="st-new">● 新規</td><td>山田太郎</td><td>EMP-001</td><td>正社員</td><td>渋谷店</td><td>¥200,000</td><td>160</td><td>20</td></tr>
-          <tr><td>3</td><td class="st-new">● 新規</td><td>佐藤花子</td><td>EMP-002</td><td>正社員</td><td>渋谷店</td><td>¥200,000</td><td>160</td><td>20</td></tr>
-          <tr><td>4</td><td class="st-new">● 新規</td><td>田中一郎</td><td>EMP-003</td><td>パート</td><td>渋谷店</td><td>¥1,200</td><td>-</td><td>-</td></tr>
-          <tr><td>5</td><td class="st-upd">● 更新</td><td>鈴木次郎</td><td>EMP-004</td><td>正社員</td><td>新宿店</td><td>¥200,000</td><td>160</td><td>20</td></tr>
-          <tr><td>6</td><td class="st-upd">● 更新</td><td>高橋美咲</td><td>EMP-005</td><td>パート</td><td>新宿店</td><td>¥1,200</td><td>-</td><td>-</td></tr>
-          <tr><td>7</td><td class="st-err">✗ エラー</td><td>-</td><td>EMP-006</td><td style="color:#e74c3c">契約社員</td><td>渋谷店</td><td>-</td><td>-</td><td>-</td></tr>
-        </tbody>
-      </table>
-
-      <!-- 2nd: hr_ 補完データ -->
-      <table class="pv-table saas-pv-tab" id="saas-pv-2" style="display:none;">
-        <thead>
-          <tr><th>従業員コード</th><th>マッチ</th><th>給与体系</th><th>金額（月給）</th><th>金額（時給）</th><th>通勤手当（月給）</th><th>通勤手当（時給）</th><th>所属</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>EMP-001</td><td class="st-new" style="color:#2ec4a0;">✓ 一致</td><td>月給</td><td>¥200,000</td><td>-</td><td>¥30,000</td><td>-</td><td>渋谷店</td></tr>
-          <tr><td>EMP-002</td><td class="st-new" style="color:#2ec4a0;">✓ 一致</td><td>月給</td><td>¥200,000</td><td>-</td><td>¥50,000</td><td>-</td><td>渋谷店</td></tr>
-          <tr><td>EMP-003</td><td class="st-new" style="color:#2ec4a0;">✓ 一致</td><td>時給</td><td>-</td><td>¥1,200</td><td>-</td><td>¥500</td><td>渋谷店</td></tr>
-          <tr><td>EMP-004</td><td class="st-new" style="color:#2ec4a0;">✓ 一致</td><td>月給</td><td>¥200,000</td><td>-</td><td>¥30,000</td><td>-</td><td>新宿店</td></tr>
-          <tr><td>EMP-005</td><td class="st-new" style="color:#2ec4a0;">✓ 一致</td><td>時給</td><td>-</td><td>¥1,200</td><td>-</td><td>¥500</td><td>新宿店</td></tr>
-          <tr><td>EMP-006</td><td style="color:#e74c3c;font-weight:600;">✗ 1stにエラー</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
-        </tbody>
-      </table>
-
-      <!-- エラーのみ -->
-      <table class="pv-table saas-pv-tab" id="saas-pv-3" style="display:none;">
-        <thead>
-          <tr><th>行</th><th>状態</th><th>名前</th><th>従業員コード</th><th>雇用区分</th><th>店舗</th><th>エラー内容</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>7</td><td class="st-err">✗ エラー</td><td>-</td><td>EMP-006</td><td style="color:#e74c3c">契約社員</td><td>渋谷店</td><td style="color:#e74c3c">雇用区分「契約社員」が未登録</td></tr>
-        </tbody>
-      </table>
     </div>
+
+    <!-- マッピング状況サマリ (折りたたみ・補助情報) -->
+    <details style="margin-top:14px;background:#fafafa;border:1px solid #e0e0e0;border-radius:6px;padding:10px 14px;">
+      <summary style="cursor:pointer;font-size:12px;font-weight:700;color:#555;">🔍 マッピング状況 (補助情報) — 各列が外部勤怠サービスのどのソースから取り込まれたか</summary>
+      <div style="margin-top:10px;font-size:11px;color:#666;line-height:1.8;">
+        <div style="display:grid;grid-template-columns:1fr 30px 1fr 80px;gap:6px 12px;align-items:center;">
+          <div><strong>ラクミー項目</strong></div><div></div><div><strong>取込ソース</strong></div><div><strong>備考</strong></div>
+          <div>名前 / 従業員コード</div><div>←</div><div>KoT.employee_info</div><div style="font-size:10px;color:#888;">1st 主データ</div>
+          <div>雇用区分 / 店舗</div><div>←</div><div>KoT.employee_info</div><div style="font-size:10px;color:#888;">1st 主データ + 派生取込</div>
+          <div>給与体系 / 金額 / 通勤手当</div><div>←</div><div>KoT.hr_(補完)</div><div style="font-size:10px;color:#888;">2nd 補完データ</div>
+        </div>
+        <div style="margin-top:10px;font-size:10px;color:#888;">※ マッピングの編集は <a href="#s-saas2" onclick="go('s-saas2');return false;" style="color:#2ec4a0;font-weight:700;">マッピング設定画面</a> から可能</div>
+      </div>
+    </details>
 
     <!-- エラー対処 / 未マップ項目補完: 件数のみサマリー表示し、修正画面 (s-saas-fix) へ誘導 -->
     <div id="saas-preview-fix-summary" class="wcard" style="background:#fff8ed;border-color:#fde68a;">
