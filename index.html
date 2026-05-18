@@ -608,8 +608,68 @@
     </div>
     </div>
 
+    <!-- ★ 管理者データ確認セクション (2026-05-18 追加 / 5分岐自動判定) -->
+    <div id="tpl-confirm-admin">
+    <div class="map-section-header" style="margin-top:24px;"><span style="background:#2ec4a0;color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;">③</span> 管理者データ <span style="font-size:10px;color:#888;font-weight:400;margin-left:6px;">(任意・5分岐自動判定)</span></div>
+    <div class="alert alert-info">③ 管理者データ: <strong>5件</strong>のデータを検出し、メアド突合で 5分岐自動判定しました。</div>
+
+    <div class="pv-summary">
+      <div class="pv-box pv-total"><div class="num">5</div><div class="lbl">データ行数</div></div>
+      <div class="pv-box" style="background:#e8f8f5;border:1px solid #b8e6d6;color:#0e9077;border-radius:6px;padding:8px 12px;text-align:center;min-width:80px;"><div class="num" style="font-size:18px;font-weight:700;">2</div><div class="lbl" style="font-size:10px;">🆕 新規登録</div></div>
+      <div class="pv-box" style="background:#ede7f6;border:1px solid #c5b6e1;color:#5c4dac;border-radius:6px;padding:8px 12px;text-align:center;min-width:80px;"><div class="num" style="font-size:18px;font-weight:700;">1</div><div class="lbl" style="font-size:10px;">👥 既存登録</div></div>
+      <div class="pv-box" style="background:#fff8e1;border:1px solid #ffe0a3;color:#f0960a;border-radius:6px;padding:8px 12px;text-align:center;min-width:80px;"><div class="num" style="font-size:18px;font-weight:700;">1</div><div class="lbl" style="font-size:10px;">🔄 差し替え</div></div>
+      <div class="pv-box pv-err"><div class="num">1</div><div class="lbl">❌ エラー</div></div>
+    </div>
+
+    <div class="wcard" style="padding:0;overflow-x:auto;">
+      <div class="stabs" style="padding:0 14px;">
+        <div class="stab active">すべて (5)</div>
+        <div class="stab" style="color:#f0960a;">🔄 差し替え対象 (1)</div>
+        <div class="stab" style="color:#e74c3c">❌ エラー (1)</div>
+      </div>
+      <table class="pv-table">
+        <thead>
+          <tr><th>行</th><th>判定</th><th>名前</th><th>メール</th><th>店舗</th><th>送信メール</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>2</td>
+            <td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#0e9077;background:#e8f8f5;border:1px solid #b8e6d6;">🆕 新規登録</span></td>
+            <td>山本 健一</td><td>yamamoto@example.jp</td><td>渋谷店</td>
+            <td style="font-size:11px;color:#555;">招待メール(新規版)</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#0e9077;background:#e8f8f5;border:1px solid #b8e6d6;">🆕 新規登録</span></td>
+            <td>佐藤 一郎</td><td>sato@example.jp</td><td>新宿店</td>
+            <td style="font-size:11px;color:#555;">招待メール(新規版)</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#5c4dac;background:#ede7f6;border:1px solid #c5b6e1;">👥 既存登録</span></td>
+            <td>test</td><td>test@example.com</td><td>渋谷店</td>
+            <td style="font-size:11px;color:#555;">通知メール(既存登録版)</td>
+          </tr>
+          <tr style="background:#fffaf0;">
+            <td>5</td>
+            <td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#f0960a;background:#fff8e1;border:1px solid #ffe0a3;">🔄 既存・差し替え</span></td>
+            <td>林 健次郎</td><td>hayashi@example.jp</td><td>新宿店</td>
+            <td style="font-size:11px;color:#f0960a;">差し替え版招待メール (旧無効化)</td>
+          </tr>
+          <tr style="background:#fffafa;">
+            <td>6</td>
+            <td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#c62828;background:#ffebee;border:1px solid #ffcdd2;">❌ 既管理者</span></td>
+            <td>鈴木 花子</td><td>suzuki@example.jp</td><td>渋谷店</td>
+            <td style="font-size:11px;color:#c62828;">スキップ (重複)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top:8px;font-size:10px;color:#888;padding:0 14px;">※ 管理者データは <code style="background:#f5f5f5;padding:1px 4px;border-radius:3px;">resolveAdminRegistrationType()</code> で 5分岐自動判定。「重複時の処理」設定は管理者データには適用されません (常に 5分岐ロジック)。</div>
+    </div>
+
     <div class="wcard">
-      <div class="wcard-title" style="margin-bottom:8px">重複時の処理</div>
+      <div class="wcard-title" style="margin-bottom:8px">重複時の処理 <span style="font-size:10px;color:#888;font-weight:400;">(従業員データのみ適用)</span></div>
       <div class="dup-sel">
         <div class="dup-opt selected" onclick="selDup(this)">スキップ（既存を保持）</div>
         <div class="dup-opt" onclick="selDup(this)">上書き更新</div>
@@ -1501,8 +1561,43 @@
       </div>
     </div>
 
+    <!-- ★ 管理者データ確認セクション (2026-05-18 追加 / 5分岐自動判定) -->
+    <div style="margin-top:24px;">
+      <div class="map-section-header"><span style="background:#2ec4a0;color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;">③</span> 管理者データ <span style="font-size:10px;color:#888;font-weight:400;margin-left:6px;">(任意・5分岐自動判定)</span></div>
+      <div class="alert alert-info">③ 管理者データ: <strong>5件</strong>のデータを検出し、メアド突合で 5分岐自動判定しました。</div>
+
+      <div class="pv-summary">
+        <div class="pv-box pv-total"><div class="num">5</div><div class="lbl">データ行数</div></div>
+        <div class="pv-box" style="background:#e8f8f5;border:1px solid #b8e6d6;color:#0e9077;border-radius:6px;padding:8px 12px;text-align:center;min-width:80px;"><div class="num" style="font-size:18px;font-weight:700;">2</div><div class="lbl" style="font-size:10px;">🆕 新規登録</div></div>
+        <div class="pv-box" style="background:#ede7f6;border:1px solid #c5b6e1;color:#5c4dac;border-radius:6px;padding:8px 12px;text-align:center;min-width:80px;"><div class="num" style="font-size:18px;font-weight:700;">1</div><div class="lbl" style="font-size:10px;">👥 既存登録</div></div>
+        <div class="pv-box" style="background:#fff8e1;border:1px solid #ffe0a3;color:#f0960a;border-radius:6px;padding:8px 12px;text-align:center;min-width:80px;"><div class="num" style="font-size:18px;font-weight:700;">1</div><div class="lbl" style="font-size:10px;">🔄 差し替え</div></div>
+        <div class="pv-box pv-err"><div class="num">1</div><div class="lbl">❌ エラー</div></div>
+      </div>
+
+      <div class="wcard" style="padding:0;overflow-x:auto;">
+        <div class="stabs" style="padding:0 14px;">
+          <div class="stab active">すべて (5)</div>
+          <div class="stab" style="color:#f0960a;">🔄 差し替え対象 (1)</div>
+          <div class="stab" style="color:#e74c3c">❌ エラー (1)</div>
+        </div>
+        <table class="pv-table">
+          <thead>
+            <tr><th>行</th><th>判定</th><th>名前</th><th>メール</th><th>店舗</th><th>送信メール</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>2</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#0e9077;background:#e8f8f5;border:1px solid #b8e6d6;">🆕 新規登録</span></td><td>山本 健一</td><td>yamamoto@example.jp</td><td>渋谷店</td><td style="font-size:11px;color:#555;">招待メール(新規版)</td></tr>
+            <tr><td>3</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#0e9077;background:#e8f8f5;border:1px solid #b8e6d6;">🆕 新規登録</span></td><td>佐藤 一郎</td><td>sato@example.jp</td><td>新宿店</td><td style="font-size:11px;color:#555;">招待メール(新規版)</td></tr>
+            <tr><td>4</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#5c4dac;background:#ede7f6;border:1px solid #c5b6e1;">👥 既存登録</span></td><td>test</td><td>test@example.com</td><td>渋谷店</td><td style="font-size:11px;color:#555;">通知メール(既存登録版)</td></tr>
+            <tr style="background:#fffaf0;"><td>5</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#f0960a;background:#fff8e1;border:1px solid #ffe0a3;">🔄 既存・差し替え</span></td><td>林 健次郎</td><td>hayashi@example.jp</td><td>新宿店</td><td style="font-size:11px;color:#f0960a;">差し替え版招待メール (旧無効化)</td></tr>
+            <tr style="background:#fffafa;"><td>6</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#c62828;background:#ffebee;border:1px solid #ffcdd2;">❌ 既管理者</span></td><td>鈴木 花子</td><td>suzuki@example.jp</td><td>渋谷店</td><td style="font-size:11px;color:#c62828;">スキップ (重複)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="margin-top:8px;font-size:10px;color:#888;padding:0 14px;">※ 管理者データは <code style="background:#f5f5f5;padding:1px 4px;border-radius:3px;">resolveAdminRegistrationType()</code> で 5分岐自動判定。「重複時の処理」設定は管理者データには適用されません (常に 5分岐ロジック)。</div>
+    </div>
+
     <div class="wcard">
-      <div class="wcard-title" style="margin-bottom:8px">重複時の処理</div>
+      <div class="wcard-title" style="margin-bottom:8px">重複時の処理 <span style="font-size:10px;color:#888;font-weight:400;">(従業員データのみ適用)</span></div>
       <div class="dup-sel">
         <div class="dup-opt selected" onclick="selDup(this)">上書き更新</div>
         <div class="dup-opt" onclick="selDup(this)">スキップ（既存を保持）</div>
