@@ -397,7 +397,10 @@
     </div>
 
     <div class="wcard">
-      <div class="wcard-title"><span class="num">1</span> テンプレートを選択（複数選択可）</div>
+      <div class="wcard-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+        <div><span class="num">1</span> テンプレートを選択（複数選択可）</div>
+        <a href="#" id="tpl-fallback-to-saas" onclick="event.preventDefault();fallbackToSaas();" style="display:none;font-size:11px;color:#1a73e8;text-decoration:underline;font-weight:600;">🔄 外部勤怠サービスでも取込可能 → 外部勤怠取込に切替 →</a>
+      </div>
       <div id="tpl-select-caption" style="display:none;"></div>
       <!-- 初期セットアップ時の進捗バー(setupモードのみ・テキスト + 横長バー) -->
       <div id="tpl-setup-progress" style="display:none;margin-bottom:12px;">
@@ -846,7 +849,10 @@
     </div>
 
     <div class="wcard" id="saas-section-sources">
-      <div class="wcard-title"><span class="num" id="saas-num-2">2</span> 取り込みデータ（複数選択可）</div>
+      <div class="wcard-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+        <div><span class="num" id="saas-num-2">2</span> 取り込みデータ（複数選択可）</div>
+        <a href="#" id="saas-fallback-to-tpl" onclick="event.preventDefault();fallbackToTpl();" style="display:none;font-size:11px;color:#2ec4a0;text-decoration:underline;font-weight:600;">📄 外部勤怠で取れないデータ → テンプレ取込に切替 →</a>
+      </div>
       <!-- 初期セットアップ時の進捗バー(setupモードのみ・テキスト + 横長バー) -->
       <div id="saas-setup-progress" style="display:none;margin-bottom:12px;">
         <div id="saas-setup-progress-chips"></div>
@@ -2041,11 +2047,42 @@ function snapshotSaasState() {
 //   - 初期セットアップ動線 (#tpl-setup/#saas-setup) は別経路 → 無影響
 //   - 初期チェックON はページロード時1回のみ、その後はユーザー操作で自由編集
 //   - sessionStorage は使わず URLパラメータのみで判定 (動線が独立)
+// 方式切替: 外部勤怠 → テンプレ取込
+function fallbackToTpl() {
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var type = params.get('type') || '';
+    var newUrl = location.pathname + '?type=' + encodeURIComponent(type) + '&mode=tpl';
+    location.href = newUrl;
+  } catch (e) {}
+}
+// 方式切替: テンプレ取込 → 外部勤怠
+function fallbackToSaas() {
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var type = params.get('type') || '';
+    var newUrl = location.pathname + '?type=' + encodeURIComponent(type) + '&mode=saas';
+    location.href = newUrl;
+  } catch (e) {}
+}
+
 function applyInitialCheckFromUrl(screenId) {
   try {
     var params = new URLSearchParams(window.location.search);
     var type = params.get('type');
     if (!type) return; // パラメータなし = 既存動作
+    // 方式切替リンクの表示制御 (URLパラメータがある場合のみ表示)
+    if (screenId === 's-tpl1') {
+      var tplFb = document.getElementById('tpl-fallback-to-saas');
+      // brand/store/emptype は外部勤怠で取れない → 切替リンク非表示
+      var canSaas = (type === 'employee' || type === 'admin');
+      if (tplFb) tplFb.style.display = canSaas ? 'inline-block' : 'none';
+    }
+    if (screenId === 's-saas1') {
+      var saasFb = document.getElementById('saas-fallback-to-tpl');
+      // 全種別でテンプレ取込にフォールバック可能
+      if (saasFb) saasFb.style.display = 'inline-block';
+    }
     // demo機能(アップ済状態の自動チェック)の後に実行するため遅延
     setTimeout(function() {
       if (screenId === 's-tpl1') {
