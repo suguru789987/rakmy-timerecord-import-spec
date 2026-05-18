@@ -2070,22 +2070,32 @@ function applyInitialCheckFromUrl(screenId) {
   } catch (e) {}
 }
 
-// ページロード時 URLパラメータで遷移先決定
+// ページロード時 URLパラメータで遷移先決定 (DOMContentLoaded 発火後も対応)
 (function initFromUrl() {
   try {
     var params = new URLSearchParams(window.location.search);
     var type = params.get('type');
     var mode = params.get('mode');
     if (!type) return;
-    window.addEventListener('DOMContentLoaded', function() {
-      if (mode === 'tpl' || type === 'brand' || type === 'store' || type === 'emptype') {
-        setTimeout(function(){ go('s-tpl1'); }, 100);
-      } else if (mode === 'saas') {
-        setTimeout(function(){ go('s-saas1'); }, 100);
-      }
-      // type=admin/employee で mode指定なし → TOPに留まる (ユーザー方式選択)
-    });
-  } catch (e) {}
+    function applyRoute() {
+      try {
+        var targetId = null;
+        if (mode === 'tpl' || type === 'brand' || type === 'store' || type === 'emptype') {
+          targetId = 's-tpl1';
+        } else if (mode === 'saas') {
+          targetId = 's-saas1';
+        }
+        if (targetId && typeof go === 'function') {
+          go(targetId);
+        }
+      } catch (err) { console.error('applyRoute error:', err); }
+    }
+    if (document.readyState === 'loading') {
+      window.addEventListener('DOMContentLoaded', function(){ setTimeout(applyRoute, 50); });
+    } else {
+      setTimeout(applyRoute, 50);
+    }
+  } catch (e) { console.error('initFromUrl error:', e); }
 })();
 
 function go(id) {
