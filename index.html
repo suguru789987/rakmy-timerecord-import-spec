@@ -723,18 +723,15 @@
       <h2 style="font-size:22px;font-weight:700;color:#0e9077;margin:0 0 8px 0;">インポート完了</h2>
       <div style="font-size:14px;color:#333;margin-bottom:6px;"><strong>5件</strong>のデータの取込が完了しました。</div>
       <div style="font-size:12px;color:#888;margin-bottom:24px;">続けて<strong>遷移元の設定画面</strong>で登録結果の一覧をご確認ください。</div>
-      <div id="tpl3-countdown" style="font-size:11px;color:#1a73e8;margin-bottom:14px;">⏱ <span id="tpl3-cd-num">3</span>秒後に自動的に設定画面に戻ります...</div>
       <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
         <button class="btn btn-primary" style="font-size:14px;padding:12px 22px;" onclick="returnToSourceSetting();">← 設定画面に戻る</button>
-        <button class="btn btn-ghost" onclick="cancelAutoReturn('tpl3');">自動戻りを止める</button>
       </div>
     </div>
 
     <div style="margin-top:24px;padding:12px 14px;background:#fff8ed;border:1px solid #fde68a;border-radius:8px;font-size:11px;color:#9c4d12;line-height:1.7;">
       💡 <strong>仕様メモ:</strong> 運用更新動線の完了画面 (s-tpl3-single)。新規登録用 s-tpl3 とは <strong>完全独立</strong>。<br>
-      ・<strong>完了後の挙動</strong>: インポート完了 → 短いサマリ表示 → <strong>自動で遷移元設定画面に復帰</strong>。<br>
-      ・<strong>データの最終確認</strong>は遷移元の設定画面（登録一覧）で行う。完了画面に再度同じ一覧を出すと冗長なため省略。<br>
-      ・自動戻り: 別タブ起動=<code>window.close()</code>／同一タブ=<code>history.back()</code>。
+      ・<strong>完了後の挙動</strong>: インポート完了 → 短いサマリ表示 → <strong>「設定画面に戻る」で遷移元設定画面に復帰</strong> (自動戻り機能は廃止)。<br>
+      ・<strong>データの最終確認</strong>は遷移元の設定画面（登録一覧）で行う。完了画面に再度同じ一覧を出すと冗長なため省略。
     </div>
   </div>
 </div>
@@ -836,16 +833,14 @@
       <h2 style="font-size:22px;font-weight:700;color:#0e9077;margin:0 0 8px 0;">インポート完了</h2>
       <div style="font-size:14px;color:#333;margin-bottom:6px;"><strong>5件</strong>の外部勤怠データの取込が完了しました。</div>
       <div style="font-size:12px;color:#888;margin-bottom:24px;">続けて<strong>遷移元の設定画面</strong>で登録結果の一覧をご確認ください。</div>
-      <div id="saas3-countdown" style="font-size:11px;color:#1a73e8;margin-bottom:14px;">⏱ <span id="saas3-cd-num">3</span>秒後に自動的に設定画面に戻ります...</div>
       <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
         <button class="btn btn-primary" style="font-size:14px;padding:12px 22px;" onclick="returnToSourceSetting();">← 設定画面に戻る</button>
-        <button class="btn btn-ghost" onclick="cancelAutoReturn('saas3');">自動戻りを止める</button>
       </div>
     </div>
 
     <div style="margin-top:24px;padding:12px 14px;background:#fff8ed;border:1px solid #fde68a;border-radius:8px;font-size:11px;color:#9c4d12;line-height:1.7;">
       💡 <strong>仕様メモ:</strong> 運用更新動線の完了画面 (s-saas-done-single)。新規登録用 s-saas4 とは <strong>完全独立</strong>。<br>
-      ・<strong>完了後の挙動</strong>: インポート完了 → 短いサマリ表示 → <strong>自動で遷移元設定画面に復帰</strong>。<br>
+      ・<strong>完了後の挙動</strong>: インポート完了 → 短いサマリ表示 → <strong>「設定画面に戻る」で遷移元設定画面に復帰</strong> (自動戻り機能は廃止)。<br>
       ・データ最終確認は遷移元の設定画面（登録一覧）で行う想定 (完了画面に再掲しない)。
     </div>
   </div>
@@ -2658,32 +2653,6 @@ function singleSaasAdvance() {
 }
 
 // ============================================================
-// 運用更新 完了画面 → 遷移元の設定画面へ戻る (auto-countdown)
-// ============================================================
-var _autoReturnTimers = {};
-function startAutoReturn(prefix, seconds) {
-  cancelAutoReturn(prefix);
-  var n = seconds || 3;
-  var numEl = document.getElementById(prefix + '-cd-num');
-  if (numEl) numEl.textContent = String(n);
-  _autoReturnTimers[prefix] = setInterval(function () {
-    n--;
-    if (numEl) numEl.textContent = String(n);
-    if (n <= 0) {
-      cancelAutoReturn(prefix);
-      returnToSourceSetting();
-    }
-  }, 1000);
-}
-function cancelAutoReturn(prefix) {
-  if (_autoReturnTimers[prefix]) {
-    clearInterval(_autoReturnTimers[prefix]);
-    delete _autoReturnTimers[prefix];
-    var cdEl = document.getElementById(prefix + '-countdown');
-    if (cdEl) cdEl.innerHTML = '⏸ 自動戻りを停止しました — 下のボタンから手動で戻れます';
-  }
-}
-// ============================================================
 // s-tpl2-single: タブを「取り込んだ順」で並べる + 切替
 // ============================================================
 var TPL_KEY_LABEL = { brand:'業態・ブランド', store:'店舗', emptype:'雇用区分', employee:'従業員', admin:'管理者' };
@@ -2886,11 +2855,6 @@ function applySinglePage(screenId) {
 })();
 
 function go(id) {
-  // 他画面に遷移する場合は完了画面のカウントダウンを解除
-  if (typeof cancelAutoReturn === 'function') {
-    if (id !== 's-tpl3-single') cancelAutoReturn('tpl3');
-    if (id !== 's-saas-done-single') cancelAutoReturn('saas3');
-  }
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   document.querySelectorAll('.demo-nav button').forEach(b => b.classList.remove('current'));
@@ -2910,13 +2874,6 @@ function go(id) {
   }
   if (id === 's-saas-preview-single') {
     if (typeof setupSaasPreviewSingleTabs === 'function') setupSaasPreviewSingleTabs();
-  }
-  // 運用更新 完了画面 → 自動戻りカウントダウンを起動
-  if (id === 's-tpl3-single') {
-    if (typeof startAutoReturn === 'function') startAutoReturn('tpl3', 3);
-  }
-  if (id === 's-saas-done-single') {
-    if (typeof startAutoReturn === 'function') startAutoReturn('saas3', 3);
   }
   if (id === 's-tpl2') {
     updateTplConfirmSections();
