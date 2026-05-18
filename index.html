@@ -444,6 +444,21 @@
       <a href="#" onclick="clearSingleImportMode();go('s-top');return false;" style="font-size:11px;color:#0d47a1;text-decoration:underline;font-weight:700;">通常モードへ戻る →</a>
     </div>
 
+    <!-- ★ 派生取込バナー (case-B: 店舗/雇用区分の設定画面から外部勤怠を選択して遷移した場合に表示) -->
+    <div id="saas-derived-banner" style="display:none;background:#fff8e1;border:1px solid #ffe0a3;border-radius:8px;padding:14px 18px;margin-bottom:18px;">
+      <div style="display:flex;align-items:start;gap:12px;">
+        <span style="font-size:24px;">🔄</span>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:700;color:#9c4d12;margin-bottom:4px;">派生取込モード: <span id="saas-derived-target-label">店舗</span> の設定画面から遷移</div>
+          <div style="font-size:11px;color:#666;line-height:1.7;">
+            外部勤怠サービスでは <strong><span id="saas-derived-target-label2">店舗</span></strong> を単独で取り込めません。<br>
+            <strong>従業員データを取り込む</strong>と、システムが自動的に <span id="saas-derived-target-label3">店舗</span> データを派生取込してマスタテーブルに登録します。<br>
+            <span style="color:#888;">プレビュー画面で派生取込結果を確認可能 (① 設定マスタタブ)。</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="flow-steps">
       <div class="fs active"><span class="fs-num">1</span><span class="fs-label">アップロード</span></div>
       <div class="fs-line"></div>
@@ -2218,6 +2233,7 @@ function clearSingleImportMode() {
   try {
     sessionStorage.removeItem('singleImportType');
     sessionStorage.removeItem('singleImportMode');
+    sessionStorage.removeItem('singleImportDerived');
   } catch (e) {}
 }
 // 2026-05-18 (案B 物理分離): applySingleImportMode は専用画面 s-tpl-single/s-saas-single
@@ -2241,6 +2257,22 @@ function applySingleImportMode(screenId) {
   if (screenId === 's-saas-single') {
     var t2 = document.getElementById('single-saas-type-label');
     if (t2) t2.textContent = label;
+    // 派生取込バナー (店舗/雇用区分の設定画面から外部勤怠を選択して遷移した場合)
+    var derived = '';
+    try { derived = sessionStorage.getItem('singleImportDerived') || ''; } catch (e) {}
+    var derivedBanner = document.getElementById('saas-derived-banner');
+    if (derivedBanner) {
+      if (derived === 'store' || derived === 'emptype') {
+        var derivedLabel = (derived === 'store') ? '店舗' : '雇用区分';
+        ['saas-derived-target-label','saas-derived-target-label2','saas-derived-target-label3'].forEach(function(id){
+          var el = document.getElementById(id);
+          if (el) el.textContent = derivedLabel;
+        });
+        derivedBanner.style.display = '';
+      } else {
+        derivedBanner.style.display = 'none';
+      }
+    }
   }
 }
 
@@ -2250,8 +2282,12 @@ function applySingleImportMode(screenId) {
     var params = new URLSearchParams(window.location.search);
     var type = params.get('type');
     var mode = params.get('mode');
+    var derived = params.get('derived'); // 案B: 店舗/雇用区分から派生取込で遷移した場合の元の種別
     if (type) {
       setSingleImportMode(type, mode || '');
+      if (derived) {
+        try { sessionStorage.setItem('singleImportDerived', derived); } catch (e) {}
+      }
       window.addEventListener('DOMContentLoaded', function() {
         if (mode === 'tpl' || type === 'brand' || type === 'store' || type === 'emptype') {
           // テンプレ取込専用画面に直行 (brand/store/emptype は外部勤怠では取れない)
