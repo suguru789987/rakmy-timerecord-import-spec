@@ -1423,6 +1423,16 @@
       <div class="fs"><span class="fs-num">3</span><span class="fs-label">完了</span></div>
     </div>
 
+    <!-- ★ 取り込みデータ種別タブ (2026-05-18 追加・大タブ) -->
+    <div class="wcard" style="padding:0;margin-bottom:16px;background:#f5f7f9;border:1px solid #e0e0e0;">
+      <div style="display:flex;align-items:stretch;gap:0;">
+        <button onclick="switchSaasDataTypeTab('employee')" id="saas-typetab-employee" style="flex:1;padding:14px 16px;border:none;background:#fff;border-bottom:3px solid #2ec4a0;cursor:pointer;font-size:13px;font-weight:700;color:#0e9077;">② 従業員 <span style="font-size:10px;color:#888;font-weight:400;">(15件 / エラー1)</span></button>
+        <button onclick="switchSaasDataTypeTab('admin')" id="saas-typetab-admin" style="flex:1;padding:14px 16px;border:none;background:#f5f7f9;border-bottom:3px solid transparent;cursor:pointer;font-size:13px;font-weight:600;color:#555;">③ 管理者 <span style="font-size:10px;color:#888;font-weight:400;">(任意・5件)</span></button>
+      </div>
+    </div>
+
+    <!-- ② 従業員データセクション (既存) -->
+    <div id="saas-confirm-employee">
     <!-- 取り込みデータプレビュー -->
     <div class="pv-summary">
       <div class="pv-box pv-total"><div class="num">15</div><div class="lbl">データ行数</div></div>
@@ -1570,8 +1580,10 @@
       </div>
     </div>
 
+    </div><!-- /#saas-confirm-employee -->
+
     <!-- ★ 管理者データ確認セクション (2026-05-18 追加 / 5分岐自動判定) -->
-    <div style="margin-top:24px;">
+    <div id="saas-confirm-admin" style="display:none;margin-top:24px;">
       <div class="map-section-header"><span style="background:#2ec4a0;color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;">③</span> 管理者データ <span style="font-size:10px;color:#888;font-weight:400;margin-left:6px;">(任意・5分岐自動判定)</span></div>
       <div class="alert alert-info">③ 管理者データ: <strong>5件</strong>のデータを検出し、メアド突合で 5分岐自動判定しました。</div>
 
@@ -2044,6 +2056,10 @@ function go(id) {
     updateTplConfirmSections();
     // 2026-05-18 追加: 大タブで初期は「① 設定マスタ」を表示
     if (typeof switchTplDataTypeTab === 'function') switchTplDataTypeTab('master');
+  }
+  if (id === 's-saas-preview') {
+    // 2026-05-18 追加: 大タブで初期は「② 従業員」を表示
+    if (typeof switchSaasDataTypeTab === 'function') switchSaasDataTypeTab('employee');
   }
   // 中断検知用 localStorage 管理: 進捗(completed/total/currentStep/label)を記録、完了画面でクリア
   // ★ s-tpl1 / s-saas1 ではチェック状態 + アップ済データ名 もスナップショット保存(再開時に復元できるよう)
@@ -3016,6 +3032,24 @@ function switchMasterTab(el, idx) {
 function switchTplDataTypeTab(type) {
   var tabs = { master:'tpl-typetab-master', employee:'tpl-typetab-employee', admin:'tpl-typetab-admin' };
   var sections = { master:'tpl-confirm-master', employee:'tpl-confirm-employee', admin:'tpl-confirm-admin' };
+  Object.keys(tabs).forEach(function(k) {
+    var btn = document.getElementById(tabs[k]);
+    if (btn) {
+      var active = (k === type);
+      btn.style.background = active ? '#fff' : '#f5f7f9';
+      btn.style.borderBottom = active ? '3px solid #2ec4a0' : '3px solid transparent';
+      btn.style.color = active ? '#0e9077' : '#555';
+      btn.style.fontWeight = active ? '700' : '600';
+    }
+    var sec = document.getElementById(sections[k]);
+    if (sec) sec.style.display = (k === type) ? '' : 'none';
+  });
+}
+
+// 外部勤怠サービス (s-saas-preview) 用 取り込みデータ種別タブ切替
+function switchSaasDataTypeTab(type) {
+  var tabs = { employee:'saas-typetab-employee', admin:'saas-typetab-admin' };
+  var sections = { employee:'saas-confirm-employee', admin:'saas-confirm-admin' };
   Object.keys(tabs).forEach(function(k) {
     var btn = document.getElementById(tabs[k]);
     if (btn) {
