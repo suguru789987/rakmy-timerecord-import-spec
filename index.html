@@ -272,6 +272,9 @@
     <h4>画面切替（デモ用）</h4>
     <button class="current" onclick="go('s-top')">トップ</button>
     <div class="dn-sep"></div>
+    <button onclick="setSingleImportMode('emptype','tpl');go('s-tpl-single')" style="color:#1a73e8;">★単一(運用):テンプレ取込</button>
+    <button onclick="setSingleImportMode('admin','');go('s-saas-single')" style="color:#1a73e8;">★単一(運用):外部勤怠取込</button>
+    <div class="dn-sep"></div>
     <button onclick="go('s-tpl1')">テンプレ① アップロード</button>
     <button onclick="go('s-tpl2')">テンプレ② 確認・実行</button>
     <button onclick="go('s-tpl3')">テンプレ③ 完了</button>
@@ -311,7 +314,7 @@
   <div class="page-header"><h1 class="page-title">インポート</h1></div>
   <div class="content">
     <div class="import-cards">
-      <div class="import-card" onclick="go('s-tpl1')">
+      <div class="import-card" onclick="(getSingleImportType()) ? go('s-tpl-single') : go('s-tpl1')">
         <div class="ic-icon">📄</div>
         <h3>テンプレートで取り込み</h3>
         <p>ラクミー専用テンプレートにデータを入力してインポート。初期セットアップに最適。</p>
@@ -324,7 +327,7 @@
         </div>
         <div class="ic-arrow">→</div>
       </div>
-      <div class="import-card" onclick="go('s-saas1')">
+      <div class="import-card" onclick="(getSingleImportType()) ? go('s-saas-single') : go('s-saas1')">
         <div class="ic-icon">🔄</div>
         <h3>外部勤怠サービスから取り込み</h3>
         <p>キングオブタイム・ジョブカンのCSVデータを列マッピングしてインポート。</p>
@@ -358,6 +361,134 @@
           <span class="history-result result-warn">⚠ 一部エラー</span>
         </div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== -->
+<!-- ==================== -->
+<!-- ★ 2026-05-18 新設: 単一種別モード専用画面 (運用更新動線・物理分離) -->
+<!-- 既存 s-tpl1/s-saas1 とは完全独立。コンタミ防止のため共通ロジックを使用しない。 -->
+<!-- ==================== -->
+
+<!-- テンプレ取込・単一種別モード -->
+<div class="screen" id="s-tpl-single">
+  <div class="page-header">
+    <h1 class="page-title">テンプレートで取り込み <span style="font-size:11px;color:#fff;background:#1a73e8;padding:3px 10px;border-radius:12px;margin-left:8px;">単一種別モード (運用更新)</span></h1>
+  </div>
+  <div class="content">
+
+    <!-- 種別ヘッダー -->
+    <div style="background:#e8f4fd;border:1px solid #b3d9f0;border-radius:8px;padding:14px 18px;margin-bottom:18px;display:flex;align-items:center;gap:12px;">
+      <span style="font-size:24px;">🎯</span>
+      <div style="flex:1;">
+        <div style="font-size:13px;color:#0d47a1;font-weight:700;"><span id="single-tpl-type-label">-</span> のみインポート</div>
+        <div style="font-size:11px;color:#555;margin-top:2px;">設定画面からの「📥 CSVインポート」経由で開いた専用動線です。該当データのみアップロード可能。</div>
+      </div>
+      <a href="#" onclick="clearSingleImportMode();go('s-top');return false;" style="font-size:11px;color:#0d47a1;text-decoration:underline;font-weight:700;">通常モードへ戻る →</a>
+    </div>
+
+    <div class="flow-steps">
+      <div class="fs active"><span class="fs-num">1</span><span class="fs-label">アップロード</span></div>
+      <div class="fs-line"></div>
+      <div class="fs"><span class="fs-num">2</span><span class="fs-label">確認・実行</span></div>
+      <div class="fs-line"></div>
+      <div class="fs"><span class="fs-num">3</span><span class="fs-label">完了</span></div>
+    </div>
+
+    <div class="wcard">
+      <div class="wcard-title"><span class="num">1</span> テンプレートをダウンロード</div>
+      <div style="font-size:12px;color:#666;margin-bottom:10px;">該当データ用の CSV テンプレートをダウンロードして、Excel等で入力してください。</div>
+      <button class="btn btn-ghost" style="font-size:12px;">⬇ <span id="single-tpl-type-label-dl">該当種別</span> のテンプレートをDL</button>
+    </div>
+
+    <div class="wcard">
+      <div class="wcard-title"><span class="num">2</span> ファイルをアップロード</div>
+      <div style="border:2px dashed #ccc;border-radius:8px;padding:30px;text-align:center;color:#888;background:#fafafa;">
+        <div style="font-size:32px;margin-bottom:8px;">📎</div>
+        <div style="font-size:13px;">ファイルをドラッグ&ドロップ または</div>
+        <div style="margin-top:10px;"><button class="btn btn-primary" style="font-size:12px;">ファイルを選択</button></div>
+        <div style="margin-top:8px;font-size:10px;color:#aaa;">CSV / TSV (最大10MB)</div>
+      </div>
+    </div>
+
+    <div class="btn-group">
+      <button class="btn btn-ghost" onclick="window.close();">← 閉じる (元画面へ戻る)</button>
+      <button class="btn btn-primary" onclick="alert('デモ: アップロード後、確認画面に遷移します')">次へ: 確認画面 →</button>
+    </div>
+
+    <div style="margin-top:24px;padding:12px 14px;background:#fff8ed;border:1px solid #fde68a;border-radius:8px;font-size:11px;color:#9c4d12;line-height:1.7;">
+      💡 <strong>仕様メモ (案B 物理分離):</strong><br>
+      • この画面は <strong>運用更新動線専用</strong> (s-tpl1 とは独立) — コンタミ防止のため共通ロジックを使用しない<br>
+      • owner-mock の各設定画面 (業態 ops/店舗 ops/雇用区分 ops/従業員 ops) の「📥 CSVインポート」ボタンから新タブで開く<br>
+      • URLパラメータ: <code>?type=brand&mode=tpl</code> など<br>
+      • 既存 s-tpl1 (複数選択モード/初期セットアップ用) には一切影響なし
+    </div>
+  </div>
+</div>
+
+<!-- 外部勤怠取込・単一種別モード -->
+<div class="screen" id="s-saas-single">
+  <div class="page-header">
+    <h1 class="page-title">外部勤怠サービスから取り込み <span style="font-size:11px;color:#fff;background:#1a73e8;padding:3px 10px;border-radius:12px;margin-left:8px;">単一種別モード (運用更新)</span></h1>
+  </div>
+  <div class="content">
+
+    <!-- 種別ヘッダー -->
+    <div style="background:#e8f4fd;border:1px solid #b3d9f0;border-radius:8px;padding:14px 18px;margin-bottom:18px;display:flex;align-items:center;gap:12px;">
+      <span style="font-size:24px;">🎯</span>
+      <div style="flex:1;">
+        <div style="font-size:13px;color:#0d47a1;font-weight:700;"><span id="single-saas-type-label">-</span> のみインポート</div>
+        <div style="font-size:11px;color:#555;margin-top:2px;">設定画面からの「📥 CSVインポート」経由で開いた専用動線です。該当データのみアップロード可能 (admin/employee 専用)。</div>
+      </div>
+      <a href="#" onclick="clearSingleImportMode();go('s-top');return false;" style="font-size:11px;color:#0d47a1;text-decoration:underline;font-weight:700;">通常モードへ戻る →</a>
+    </div>
+
+    <div class="flow-steps">
+      <div class="fs active"><span class="fs-num">1</span><span class="fs-label">アップロード</span></div>
+      <div class="fs-line"></div>
+      <div class="fs"><span class="fs-num">2</span><span class="fs-label">マッピング</span></div>
+      <div class="fs-line"></div>
+      <div class="fs"><span class="fs-num">3</span><span class="fs-label">プレビュー</span></div>
+      <div class="fs-line"></div>
+      <div class="fs"><span class="fs-num">4</span><span class="fs-label">完了</span></div>
+    </div>
+
+    <div class="wcard">
+      <div class="wcard-title"><span class="num">1</span> 連携元サービスを選択</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <div class="saas-item selected" style="flex:1;min-width:160px;padding:14px;border:2px solid #2ec4a0;border-radius:8px;cursor:pointer;text-align:center;">
+          <div style="font-size:24px;">⏰</div><div style="font-size:13px;font-weight:700;">キングオブタイム</div>
+        </div>
+        <div class="saas-item" style="flex:1;min-width:160px;padding:14px;border:2px solid #e0e0e0;border-radius:8px;cursor:pointer;text-align:center;">
+          <div style="font-size:24px;">📋</div><div style="font-size:13px;font-weight:700;">ジョブカン</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wcard">
+      <div class="wcard-title"><span class="num">2</span> ファイルをアップロード</div>
+      <div style="font-size:12px;color:#666;margin-bottom:10px;">該当種別のデータが含まれる CSV をアップロードしてください。</div>
+      <div style="border:2px dashed #ccc;border-radius:8px;padding:30px;text-align:center;color:#888;background:#fafafa;">
+        <div style="font-size:32px;margin-bottom:8px;">📎</div>
+        <div style="font-size:13px;">ファイルをドラッグ&ドロップ または</div>
+        <div style="margin-top:10px;"><button class="btn btn-primary" style="font-size:12px;">ファイルを選択</button></div>
+        <div style="margin-top:8px;font-size:10px;color:#aaa;">CSV / TSV (最大10MB)</div>
+      </div>
+    </div>
+
+    <div class="btn-group">
+      <button class="btn btn-ghost" onclick="window.close();">← 閉じる (元画面へ戻る)</button>
+      <button class="btn btn-primary" onclick="alert('デモ: アップロード後、マッピング画面に遷移します')">次へ: マッピング →</button>
+    </div>
+
+    <div style="margin-top:24px;padding:12px 14px;background:#fff8ed;border:1px solid #fde68a;border-radius:8px;font-size:11px;color:#9c4d12;line-height:1.7;">
+      💡 <strong>仕様メモ (案B 物理分離):</strong><br>
+      • この画面は <strong>運用更新動線専用</strong> (s-saas1 とは独立) — コンタミ防止のため共通ロジックを使用しない<br>
+      • 対応種別: <strong>従業員 / 管理者のみ</strong> (業態/店舗/雇用区分は外部勤怠で取得不可 → s-tpl-single にリダイレクト)<br>
+      • owner-mock の従業員 ops/管理者一覧 の「📥 CSVインポート」ボタンから新タブで開く<br>
+      • URLパラメータ: <code>?type=employee</code> または <code>?type=admin</code><br>
+      • 既存 s-saas1 (複数選択モード/初期セットアップ用) には一切影響なし
     </div>
   </div>
 </div>
@@ -2089,90 +2220,31 @@ function clearSingleImportMode() {
     sessionStorage.removeItem('singleImportMode');
   } catch (e) {}
 }
+// 2026-05-18 (案B 物理分離): applySingleImportMode は専用画面 s-tpl-single/s-saas-single
+// で単独動作。既存 s-tpl1/s-saas1 には一切影響を与えない (コンタミ防止のため)。
 function applySingleImportMode(screenId) {
   var type = getSingleImportType();
-  if (!type) return; // パラメータなし = 通常動作
-
+  if (!type) return;
+  // 専用画面のヘッダーに種別ラベル表示
   var typeMap = {
-    'brand':    { key:'brand',    label:'業態・ブランド' },
-    'store':    { key:'store',    label:'店舗' },
-    'emptype':  { key:'emptype',  label:'雇用区分' },
-    'employee': { key:'employee', label:'従業員' },
-    'admin':    { key:'admin',    label:'管理者' }
+    'brand':    '業態・ブランド',
+    'store':    '店舗',
+    'emptype':  '雇用区分',
+    'employee': '従業員',
+    'admin':    '管理者'
   };
-  var info = typeMap[type];
-  if (!info) return;
-
-  // s-tpl1: 該当チェックボックス以外を非表示 + 「単一種別モード」案内バナー
-  if (screenId === 's-tpl1') {
-    document.querySelectorAll('#s-tpl1 .source-check[data-tpl]').forEach(function(lbl) {
-      var cb = lbl.querySelector('input[type="checkbox"]');
-      if (lbl.getAttribute('data-tpl') === info.key) {
-        if (cb) { cb.checked = true; cb.disabled = true; }
-        lbl.style.display = '';
-        lbl.classList.add('checked');
-      } else {
-        if (cb) { cb.checked = false; cb.disabled = true; }
-        lbl.style.display = 'none';
-        lbl.classList.remove('checked');
-      }
-    });
-    // 案内バナー (なければ追加)
-    var ban = document.getElementById('single-import-banner-tpl1');
-    if (!ban) {
-      ban = document.createElement('div');
-      ban.id = 'single-import-banner-tpl1';
-      ban.style.cssText = 'background:#e3f2fd;border:1px solid #b3d9f0;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#0d47a1;display:flex;align-items:center;gap:8px;';
-      var container = document.querySelector('#s-tpl1 .content');
-      if (container) container.insertBefore(ban, container.firstChild);
-    }
-    ban.innerHTML = '<span style="font-size:18px;">🎯</span><div><strong>単一種別モード: ' + info.label + '</strong> のみインポート (運用更新動線・該当データ専用)。複数データを取り込む場合は <a href="#" onclick="clearSingleImportMode();location.href=location.pathname;return false;" style="color:#0d47a1;text-decoration:underline;font-weight:700;">通常モードへ戻る</a></div>';
+  var label = typeMap[type] || type;
+  if (screenId === 's-tpl-single') {
+    var t1 = document.getElementById('single-tpl-type-label');
+    if (t1) t1.textContent = label;
   }
-
-  // s-saas1: 該当チェックボックス以外を非表示 (admin / employee のみ対応)
-  if (screenId === 's-saas1') {
-    if (info.key !== 'admin' && info.key !== 'employee') {
-      // 外部勤怠で取れない種別 (brand/store/emptype) → 即 s-tpl1 に遷移
-      setSingleImportMode(type, 'tpl');
-      setTimeout(function(){ go('s-tpl1'); }, 50);
-      return;
-    }
-    // KoT/Jobcan の従業員データ系 (employee) または 管理者データ (admin) のみ表示
-    document.querySelectorAll('#s-saas1 .source-check[data-map]').forEach(function(lbl) {
-      var dm = lbl.getAttribute('data-map') || '';
-      var matches = false;
-      if (info.key === 'admin') {
-        matches = /admin/.test(dm);
-      } else if (info.key === 'employee') {
-        matches = /(emp|staff|hr|rate|group)/.test(dm) && !/admin/.test(dm);
-      }
-      var cb = lbl.querySelector('input[type="checkbox"]');
-      if (matches) {
-        if (cb) { cb.checked = true; cb.disabled = true; }
-        lbl.style.display = '';
-        lbl.classList.add('checked');
-      } else {
-        if (cb) { cb.checked = false; cb.disabled = true; }
-        lbl.style.display = 'none';
-        lbl.classList.remove('checked');
-      }
-    });
-    // 業態テンプレ (data-saas-extra="brand") は単一種別モードでは非表示
-    var brandCheck = document.getElementById('saas-brand-check');
-    if (brandCheck) brandCheck.style.display = 'none';
-    var banS = document.getElementById('single-import-banner-saas1');
-    if (!banS) {
-      banS = document.createElement('div');
-      banS.id = 'single-import-banner-saas1';
-      banS.style.cssText = 'background:#e3f2fd;border:1px solid #b3d9f0;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#0d47a1;display:flex;align-items:center;gap:8px;';
-      var containerS = document.querySelector('#s-saas1 .content');
-      if (containerS) containerS.insertBefore(banS, containerS.firstChild);
-    }
-    banS.innerHTML = '<span style="font-size:18px;">🎯</span><div><strong>単一種別モード: ' + info.label + '</strong> のみインポート。<a href="#" onclick="clearSingleImportMode();location.href=location.pathname;return false;" style="color:#0d47a1;text-decoration:underline;font-weight:700;">通常モードへ戻る</a></div>';
+  if (screenId === 's-saas-single') {
+    var t2 = document.getElementById('single-saas-type-label');
+    if (t2) t2.textContent = label;
   }
 }
 
-// ページロード時に URLパラメータを解釈
+// ページロード時に URLパラメータを解釈 (案B 物理分離: 専用画面に直接遷移)
 (function initSingleImportFromUrl() {
   try {
     var params = new URLSearchParams(window.location.search);
@@ -2180,12 +2252,14 @@ function applySingleImportMode(screenId) {
     var mode = params.get('mode');
     if (type) {
       setSingleImportMode(type, mode || '');
-      // mode=tpl → 即テンプレ取込画面へ、それ以外は TOP で方式選択
       window.addEventListener('DOMContentLoaded', function() {
-        if (mode === 'tpl') {
-          setTimeout(function(){ go('s-tpl1'); }, 100);
+        if (mode === 'tpl' || type === 'brand' || type === 'store' || type === 'emptype') {
+          // テンプレ取込専用画面に直行 (brand/store/emptype は外部勤怠では取れない)
+          setTimeout(function(){ go('s-tpl-single'); }, 100);
+        } else if (type === 'admin' || type === 'employee') {
+          // TOPに留まる → ユーザーが「テンプレ or 外部勤怠」方式選択 → 該当の single 画面へ
+          // (s-top の import-card クリック時に s-tpl-single or s-saas-single へ遷移する制御を追加済み)
         }
-        // type=admin / employee の場合は TOP に留まる (ユーザーが方式選択)
       });
     }
   } catch (e) {}
@@ -2200,24 +2274,20 @@ function go(id) {
   });
   if (id === 's-saas2') showMappingPanels();
   if (id === 's-saas-settings') updateSettingsScreen();
-  // 2026-05-18 追加: TOPに戻ったら単一種別モードをクリア (コンタミ防止)
+  // 2026-05-18 (案B 物理分離): TOPに戻ったら単一種別モードをクリア (コンタミ防止)
   if (id === 's-top') clearSingleImportMode();
-  if (id === 's-tpl1' || id === 's-tpl2' || id === 's-saas1' || id === 's-saas-preview') {
+  // 単一種別モードは専用画面 (s-tpl-single / s-saas-single) でのみ動作
+  if (id === 's-tpl-single' || id === 's-saas-single') {
     applySingleImportMode(id);
   }
   if (id === 's-tpl2') {
     updateTplConfirmSections();
-    // 2026-05-18 追加: 大タブで初期は「① 設定マスタ」を表示 (単一種別モード時は該当タブ)
-    var singleType = getSingleImportType();
-    var initialTab = (singleType === 'employee' || singleType === 'admin') ? singleType :
-                     ((singleType === 'brand' || singleType === 'store' || singleType === 'emptype') ? 'master' : 'master');
-    if (typeof switchTplDataTypeTab === 'function') switchTplDataTypeTab(initialTab);
+    // 大タブ初期表示: ① 設定マスタ (s-tpl2 は常に複数選択モード)
+    if (typeof switchTplDataTypeTab === 'function') switchTplDataTypeTab('master');
   }
   if (id === 's-saas-preview') {
-    // 2026-05-18 追加: 大タブで初期は「② 従業員」を表示 (単一種別モード時は該当タブ)
-    var singleTypeS = getSingleImportType();
-    var initialTabS = (singleTypeS === 'admin') ? 'admin' : 'employee';
-    if (typeof switchSaasDataTypeTab === 'function') switchSaasDataTypeTab(initialTabS);
+    // 大タブ初期表示: ② 従業員 (s-saas-preview は常に複数選択モード)
+    if (typeof switchSaasDataTypeTab === 'function') switchSaasDataTypeTab('employee');
   }
   // 中断検知用 localStorage 管理: 進捗(completed/total/currentStep/label)を記録、完了画面でクリア
   // ★ s-tpl1 / s-saas1 ではチェック状態 + アップ済データ名 もスナップショット保存(再開時に復元できるよう)
