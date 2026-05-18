@@ -2067,6 +2067,130 @@ function snapshotSaasState() {
   };
 }
 
+// ===== 単一種別モード (2026-05-18 追加) =====
+// 運用更新からのCSVインポートで「該当データのみ」表示する動線
+// URLパラメータ: ?type=brand|store|emptype|employee|admin&mode=tpl
+// コンタミ防止: 既存の複数選択動線 (初期セットアップ用) は完全に維持
+function getSingleImportType() {
+  try { return sessionStorage.getItem('singleImportType') || ''; } catch (e) { return ''; }
+}
+function getSingleImportMode() {
+  try { return sessionStorage.getItem('singleImportMode') || ''; } catch (e) { return ''; }
+}
+function setSingleImportMode(type, mode) {
+  try {
+    if (type) sessionStorage.setItem('singleImportType', type);
+    if (mode) sessionStorage.setItem('singleImportMode', mode);
+  } catch (e) {}
+}
+function clearSingleImportMode() {
+  try {
+    sessionStorage.removeItem('singleImportType');
+    sessionStorage.removeItem('singleImportMode');
+  } catch (e) {}
+}
+function applySingleImportMode(screenId) {
+  var type = getSingleImportType();
+  if (!type) return; // パラメータなし = 通常動作
+
+  var typeMap = {
+    'brand':    { key:'brand',    label:'業態・ブランド' },
+    'store':    { key:'store',    label:'店舗' },
+    'emptype':  { key:'emptype',  label:'雇用区分' },
+    'employee': { key:'employee', label:'従業員' },
+    'admin':    { key:'admin',    label:'管理者' }
+  };
+  var info = typeMap[type];
+  if (!info) return;
+
+  // s-tpl1: 該当チェックボックス以外を非表示 + 「単一種別モード」案内バナー
+  if (screenId === 's-tpl1') {
+    document.querySelectorAll('#s-tpl1 .source-check[data-tpl]').forEach(function(lbl) {
+      var cb = lbl.querySelector('input[type="checkbox"]');
+      if (lbl.getAttribute('data-tpl') === info.key) {
+        if (cb) { cb.checked = true; cb.disabled = true; }
+        lbl.style.display = '';
+        lbl.classList.add('checked');
+      } else {
+        if (cb) { cb.checked = false; cb.disabled = true; }
+        lbl.style.display = 'none';
+        lbl.classList.remove('checked');
+      }
+    });
+    // 案内バナー (なければ追加)
+    var ban = document.getElementById('single-import-banner-tpl1');
+    if (!ban) {
+      ban = document.createElement('div');
+      ban.id = 'single-import-banner-tpl1';
+      ban.style.cssText = 'background:#e3f2fd;border:1px solid #b3d9f0;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#0d47a1;display:flex;align-items:center;gap:8px;';
+      var container = document.querySelector('#s-tpl1 .content');
+      if (container) container.insertBefore(ban, container.firstChild);
+    }
+    ban.innerHTML = '<span style="font-size:18px;">🎯</span><div><strong>単一種別モード: ' + info.label + '</strong> のみインポート (運用更新動線・該当データ専用)。複数データを取り込む場合は <a href="#" onclick="clearSingleImportMode();location.href=location.pathname;return false;" style="color:#0d47a1;text-decoration:underline;font-weight:700;">通常モードへ戻る</a></div>';
+  }
+
+  // s-saas1: 該当チェックボックス以外を非表示 (admin / employee のみ対応)
+  if (screenId === 's-saas1') {
+    if (info.key !== 'admin' && info.key !== 'employee') {
+      // 外部勤怠で取れない種別 (brand/store/emptype) → 即 s-tpl1 に遷移
+      setSingleImportMode(type, 'tpl');
+      setTimeout(function(){ go('s-tpl1'); }, 50);
+      return;
+    }
+    // KoT/Jobcan の従業員データ系 (employee) または 管理者データ (admin) のみ表示
+    document.querySelectorAll('#s-saas1 .source-check[data-map]').forEach(function(lbl) {
+      var dm = lbl.getAttribute('data-map') || '';
+      var matches = false;
+      if (info.key === 'admin') {
+        matches = /admin/.test(dm);
+      } else if (info.key === 'employee') {
+        matches = /(emp|staff|hr|rate|group)/.test(dm) && !/admin/.test(dm);
+      }
+      var cb = lbl.querySelector('input[type="checkbox"]');
+      if (matches) {
+        if (cb) { cb.checked = true; cb.disabled = true; }
+        lbl.style.display = '';
+        lbl.classList.add('checked');
+      } else {
+        if (cb) { cb.checked = false; cb.disabled = true; }
+        lbl.style.display = 'none';
+        lbl.classList.remove('checked');
+      }
+    });
+    // 業態テンプレ (data-saas-extra="brand") は単一種別モードでは非表示
+    var brandCheck = document.getElementById('saas-brand-check');
+    if (brandCheck) brandCheck.style.display = 'none';
+    var banS = document.getElementById('single-import-banner-saas1');
+    if (!banS) {
+      banS = document.createElement('div');
+      banS.id = 'single-import-banner-saas1';
+      banS.style.cssText = 'background:#e3f2fd;border:1px solid #b3d9f0;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#0d47a1;display:flex;align-items:center;gap:8px;';
+      var containerS = document.querySelector('#s-saas1 .content');
+      if (containerS) containerS.insertBefore(banS, containerS.firstChild);
+    }
+    banS.innerHTML = '<span style="font-size:18px;">🎯</span><div><strong>単一種別モード: ' + info.label + '</strong> のみインポート。<a href="#" onclick="clearSingleImportMode();location.href=location.pathname;return false;" style="color:#0d47a1;text-decoration:underline;font-weight:700;">通常モードへ戻る</a></div>';
+  }
+}
+
+// ページロード時に URLパラメータを解釈
+(function initSingleImportFromUrl() {
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var type = params.get('type');
+    var mode = params.get('mode');
+    if (type) {
+      setSingleImportMode(type, mode || '');
+      // mode=tpl → 即テンプレ取込画面へ、それ以外は TOP で方式選択
+      window.addEventListener('DOMContentLoaded', function() {
+        if (mode === 'tpl') {
+          setTimeout(function(){ go('s-tpl1'); }, 100);
+        }
+        // type=admin / employee の場合は TOP に留まる (ユーザーが方式選択)
+      });
+    }
+  } catch (e) {}
+})();
+
 function go(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -2076,14 +2200,24 @@ function go(id) {
   });
   if (id === 's-saas2') showMappingPanels();
   if (id === 's-saas-settings') updateSettingsScreen();
+  // 2026-05-18 追加: TOPに戻ったら単一種別モードをクリア (コンタミ防止)
+  if (id === 's-top') clearSingleImportMode();
+  if (id === 's-tpl1' || id === 's-tpl2' || id === 's-saas1' || id === 's-saas-preview') {
+    applySingleImportMode(id);
+  }
   if (id === 's-tpl2') {
     updateTplConfirmSections();
-    // 2026-05-18 追加: 大タブで初期は「① 設定マスタ」を表示
-    if (typeof switchTplDataTypeTab === 'function') switchTplDataTypeTab('master');
+    // 2026-05-18 追加: 大タブで初期は「① 設定マスタ」を表示 (単一種別モード時は該当タブ)
+    var singleType = getSingleImportType();
+    var initialTab = (singleType === 'employee' || singleType === 'admin') ? singleType :
+                     ((singleType === 'brand' || singleType === 'store' || singleType === 'emptype') ? 'master' : 'master');
+    if (typeof switchTplDataTypeTab === 'function') switchTplDataTypeTab(initialTab);
   }
   if (id === 's-saas-preview') {
-    // 2026-05-18 追加: 大タブで初期は「② 従業員」を表示
-    if (typeof switchSaasDataTypeTab === 'function') switchSaasDataTypeTab('employee');
+    // 2026-05-18 追加: 大タブで初期は「② 従業員」を表示 (単一種別モード時は該当タブ)
+    var singleTypeS = getSingleImportType();
+    var initialTabS = (singleTypeS === 'admin') ? 'admin' : 'employee';
+    if (typeof switchSaasDataTypeTab === 'function') switchSaasDataTypeTab(initialTabS);
   }
   // 中断検知用 localStorage 管理: 進捗(completed/total/currentStep/label)を記録、完了画面でクリア
   // ★ s-tpl1 / s-saas1 ではチェック状態 + アップ済データ名 もスナップショット保存(再開時に復元できるよう)
