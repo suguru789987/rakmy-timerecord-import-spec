@@ -2046,29 +2046,38 @@ function applyInitialCheckFromUrl(screenId) {
     var params = new URLSearchParams(window.location.search);
     var type = params.get('type');
     if (!type) return; // パラメータなし = 既存動作
-    if (screenId === 's-tpl1') {
-      // s-tpl1 の該当チェックを ON、他は OFF (編集自由)
-      document.querySelectorAll('#s-tpl1 .source-check[data-tpl]').forEach(function(lbl) {
-        var cb = lbl.querySelector('input[type="checkbox"]');
-        var match = (lbl.getAttribute('data-tpl') === type);
-        if (cb) cb.checked = match;
-        if (match) lbl.classList.add('checked');
-        else lbl.classList.remove('checked');
-      });
-    } else if (screenId === 's-saas1') {
-      // s-saas1 の該当チェックを ON (admin/employee 対応)
-      document.querySelectorAll('#s-saas1 .source-check[data-map]').forEach(function(lbl) {
-        var dm = lbl.getAttribute('data-map') || '';
-        var match = false;
-        if (type === 'admin') match = /admin/.test(dm);
-        else if (type === 'employee') match = /(emp|staff|hr|rate|group)/.test(dm) && !/admin/.test(dm);
-        var cb = lbl.querySelector('input[type="checkbox"]');
-        if (cb) cb.checked = match;
-        if (match) lbl.classList.add('checked');
-        else lbl.classList.remove('checked');
-      });
-    }
-  } catch (e) {}
+    // demo機能(アップ済状態の自動チェック)の後に実行するため遅延
+    setTimeout(function() {
+      if (screenId === 's-tpl1') {
+        document.querySelectorAll('#s-tpl1 .source-check[data-tpl]').forEach(function(lbl) {
+          var cb = lbl.querySelector('input[type="checkbox"]');
+          var match = (lbl.getAttribute('data-tpl') === type);
+          if (cb) cb.checked = match;
+          if (match) lbl.classList.add('checked');
+          else lbl.classList.remove('checked');
+        });
+      } else if (screenId === 's-saas1') {
+        // 業態テンプレ (saas-brand-check, data-saas-extra="brand") も OFF にする
+        var brandCheck = document.querySelector('#s-saas1 .source-check[data-saas-extra="brand"]');
+        if (brandCheck) {
+          var brandCb = brandCheck.querySelector('input[type="checkbox"]');
+          if (brandCb) brandCb.checked = false;
+          brandCheck.classList.remove('checked');
+        }
+        // 取り込みデータの各チェック (data-map="map-XXX-XXX")
+        document.querySelectorAll('#s-saas1 .source-check[data-map]').forEach(function(lbl) {
+          var dm = lbl.getAttribute('data-map') || '';
+          var match = false;
+          if (type === 'admin') match = /admin/.test(dm);
+          else if (type === 'employee') match = /(emp|staff|hr|rate|group)/.test(dm) && !/admin/.test(dm);
+          var cb = lbl.querySelector('input[type="checkbox"]');
+          if (cb) cb.checked = match;
+          if (match) lbl.classList.add('checked');
+          else lbl.classList.remove('checked');
+        });
+      }
+    }, 200); // demo init より後に実行
+  } catch (e) { console.error('applyInitialCheckFromUrl error:', e); }
 }
 
 // ページロード時 URLパラメータで遷移先決定 (DOMContentLoaded 発火後も対応)
