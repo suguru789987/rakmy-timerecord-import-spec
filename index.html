@@ -2779,20 +2779,37 @@ function switchSaasPreviewSingleTab(key) {
   if (sec) sec.style.display = '';
 }
 
+// 遷移元の設定画面 URL を URL パラメータの type から逆引き
+// owner-mock の運用更新設定画面ハッシュにマップ
+var OWNER_MOCK_BASE = 'https://suguru789987.github.io/rakmy-owner-registration-mock/';
+var SOURCE_SETTING_HASH = {
+  brand:    'brand-ops-settings',
+  store:    'store-ops-settings',
+  emptype:  'emptype-ops-settings',
+  employee: 'emp-ops-settings',
+  admin:    'd1'
+};
+function getSourceSettingUrl() {
+  var params = new URLSearchParams(window.location.search);
+  var t = params.get('type');
+  var hash = SOURCE_SETTING_HASH[t] || 'b0-empty';
+  return OWNER_MOCK_BASE + '#' + hash;
+}
 function returnToSourceSetting() {
-  // 1) 親ウィンドウ(設定画面)から window.open で起動された場合 → そのタブを閉じる
+  var url = getSourceSettingUrl();
+  // owner-mock 側が window.open(..., 'noopener') で開いているため
+  // window.opener は null。history.back() も効かない (新規タブ)。
+  // → owner-mock の対応する設定画面 URL に直接遷移して、そこで一覧確認させる。
   try {
+    // 親ウィンドウが残っていればフォーカス+閉じる試行 (noopener なので大抵 null)
     if (window.opener && !window.opener.closed) {
-      window.close();
+      try { window.opener.location.href = url; window.opener.focus(); } catch (e) {}
+      try { window.close(); } catch (e) {}
       return;
     }
-  } catch (e) { /* cross-origin で参照不可な場合は次へ */ }
-  // 2) 同一タブ遷移: history で戻る (referrer がある場合)
-  if (document.referrer) {
-    try { history.back(); return; } catch (e) {}
-  }
-  // 3) フォールバック: メッセージ表示
-  alert('設定画面に戻る (デモ環境では遷移元情報が無いため、ブラウザの戻るボタンで戻ってください)');
+  } catch (e) {}
+  // 同タブで owner-mock 設定画面に遷移
+  window.location.href = url;
 }
 
 // 専用画面の種別ラベル + 該当データのみチェック ON
