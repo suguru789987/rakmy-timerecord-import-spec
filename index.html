@@ -527,6 +527,15 @@
       <div class="fs"><span class="fs-num">3</span><span class="fs-label">完了</span></div>
     </div>
 
+    <!-- ★ 取り込みデータ種別タブ (2026-05-18 追加・大タブ) -->
+    <div class="wcard" style="padding:0;margin-bottom:16px;background:#f5f7f9;border:1px solid #e0e0e0;">
+      <div style="display:flex;align-items:stretch;gap:0;">
+        <button onclick="switchTplDataTypeTab('master')" id="tpl-typetab-master" style="flex:1;padding:14px 16px;border:none;background:#fff;border-bottom:3px solid #2ec4a0;cursor:pointer;font-size:13px;font-weight:700;color:#0e9077;">① 設定マスタ <span style="font-size:10px;color:#888;font-weight:400;">(業態2/店舗2/雇用区分3)</span></button>
+        <button onclick="switchTplDataTypeTab('employee')" id="tpl-typetab-employee" style="flex:1;padding:14px 16px;border:none;background:#f5f7f9;border-bottom:3px solid transparent;cursor:pointer;font-size:13px;font-weight:600;color:#555;">② 従業員 <span style="font-size:10px;color:#888;font-weight:400;">(8件 / エラー1)</span></button>
+        <button onclick="switchTplDataTypeTab('admin')" id="tpl-typetab-admin" style="flex:1;padding:14px 16px;border:none;background:#f5f7f9;border-bottom:3px solid transparent;cursor:pointer;font-size:13px;font-weight:600;color:#555;">③ 管理者 <span style="font-size:10px;color:#888;font-weight:400;">(任意・5件)</span></button>
+      </div>
+    </div>
+
     <!-- 設定マスタ確認セクション -->
     <div id="tpl-confirm-master">
     <div class="map-section-header"><span style="background:#2ec4a0;color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;">①</span> 設定マスタ</div>
@@ -2031,7 +2040,11 @@ function go(id) {
   });
   if (id === 's-saas2') showMappingPanels();
   if (id === 's-saas-settings') updateSettingsScreen();
-  if (id === 's-tpl2') updateTplConfirmSections();
+  if (id === 's-tpl2') {
+    updateTplConfirmSections();
+    // 2026-05-18 追加: 大タブで初期は「① 設定マスタ」を表示
+    if (typeof switchTplDataTypeTab === 'function') switchTplDataTypeTab('master');
+  }
   // 中断検知用 localStorage 管理: 進捗(completed/total/currentStep/label)を記録、完了画面でクリア
   // ★ s-tpl1 / s-saas1 ではチェック状態 + アップ済データ名 もスナップショット保存(再開時に復元できるよう)
   try {
@@ -2997,6 +3010,24 @@ function switchMasterTab(el, idx) {
   el.classList.add('active');
   document.querySelectorAll('.master-tab-content').forEach(function(t) { t.style.display = 'none'; });
   document.getElementById('master-tab-' + idx).style.display = '';
+}
+
+// ★ 取り込みデータ種別タブ切替 (2026-05-18 追加 / 大タブ)
+function switchTplDataTypeTab(type) {
+  var tabs = { master:'tpl-typetab-master', employee:'tpl-typetab-employee', admin:'tpl-typetab-admin' };
+  var sections = { master:'tpl-confirm-master', employee:'tpl-confirm-employee', admin:'tpl-confirm-admin' };
+  Object.keys(tabs).forEach(function(k) {
+    var btn = document.getElementById(tabs[k]);
+    if (btn) {
+      var active = (k === type);
+      btn.style.background = active ? '#fff' : '#f5f7f9';
+      btn.style.borderBottom = active ? '3px solid #2ec4a0' : '3px solid transparent';
+      btn.style.color = active ? '#0e9077' : '#555';
+      btn.style.fontWeight = active ? '700' : '600';
+    }
+    var sec = document.getElementById(sections[k]);
+    if (sec) sec.style.display = (k === type) ? '' : 'none';
+  });
 }
 
 function updateTplConfirmSections() {
