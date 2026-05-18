@@ -272,9 +272,6 @@
     <h4>画面切替（デモ用）</h4>
     <button class="current" onclick="go('s-top')">トップ</button>
     <div class="dn-sep"></div>
-    <button onclick="setSingleImportMode('emptype','tpl');go('s-tpl-single')" style="color:#1a73e8;">★単一(運用):テンプレ取込</button>
-    <button onclick="setSingleImportMode('admin','');go('s-saas-single')" style="color:#1a73e8;">★単一(運用):外部勤怠取込</button>
-    <div class="dn-sep"></div>
     <button onclick="go('s-tpl1')">テンプレ① アップロード</button>
     <button onclick="go('s-tpl2')">テンプレ② 確認・実行</button>
     <button onclick="go('s-tpl3')">テンプレ③ 完了</button>
@@ -314,7 +311,7 @@
   <div class="page-header"><h1 class="page-title">インポート</h1></div>
   <div class="content">
     <div class="import-cards">
-      <div class="import-card" onclick="(getSingleImportType()) ? go('s-tpl-single') : go('s-tpl1')">
+      <div class="import-card" onclick="go('s-tpl1')">
         <div class="ic-icon">📄</div>
         <h3>テンプレートで取り込み</h3>
         <p>ラクミー専用テンプレートにデータを入力してインポート。初期セットアップに最適。</p>
@@ -327,7 +324,7 @@
         </div>
         <div class="ic-arrow">→</div>
       </div>
-      <div class="import-card" onclick="(getSingleImportType()) ? go('s-saas-single') : go('s-saas1')">
+      <div class="import-card" onclick="go('s-saas1')">
         <div class="ic-icon">🔄</div>
         <h3>外部勤怠サービスから取り込み</h3>
         <p>キングオブタイム・ジョブカンのCSVデータを列マッピングしてインポート。</p>
@@ -363,138 +360,6 @@
       </div>
     </div>
   </div>
-</div>
-
-<!-- ==================== -->
-<!-- ==================== -->
-<!-- ★ 2026-05-18 新設: 単一種別モード専用画面 (運用更新動線・物理分離) -->
-<!-- 既存 s-tpl1/s-saas1 とは完全独立。コンタミ防止のため共通ロジックを使用しない。 -->
-<!-- ==================== -->
-
-<!-- テンプレ取込・単一種別モード -->
-<div class="screen" id="s-tpl-single">
-  <div class="page-header">
-    <h1 class="page-title">テンプレートで取り込み <span style="font-size:11px;color:#fff;background:#1a73e8;padding:3px 10px;border-radius:12px;margin-left:8px;">単一種別モード (運用更新)</span></h1>
-  </div>
-  <div class="content">
-
-    <!-- 種別ヘッダー -->
-    <div style="background:#e8f4fd;border:1px solid #b3d9f0;border-radius:8px;padding:14px 18px;margin-bottom:18px;display:flex;align-items:center;gap:12px;">
-      <span style="font-size:24px;">🎯</span>
-      <div style="flex:1;">
-        <div style="font-size:13px;color:#0d47a1;font-weight:700;"><span id="single-tpl-type-label">-</span> のみインポート</div>
-        <div style="font-size:11px;color:#555;margin-top:2px;">設定画面からの「📥 CSVインポート」経由で開いた専用動線です。該当データのみアップロード可能。</div>
-      </div>
-      <a href="#" onclick="clearSingleImportMode();go('s-top');return false;" style="font-size:11px;color:#0d47a1;text-decoration:underline;font-weight:700;">通常モードへ戻る →</a>
-    </div>
-
-    <div class="flow-steps">
-      <div class="fs active"><span class="fs-num">1</span><span class="fs-label">アップロード</span></div>
-      <div class="fs-line"></div>
-      <div class="fs"><span class="fs-num">2</span><span class="fs-label">確認・実行</span></div>
-      <div class="fs-line"></div>
-      <div class="fs"><span class="fs-num">3</span><span class="fs-label">完了</span></div>
-    </div>
-
-    <div class="wcard">
-      <div class="wcard-title"><span class="num">1</span> テンプレートをダウンロード</div>
-      <div style="font-size:12px;color:#666;margin-bottom:10px;">該当データ用の CSV テンプレートをダウンロードして、Excel等で入力してください。</div>
-      <button class="btn btn-ghost" style="font-size:12px;">⬇ <span id="single-tpl-type-label-dl">該当種別</span> のテンプレートをDL</button>
-    </div>
-
-    <div class="wcard">
-      <div class="wcard-title"><span class="num">2</span> ファイルをアップロード</div>
-      <div style="border:2px dashed #ccc;border-radius:8px;padding:30px;text-align:center;color:#888;background:#fafafa;">
-        <div style="font-size:32px;margin-bottom:8px;">📎</div>
-        <div style="font-size:13px;">ファイルをドラッグ&ドロップ または</div>
-        <div style="margin-top:10px;"><button class="btn btn-primary" style="font-size:12px;">ファイルを選択</button></div>
-        <div style="margin-top:8px;font-size:10px;color:#aaa;">CSV / TSV (最大10MB)</div>
-      </div>
-    </div>
-
-    <div class="btn-group">
-      <button class="btn btn-ghost" onclick="window.close();">← 閉じる (元画面へ戻る)</button>
-      <button class="btn btn-primary" onclick="alert('デモ: アップロード後、確認画面に遷移します')">次へ: 確認画面 →</button>
-    </div>
-
-    <div style="margin-top:24px;padding:12px 14px;background:#fff8ed;border:1px solid #fde68a;border-radius:8px;font-size:11px;color:#9c4d12;line-height:1.7;">
-      💡 <strong>仕様メモ (案B 物理分離):</strong><br>
-      • この画面は <strong>運用更新動線専用</strong> (s-tpl1 とは独立) — コンタミ防止のため共通ロジックを使用しない<br>
-      • owner-mock の各設定画面 (業態 ops/店舗 ops/雇用区分 ops/従業員 ops) の「📥 CSVインポート」ボタンから新タブで開く<br>
-      • URLパラメータ: <code>?type=brand&mode=tpl</code> など<br>
-      • 既存 s-tpl1 (複数選択モード/初期セットアップ用) には一切影響なし
-    </div>
-  </div>
-</div>
-
-<!-- 外部勤怠取込・単一種別モード -->
-<div class="screen" id="s-saas-single">
-  <div class="page-header">
-    <h1 class="page-title">外部勤怠サービスから取り込み <span style="font-size:11px;color:#fff;background:#1a73e8;padding:3px 10px;border-radius:12px;margin-left:8px;">単一種別モード (運用更新)</span></h1>
-  </div>
-  <div class="content">
-
-    <!-- 種別ヘッダー -->
-    <div style="background:#e8f4fd;border:1px solid #b3d9f0;border-radius:8px;padding:14px 18px;margin-bottom:18px;display:flex;align-items:center;gap:12px;">
-      <span style="font-size:24px;">🎯</span>
-      <div style="flex:1;">
-        <div style="font-size:13px;color:#0d47a1;font-weight:700;"><span id="single-saas-type-label">-</span> のみインポート</div>
-        <div style="font-size:11px;color:#555;margin-top:2px;">設定画面からの「📥 CSVインポート」経由で開いた専用動線です。該当データのみアップロード可能 (admin/employee 専用)。</div>
-      </div>
-      <a href="#" onclick="clearSingleImportMode();go('s-top');return false;" style="font-size:11px;color:#0d47a1;text-decoration:underline;font-weight:700;">通常モードへ戻る →</a>
-    </div>
-
-    <!-- 派生取込バナー: 2026-05-18 案A 派生取込仕様廃止のため削除 -->
-
-    <div class="flow-steps">
-      <div class="fs active"><span class="fs-num">1</span><span class="fs-label">アップロード</span></div>
-      <div class="fs-line"></div>
-      <div class="fs"><span class="fs-num">2</span><span class="fs-label">マッピング</span></div>
-      <div class="fs-line"></div>
-      <div class="fs"><span class="fs-num">3</span><span class="fs-label">プレビュー</span></div>
-      <div class="fs-line"></div>
-      <div class="fs"><span class="fs-num">4</span><span class="fs-label">完了</span></div>
-    </div>
-
-    <div class="wcard">
-      <div class="wcard-title"><span class="num">1</span> 連携元サービスを選択</div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;">
-        <div class="saas-item selected" style="flex:1;min-width:160px;padding:14px;border:2px solid #2ec4a0;border-radius:8px;cursor:pointer;text-align:center;">
-          <div style="font-size:24px;">⏰</div><div style="font-size:13px;font-weight:700;">キングオブタイム</div>
-        </div>
-        <div class="saas-item" style="flex:1;min-width:160px;padding:14px;border:2px solid #e0e0e0;border-radius:8px;cursor:pointer;text-align:center;">
-          <div style="font-size:24px;">📋</div><div style="font-size:13px;font-weight:700;">ジョブカン</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="wcard">
-      <div class="wcard-title"><span class="num">2</span> ファイルをアップロード</div>
-      <div style="font-size:12px;color:#666;margin-bottom:10px;">該当種別のデータが含まれる CSV をアップロードしてください。</div>
-      <div style="border:2px dashed #ccc;border-radius:8px;padding:30px;text-align:center;color:#888;background:#fafafa;">
-        <div style="font-size:32px;margin-bottom:8px;">📎</div>
-        <div style="font-size:13px;">ファイルをドラッグ&ドロップ または</div>
-        <div style="margin-top:10px;"><button class="btn btn-primary" style="font-size:12px;">ファイルを選択</button></div>
-        <div style="margin-top:8px;font-size:10px;color:#aaa;">CSV / TSV (最大10MB)</div>
-      </div>
-    </div>
-
-    <div class="btn-group">
-      <button class="btn btn-ghost" onclick="window.close();">← 閉じる (元画面へ戻る)</button>
-      <button class="btn btn-primary" onclick="alert('デモ: アップロード後、マッピング画面に遷移します')">次へ: マッピング →</button>
-    </div>
-
-    <div style="margin-top:24px;padding:12px 14px;background:#fff8ed;border:1px solid #fde68a;border-radius:8px;font-size:11px;color:#9c4d12;line-height:1.7;">
-      💡 <strong>仕様メモ (案B 物理分離):</strong><br>
-      • この画面は <strong>運用更新動線専用</strong> (s-saas1 とは独立) — コンタミ防止のため共通ロジックを使用しない<br>
-      • 対応種別: <strong>従業員 / 管理者のみ</strong> (業態/店舗/雇用区分は外部勤怠で取得不可 → s-tpl-single にリダイレクト)<br>
-      • owner-mock の従業員 ops/管理者一覧 の「📥 CSVインポート」ボタンから新タブで開く<br>
-      • URLパラメータ: <code>?type=employee</code> または <code>?type=admin</code><br>
-      • 既存 s-saas1 (複数選択モード/初期セットアップ用) には一切影響なし
-    </div>
-  </div>
-</div>
-
 <!-- ==================== -->
 <!-- TEMPLATE: STEP 1 - 選択＆アップロード（統合） -->
 <!-- ==================== -->
@@ -2167,75 +2032,59 @@ function snapshotSaasState() {
   };
 }
 
-// ===== 単一種別モード (2026-05-18 追加) =====
-// 運用更新からのCSVインポートで「該当データのみ」表示する動線
-// URLパラメータ: ?type=brand|store|emptype|employee|admin&mode=tpl
-// コンタミ防止: 既存の複数選択動線 (初期セットアップ用) は完全に維持
-function getSingleImportType() {
-  try { return sessionStorage.getItem('singleImportType') || ''; } catch (e) { return ''; }
-}
-function getSingleImportMode() {
-  try { return sessionStorage.getItem('singleImportMode') || ''; } catch (e) { return ''; }
-}
-function setSingleImportMode(type, mode) {
+// ===== 設定画面起点モード (2026-05-18 新案・案B 撤回 / 既存画面+初期チェック) =====
+// owner-mock の設定画面 → 方式選択モーダル → 該当方式のURLパラメータで s-tpl1 or s-saas1 を開く
+// → 該当データのチェックボックスが初期 ON 状態 (他は OFF だが編集可能)
+// コンタミ防止:
+//   - URLパラメータがなければ既存動作完全維持
+//   - 初期セットアップ動線 (#tpl-setup/#saas-setup) は別経路 → 無影響
+//   - 初期チェックON はページロード時1回のみ、その後はユーザー操作で自由編集
+//   - sessionStorage は使わず URLパラメータのみで判定 (動線が独立)
+function applyInitialCheckFromUrl(screenId) {
   try {
-    if (type) sessionStorage.setItem('singleImportType', type);
-    if (mode) sessionStorage.setItem('singleImportMode', mode);
+    var params = new URLSearchParams(window.location.search);
+    var type = params.get('type');
+    if (!type) return; // パラメータなし = 既存動作
+    if (screenId === 's-tpl1') {
+      // s-tpl1 の該当チェックを ON、他は OFF (編集自由)
+      document.querySelectorAll('#s-tpl1 .source-check[data-tpl]').forEach(function(lbl) {
+        var cb = lbl.querySelector('input[type="checkbox"]');
+        var match = (lbl.getAttribute('data-tpl') === type);
+        if (cb) cb.checked = match;
+        if (match) lbl.classList.add('checked');
+        else lbl.classList.remove('checked');
+      });
+    } else if (screenId === 's-saas1') {
+      // s-saas1 の該当チェックを ON (admin/employee 対応)
+      document.querySelectorAll('#s-saas1 .source-check[data-map]').forEach(function(lbl) {
+        var dm = lbl.getAttribute('data-map') || '';
+        var match = false;
+        if (type === 'admin') match = /admin/.test(dm);
+        else if (type === 'employee') match = /(emp|staff|hr|rate|group)/.test(dm) && !/admin/.test(dm);
+        var cb = lbl.querySelector('input[type="checkbox"]');
+        if (cb) cb.checked = match;
+        if (match) lbl.classList.add('checked');
+        else lbl.classList.remove('checked');
+      });
+    }
   } catch (e) {}
-}
-function clearSingleImportMode() {
-  try {
-    sessionStorage.removeItem('singleImportType');
-    sessionStorage.removeItem('singleImportMode');
-    sessionStorage.removeItem('singleImportDerived');
-  } catch (e) {}
-}
-// 2026-05-18 (案B 物理分離): applySingleImportMode は専用画面 s-tpl-single/s-saas-single
-// で単独動作。既存 s-tpl1/s-saas1 には一切影響を与えない (コンタミ防止のため)。
-function applySingleImportMode(screenId) {
-  var type = getSingleImportType();
-  if (!type) return;
-  // 専用画面のヘッダーに種別ラベル表示
-  var typeMap = {
-    'brand':    '業態・ブランド',
-    'store':    '店舗',
-    'emptype':  '雇用区分',
-    'employee': '従業員',
-    'admin':    '管理者'
-  };
-  var label = typeMap[type] || type;
-  if (screenId === 's-tpl-single') {
-    var t1 = document.getElementById('single-tpl-type-label');
-    if (t1) t1.textContent = label;
-  }
-  if (screenId === 's-saas-single') {
-    var t2 = document.getElementById('single-saas-type-label');
-    if (t2) t2.textContent = label;
-    // 2026-05-18 案A: 派生取込仕様を廃止したため、派生取込バナー処理は不要
-  }
 }
 
-// ページロード時に URLパラメータを解釈 (案B 物理分離: 専用画面に直接遷移)
-(function initSingleImportFromUrl() {
+// ページロード時 URLパラメータで遷移先決定
+(function initFromUrl() {
   try {
     var params = new URLSearchParams(window.location.search);
     var type = params.get('type');
     var mode = params.get('mode');
-    // 2026-05-18 案A: 派生取込仕様廃止のため derived パラメータ処理は削除
-    if (type) {
-      setSingleImportMode(type, mode || '');
-      window.addEventListener('DOMContentLoaded', function() {
-        if (mode === 'tpl' || type === 'brand' || type === 'store' || type === 'emptype') {
-          // テンプレ取込専用画面に直行 (brand/store/emptype は外部勤怠では取れない)
-          setTimeout(function(){ go('s-tpl-single'); }, 100);
-        } else if (mode === 'saas') {
-          // 外部勤怠取込専用画面に直行 (admin/employee のみ対応)
-          setTimeout(function(){ go('s-saas-single'); }, 100);
-        } else if (type === 'admin' || type === 'employee') {
-          // TOPに留まる → ユーザーが「テンプレ or 外部勤怠」方式選択 → 該当の single 画面へ
-        }
-      });
-    }
+    if (!type) return;
+    window.addEventListener('DOMContentLoaded', function() {
+      if (mode === 'tpl' || type === 'brand' || type === 'store' || type === 'emptype') {
+        setTimeout(function(){ go('s-tpl1'); }, 100);
+      } else if (mode === 'saas') {
+        setTimeout(function(){ go('s-saas1'); }, 100);
+      }
+      // type=admin/employee で mode指定なし → TOPに留まる (ユーザー方式選択)
+    });
   } catch (e) {}
 })();
 
@@ -2248,11 +2097,9 @@ function go(id) {
   });
   if (id === 's-saas2') showMappingPanels();
   if (id === 's-saas-settings') updateSettingsScreen();
-  // 2026-05-18 (案B 物理分離): TOPに戻ったら単一種別モードをクリア (コンタミ防止)
-  if (id === 's-top') clearSingleImportMode();
-  // 単一種別モードは専用画面 (s-tpl-single / s-saas-single) でのみ動作
-  if (id === 's-tpl-single' || id === 's-saas-single') {
-    applySingleImportMode(id);
+  // 2026-05-18 新案: 設定画面起点で URLパラメータがあれば該当チェック初期 ON
+  if (id === 's-tpl1' || id === 's-saas1') {
+    if (typeof applyInitialCheckFromUrl === 'function') applyInitialCheckFromUrl(id);
   }
   if (id === 's-tpl2') {
     updateTplConfirmSections();
