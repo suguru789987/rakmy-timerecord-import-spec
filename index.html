@@ -2074,15 +2074,31 @@ function applyInitialCheckFromUrl(screenId) {
     // 方式切替リンクの表示制御 (URLパラメータがある場合のみ表示)
     if (screenId === 's-tpl1') {
       var tplFb = document.getElementById('tpl-fallback-to-saas');
-      // brand/store/emptype は外部勤怠で取れない → 切替リンク非表示
       var canSaas = (type === 'employee' || type === 'admin');
       if (tplFb) tplFb.style.display = canSaas ? 'inline-block' : 'none';
     }
     if (screenId === 's-saas1') {
       var saasFb = document.getElementById('saas-fallback-to-tpl');
-      // 全種別でテンプレ取込にフォールバック可能
       if (saasFb) saasFb.style.display = 'inline-block';
     }
+    // ★ 設定画面起点モード: 一時保存関連UI を非表示 (動線の意図と矛盾するため)
+    var savedStatusId = (screenId === 's-tpl1') ? 'tpl-saved-status' : 'saas-saved-status';
+    var savedStatus = document.getElementById(savedStatusId);
+    if (savedStatus) savedStatus.style.display = 'none';
+    // 「一時保存時に完了済」バッジを各 source-check から削除
+    setTimeout(function() {
+      document.querySelectorAll('#' + screenId + ' .completed-badge, #' + screenId + ' .draft-restored-badge').forEach(function(b) { b.style.display = 'none'; });
+      // 「一時保存時のアップ済データを復元」バナー削除
+      var resBanner = document.querySelector('#' + screenId + ' .restore-banner');
+      if (resBanner) resBanner.style.display = 'none';
+      // 動的生成された復元バナー (style や innerHTML で識別)
+      document.querySelectorAll('#' + screenId + ' div').forEach(function(d) {
+        var html = d.innerHTML || '';
+        if (/一時保存時のアップ済データを復元|一時保存時に完了済/.test(html) && d.style.background && d.style.background.indexOf('e8f9f4') !== -1) {
+          d.style.display = 'none';
+        }
+      });
+    }, 300);
     // demo機能(アップ済状態の自動チェック)の後に実行するため遅延
     setTimeout(function() {
       if (screenId === 's-tpl1') {
