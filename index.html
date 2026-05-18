@@ -444,20 +444,7 @@
       <a href="#" onclick="clearSingleImportMode();go('s-top');return false;" style="font-size:11px;color:#0d47a1;text-decoration:underline;font-weight:700;">通常モードへ戻る →</a>
     </div>
 
-    <!-- ★ 派生取込バナー (case-B: 店舗/雇用区分の設定画面から外部勤怠を選択して遷移した場合に表示) -->
-    <div id="saas-derived-banner" style="display:none;background:#fff8e1;border:1px solid #ffe0a3;border-radius:8px;padding:14px 18px;margin-bottom:18px;">
-      <div style="display:flex;align-items:start;gap:12px;">
-        <span style="font-size:24px;">🔄</span>
-        <div style="flex:1;">
-          <div style="font-size:13px;font-weight:700;color:#9c4d12;margin-bottom:4px;">派生取込モード: <span id="saas-derived-target-label">店舗</span> の設定画面から遷移</div>
-          <div style="font-size:11px;color:#666;line-height:1.7;">
-            外部勤怠サービスでは <strong><span id="saas-derived-target-label2">店舗</span></strong> を単独で取り込めません。<br>
-            <strong>従業員データを取り込む</strong>と、システムが自動的に <span id="saas-derived-target-label3">店舗</span> データを派生取込してマスタテーブルに登録します。<br>
-            <span style="color:#888;">プレビュー画面で派生取込結果を確認可能 (① 設定マスタタブ)。</span>
-          </div>
-        </div>
-      </div>
-    </div>
+    <!-- 派生取込バナー: 2026-05-18 案A 派生取込仕様廃止のため削除 -->
 
     <div class="flow-steps">
       <div class="fs active"><span class="fs-num">1</span><span class="fs-label">アップロード</span></div>
@@ -1580,58 +1567,25 @@
 
     <!-- ① 設定マスタセクション (派生取込結果プレビュー) -->
     <div id="saas-confirm-master" style="display:none;">
-      <div class="map-section-header"><span style="background:#2ec4a0;color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;">①</span> 設定マスタ <span style="font-size:10px;color:#888;font-weight:400;margin-left:6px;">(KoT 従業員データから派生取込される項目)</span></div>
-      <div class="alert alert-info">KoT の従業員レコードから派生して、ラクミー側のマスタテーブルに自動登録される項目です。</div>
-
-      <!-- 派生取込サマリ -->
-      <div class="pv-summary">
-        <div class="pv-box" style="background:#ffebee;border:1px solid #ffcdd2;color:#c62828;border-radius:6px;padding:8px 12px;text-align:center;min-width:100px;"><div style="font-size:18px;font-weight:700;">❌</div><div style="font-size:10px;">業態 (取得不可)</div></div>
-        <div class="pv-box" style="background:#e8f8f5;border:1px solid #b8e6d6;color:#0e9077;border-radius:6px;padding:8px 12px;text-align:center;min-width:100px;"><div style="font-size:18px;font-weight:700;">2</div><div style="font-size:10px;">店舗 (派生取込)</div></div>
-        <div class="pv-box" style="background:#e8f8f5;border:1px solid #b8e6d6;color:#0e9077;border-radius:6px;padding:8px 12px;text-align:center;min-width:100px;"><div style="font-size:18px;font-weight:700;">3</div><div style="font-size:10px;">雇用区分 (派生取込)</div></div>
-      </div>
-
-      <!-- 業態 (取得不可案内) -->
-      <div class="wcard" style="padding:20px 24px;margin-bottom:14px;background:#fff8ed;border:1px solid #fde68a;">
-        <div style="display:flex;align-items:start;gap:14px;">
-          <span style="font-size:28px;">⚠️</span>
-          <div style="flex:1;">
-            <div style="font-size:13px;font-weight:700;color:#9c4d12;margin-bottom:6px;">🏷 業態・ブランド: 取得不可</div>
-            <div style="font-size:12px;color:#666;line-height:1.7;margin-bottom:10px;">
-              KoT (および多くの外部勤怠サービス) は業態・ブランドのデータを提供しません。<br>
-              <strong>テンプレートで取り込み</strong> から別途登録してください。
-            </div>
-            <button class="btn btn-ghost" style="font-size:11px;padding:5px 12px;" onclick="go('s-tpl1')">➡️ テンプレートで取り込みへ</button>
-          </div>
+      <div class="map-section-header"><span style="background:#2ec4a0;color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;">①</span> 設定マスタ <span style="font-size:10px;color:#888;font-weight:400;margin-left:6px;">(業態・店舗・雇用区分)</span></div>
+      <div class="wcard" style="padding:30px 40px;text-align:center;">
+        <div style="font-size:42px;margin-bottom:14px;">⚠️</div>
+        <h3 style="font-size:16px;font-weight:700;margin:0 0 10px 0;color:#555;">設定マスタは外部勤怠サービスから取得できません</h3>
+        <div style="font-size:13px;color:#666;line-height:1.8;margin-bottom:20px;">
+          業態・ブランド / 店舗 / 雇用区分 は外部勤怠サービス (KoT / ジョブカン等) から<br>
+          取得できないため、<strong>「テンプレートで取り込み」</strong>から事前に登録してください。<br>
+          <span style="font-size:11px;color:#888;">(2026-05-18: 派生取込仕様廃止。詳細マスタ情報の整合性確保のため。)</span>
+        </div>
+        <div style="background:#fff8ed;border:1px solid #fde68a;border-radius:6px;padding:14px 18px;font-size:12px;color:#9c4d12;text-align:left;display:inline-block;line-height:1.7;">
+          <strong>運用フロー:</strong><br>
+          1. 「テンプレートで取り込み」で <strong>業態 → 店舗 → 雇用区分</strong> を事前登録<br>
+          2. その後 「外部勤怠サービスから取り込み」で 従業員データ を取込<br>
+          3. 従業員データの「店舗名」「雇用区分名」は <strong>既存マスタと紐付け</strong>のみ (新規発行なし)
+        </div>
+        <div style="margin-top:20px;">
+          <button class="btn btn-primary" onclick="go('s-tpl1')">➡️ テンプレートで取り込みへ移動</button>
         </div>
       </div>
-
-      <!-- 店舗 (派生取込結果) -->
-      <div class="wcard" style="padding:0;overflow-x:auto;margin-bottom:14px;">
-        <div style="padding:10px 14px;border-bottom:1px solid #eee;font-size:13px;font-weight:700;color:#0e9077;">🏠 店舗: 2件を派生取込 → ラクミー側に登録</div>
-        <table class="pv-table">
-          <thead><tr><th style="width:60px;">状態</th><th>店舗名</th><th>業態・ブランド</th><th>備考</th></tr></thead>
-          <tbody>
-            <tr><td class="st-new">● 新規</td><td>渋谷店</td><td><span style="color:#c62828;font-size:10px;">未紐付け</span></td><td style="font-size:11px;color:#888;">KoT.location_name から派生</td></tr>
-            <tr><td class="st-new">● 新規</td><td>新宿店</td><td><span style="color:#c62828;font-size:10px;">未紐付け</span></td><td style="font-size:11px;color:#888;">KoT.location_name から派生</td></tr>
-          </tbody>
-        </table>
-        <div style="padding:8px 14px;font-size:10px;color:#888;">※ 業態・ブランドが未紐付けです。テンプレ取込で業態登録後、自動的に紐付けされます。</div>
-      </div>
-
-      <!-- 雇用区分 (派生取込結果) -->
-      <div class="wcard" style="padding:0;overflow-x:auto;">
-        <div style="padding:10px 14px;border-bottom:1px solid #eee;font-size:13px;font-weight:700;color:#0e9077;">📋 雇用区分: 3件を派生取込 → ラクミー側に登録</div>
-        <table class="pv-table">
-          <thead><tr><th style="width:60px;">状態</th><th>雇用区分名</th><th>雇用区分コード</th><th>備考</th></tr></thead>
-          <tbody>
-            <tr><td class="st-new">● 新規</td><td>正社員</td><td>EMP-T-001</td><td style="font-size:11px;color:#888;">KoT.employment_type から派生 (給与体系/金額は ② 従業員データの hr_補完から)</td></tr>
-            <tr><td class="st-new">● 新規</td><td>パート</td><td>EMP-T-002</td><td style="font-size:11px;color:#888;">KoT.employment_type から派生</td></tr>
-            <tr><td class="st-upd">● 既存・紐付け</td><td>アルバイト</td><td>EMP-T-003</td><td style="font-size:11px;color:#888;">既存マスタと紐付け (新規発行なし)</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div style="margin-top:12px;font-size:10px;color:#888;padding:0 4px;">※ 設定マスタはサービスごとに取得可能な範囲が異なります (現在: KingOfTime)。マッピング詳細は <a href="#s-saas2" onclick="go('s-saas2');return false;" style="color:#2ec4a0;">マッピング設定画面</a> で確認可能。</div>
     </div>
 
     <!-- ② 従業員データセクション (既存) -->
@@ -2257,22 +2211,7 @@ function applySingleImportMode(screenId) {
   if (screenId === 's-saas-single') {
     var t2 = document.getElementById('single-saas-type-label');
     if (t2) t2.textContent = label;
-    // 派生取込バナー (店舗/雇用区分の設定画面から外部勤怠を選択して遷移した場合)
-    var derived = '';
-    try { derived = sessionStorage.getItem('singleImportDerived') || ''; } catch (e) {}
-    var derivedBanner = document.getElementById('saas-derived-banner');
-    if (derivedBanner) {
-      if (derived === 'store' || derived === 'emptype') {
-        var derivedLabel = (derived === 'store') ? '店舗' : '雇用区分';
-        ['saas-derived-target-label','saas-derived-target-label2','saas-derived-target-label3'].forEach(function(id){
-          var el = document.getElementById(id);
-          if (el) el.textContent = derivedLabel;
-        });
-        derivedBanner.style.display = '';
-      } else {
-        derivedBanner.style.display = 'none';
-      }
-    }
+    // 2026-05-18 案A: 派生取込仕様を廃止したため、派生取込バナー処理は不要
   }
 }
 
@@ -2282,12 +2221,9 @@ function applySingleImportMode(screenId) {
     var params = new URLSearchParams(window.location.search);
     var type = params.get('type');
     var mode = params.get('mode');
-    var derived = params.get('derived'); // 案B: 店舗/雇用区分から派生取込で遷移した場合の元の種別
+    // 2026-05-18 案A: 派生取込仕様廃止のため derived パラメータ処理は削除
     if (type) {
       setSingleImportMode(type, mode || '');
-      if (derived) {
-        try { sessionStorage.setItem('singleImportDerived', derived); } catch (e) {}
-      }
       window.addEventListener('DOMContentLoaded', function() {
         if (mode === 'tpl' || type === 'brand' || type === 'store' || type === 'emptype') {
           // テンプレ取込専用画面に直行 (brand/store/emptype は外部勤怠では取れない)
