@@ -393,6 +393,20 @@
 
 <!-- ==================== -->
 <!-- ★ 行編集モーダル (プレビュー画面のエラー行から呼び出し) -->
+<!-- ★ マスタ追加モーダル (プレビュー C-type エラーから呼び出し) -->
+<div id="master-add-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:12px;width:520px;max-width:92vw;padding:24px;box-shadow:0 10px 40px rgba(0,0,0,0.2);">
+    <div style="font-size:16px;font-weight:700;color:#333;margin-bottom:12px;">➕ <span id="master-add-title">マスタに追加</span></div>
+    <div style="font-size:11px;color:#888;margin-bottom:14px;line-height:1.7;">取込データから抽出した値を転写しています。必要に応じて編集し「登録」を押すと、対応マスタに追加 → プレビューが自動再判定されます。</div>
+    <div id="master-add-fields" style="margin-bottom:18px;"></div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;">
+      <button onclick="closeMasterAddModal()" style="font-size:13px;padding:8px 16px;border:1px solid #ccc;background:#fff;border-radius:6px;cursor:pointer;color:#555;">キャンセル</button>
+      <button onclick="confirmMasterAdd()" style="font-size:13px;padding:8px 18px;border:none;background:#2ec4a0;color:#fff;border-radius:6px;cursor:pointer;font-weight:600;">💾 マスタに登録</button>
+    </div>
+  </div>
+</div>
+
+<!-- ★ 行編集モーダル: 取込データ行の値を直接書き換え -->
 <div id="row-edit-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9999;align-items:center;justify-content:center;">
   <div style="background:#fff;border-radius:12px;width:460px;max-width:92vw;padding:24px;box-shadow:0 10px 40px rgba(0,0,0,0.2);">
     <div style="font-size:16px;font-weight:700;color:#333;margin-bottom:12px;">✏️ <span id="row-edit-field-label">行編集</span></div>
@@ -3190,11 +3204,81 @@ var MASTER_HASH_MAP = {
   employee: 'emp-ops-settings',
   admin:    'd1'
 };
+// マスタ追加モーダル: 値プリフィル → 登録 → プレビュー再判定
+//   masterKey: 'brand'|'store'|'emptype'|'employee'|'admin'
+//   missingValue: 取込データから抽出した未登録の値
+var _masterAddPending = null;
+var MASTER_ADD_FIELDS = {
+  brand:    [{ k:'name',    label:'業態・ブランド名', required:true, autoFromMissing:true },
+             { k:'code',    label:'コード',           required:false }],
+  store:    [{ k:'name',    label:'店舗名',           required:true, autoFromMissing:true },
+             { k:'code',    label:'コード',           required:false },
+             { k:'brand',   label:'業態・ブランド',   required:false },
+             { k:'address', label:'住所',             required:false }],
+  emptype:  [{ k:'name',    label:'区分名',           required:true, autoFromMissing:true },
+             { k:'code',    label:'区分コード',       required:false },
+             { k:'pay_type',label:'給与体系',         required:false, type:'select', options:['月給','日給','時給'] },
+             { k:'base_pay',label:'基準金額',         required:false }],
+  employee: [{ k:'name',    label:'氏名',             required:true, autoFromMissing:true },
+             { k:'code',    label:'従業員コード',     required:false }],
+  admin:    [{ k:'name',    label:'氏名',             required:true, autoFromMissing:true },
+             { k:'email',   label:'メール',           required:true }]
+};
 function openMasterAddRedirect(masterKey, missingValue) {
-  var hash = MASTER_HASH_MAP[masterKey] || 'b0-empty';
-  var url = 'https://suguru789987.github.io/rakmy-owner-registration-mock/#' + hash;
-  window.open(url, '_blank', 'noopener');
-  alert('「' + missingValue + '」を' + (TPL_TYPE_LABEL[masterKey] || masterKey) + 'マスタに追加してください (デモ)。\n追加後、このプレビュー画面に戻って「再判定」を押すと取込可能になります。');
+  _masterAddPending = { masterKey: masterKey, missingValue: missingValue };
+  var title = (TPL_TYPE_LABEL[masterKey] || masterKey) + 'マスタに追加';
+  var ttl = document.getElementById('master-add-title');
+  if (ttl) ttl.textContent = title;
+  var defs = MASTER_ADD_FIELDS[masterKey] || [];
+  var fieldsEl = document.getElementById('master-add-fields');
+  if (fieldsEl) {
+    fieldsEl.innerHTML = defs.map(function(d) {
+      var val = d.autoFromMissing ? missingValue : '';
+      var reqMark = d.required ? ' <span style="color:#c62828;">*</span>' : '';
+      var prefilledNote = d.autoFromMissing ? ' <span style="font-size:10px;color:#0e9077;font-weight:600;">← 取込データから転写</span>' : '';
+      var input;
+      if (d.type === 'select') {
+        input = '<select style="width:100%;font-size:13px;padding:8px 12px;border:1px solid #ccc;border-radius:6px;">' +
+          d.options.map(function(o){ return '<option>' + o + '</option>'; }).join('') +
+          '</select>';
+      } else {
+        input = '<input type="text" value="' + val.replace(/"/g,'&quot;') + '" style="width:100%;font-size:13px;padding:8px 12px;border:1px solid ' + (d.autoFromMissing ? '#2ec4a0' : '#ccc') + ';border-radius:6px;background:' + (d.autoFromMissing ? '#f0faf6' : '#fff') + ';box-sizing:border-box;">';
+      }
+      return '<div style="margin-bottom:10px;">' +
+        '<label style="display:block;font-size:11px;color:#555;font-weight:600;margin-bottom:4px;">' + d.label + reqMark + prefilledNote + '</label>' +
+        input + '</div>';
+    }).join('');
+  }
+  var ov = document.getElementById('master-add-overlay');
+  if (ov) ov.style.display = 'flex';
+}
+function closeMasterAddModal() {
+  var ov = document.getElementById('master-add-overlay');
+  if (ov) ov.style.display = 'none';
+  _masterAddPending = null;
+}
+function confirmMasterAdd() {
+  if (!_masterAddPending) { closeMasterAddModal(); return; }
+  var p = _masterAddPending;
+  closeMasterAddModal();
+  alert('✓ 「' + p.missingValue + '」を ' + (TPL_TYPE_LABEL[p.masterKey] || p.masterKey) + 'マスタに登録しました (デモ)。\nプレビューを再判定します。');
+  // デモ: エラー行を新規扱いに置換 (鈴木次郎 アルバイトD)
+  var errRow = document.querySelector('#saas3single-sec-emp tr.demo-err-resolvable, #saas3single-sec-emp tr[data-err-key="' + p.missingValue + '"]');
+  // フォールバック: クラス st-err を含む最初の行
+  if (!errRow) errRow = document.querySelector('#saas3single-sec-emp tbody tr td.st-err');
+  if (errRow && errRow.closest) errRow = errRow.closest('tr');
+  if (errRow) {
+    errRow.style.background = '';
+    errRow.style.opacity = '';
+    errRow.style.textDecoration = '';
+    var firstTd = errRow.querySelector('td');
+    if (firstTd) { firstTd.className = 'st-new'; firstTd.textContent = '● 新規'; }
+    // 雇用区分セル (5列目)
+    var tds = errRow.querySelectorAll('td');
+    if (tds[4]) tds[4].innerHTML = p.missingValue + ' <span style="font-size:10px;color:#0e9077;">(新規登録)</span>';
+    // 操作セル空に
+    if (tds[5]) tds[5].innerHTML = '';
+  }
 }
 
 // 行スキップ: グレーアウト + 「スキップ済」表示 (元の操作セル HTML をスナップショット)
