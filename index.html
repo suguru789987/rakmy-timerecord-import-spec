@@ -724,11 +724,11 @@
           <div style="flex:1;font-size:13px;color:#c62828;font-weight:700;">4件のエラー: 雇用区分マスタに合致しない値があります</div>
           <button onclick="openBulkMasterAddModal('emptype', [{name:'アルバイトD'},{name:'派遣社員X'},{name:'業務委託契約A'},{name:'正社員 A'}]);" style="font-size:12px;padding:7px 14px;border:none;color:#fff;background:#c62828;border-radius:6px;cursor:pointer;font-weight:700;white-space:nowrap;">➕ 未登録 4件をまとめて登録</button>
         </div>
-        <div style="font-size:11px;color:#9c4d12;margin-left:28px;line-height:1.7;">
-          各エラー行の操作列から <strong>いずれか1つ</strong> 選択:<br>
-          ・<strong>➕ マスタに追加</strong>: 値が正しく、ラクミー側マスタに無いから新規登録したい (新カテゴリ等)<br>
-          ・<strong>✏️ 行編集</strong>: CSVの値が誤りで、既存マスタの正しい値に修正したい (タイプミス・揺れ等)<br>
-          ・<strong>⊘ スキップ</strong>: この行は今回取込しない
+        <div style="font-size:11px;color:#9c4d12;margin-left:28px;line-height:1.8;">
+          各行で1つ選択 ─
+          <strong>➕ マスタに追加</strong>: 新しい値を登録 ／
+          <strong>✏️ 行編集</strong>: CSV側を修正 ／
+          <strong>⊘ スキップ</strong>: 取込まない
         </div>
       </div>
       <div class="wcard" style="padding:0;overflow-x:auto;">
