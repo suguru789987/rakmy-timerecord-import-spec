@@ -415,10 +415,13 @@
         <a href="#" onclick="event.preventDefault();bulkMasterAddAppendBlankRow();" style="font-size:11px;color:#1a73e8;text-decoration:underline;font-weight:600;">+ 行を追加 <span style="color:#888;font-weight:400;">(ついでに別マスタも登録したい場合)</span></a>
       </div>
     </div>
-    <div style="padding:14px 24px;border-top:1px solid #eee;display:flex;justify-content:flex-end;gap:10px;">
-      <button onclick="closeBulkMasterAddModal()" style="font-size:13px;padding:8px 16px;border:1px solid #ccc;background:#fff;border-radius:6px;cursor:pointer;color:#555;">キャンセル</button>
-      <button onclick="alert('一時保存しました (デモ): 続きは後で再開できます');" style="font-size:13px;padding:8px 16px;border:1px solid #e67e22;color:#e67e22;background:#fff;border-radius:6px;cursor:pointer;font-weight:600;">💾 一時保存</button>
-      <button onclick="confirmBulkMasterAdd()" style="font-size:13px;padding:8px 18px;border:none;background:#2ec4a0;color:#fff;border-radius:6px;cursor:pointer;font-weight:700;">📥 登録 (<span id="bulk-master-add-count">0</span>件)</button>
+    <div style="padding:14px 24px;border-top:1px solid #eee;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
+      <div id="bulk-master-add-status" style="font-size:11px;color:#0e9077;font-weight:600;min-height:18px;"></div>
+      <div style="display:flex;gap:10px;">
+        <button onclick="closeBulkMasterAddModal()" style="font-size:13px;padding:8px 16px;border:1px solid #ccc;background:#fff;border-radius:6px;cursor:pointer;color:#555;">キャンセル</button>
+        <button onclick="bulkMasterAddDraftSave();" style="font-size:13px;padding:8px 16px;border:1px solid #e67e22;color:#e67e22;background:#fff;border-radius:6px;cursor:pointer;font-weight:600;">💾 一時保存</button>
+        <button onclick="confirmBulkMasterAdd()" style="font-size:13px;padding:8px 18px;border:none;background:#2ec4a0;color:#fff;border-radius:6px;cursor:pointer;font-weight:700;">📥 登録 (<span id="bulk-master-add-count">0</span>件)</button>
+      </div>
     </div>
   </div>
 </div>
@@ -3321,6 +3324,14 @@ function bulkMasterAddRemoveRow(btn) {
   var tr = btn.closest('tr');
   if (tr) tr.parentElement.removeChild(tr);
   bulkMasterAddUpdateCount();
+}
+// 一時保存 (alert ではなく インラインステータス表示)
+function bulkMasterAddDraftSave() {
+  var st = document.getElementById('bulk-master-add-status');
+  if (!st) return;
+  var nowStr = new Date().toLocaleTimeString('ja-JP', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+  st.innerHTML = '✓ 一時保存しました <span style="color:#888;font-weight:400;">(' + nowStr + ' ・続きは後で再開可能)</span>';
+  setTimeout(function(){ if (st) st.innerHTML = ''; }, 4000);
 }
 function bulkMasterAddAppendBlankRow() {
   if (!_bulkMasterAddPending) return;
