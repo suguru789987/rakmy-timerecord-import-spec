@@ -393,6 +393,35 @@
 
 <!-- ==================== -->
 <!-- ★ 行編集モーダル (プレビュー画面のエラー行から呼び出し) -->
+<!-- ★ 一括マスタ追加モーダル (運用更新・複数件まとめて登録) -->
+<div id="bulk-master-add-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:12px;width:880px;max-width:96vw;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 10px 40px rgba(0,0,0,0.2);">
+    <div style="padding:20px 24px 12px;border-bottom:1px solid #eee;display:flex;align-items:center;justify-content:space-between;">
+      <div style="font-size:16px;font-weight:700;color:#333;">➕ <span id="bulk-master-add-title">マスタに追加</span> <span style="font-size:10px;color:#fff;background:#1a73e8;padding:3px 10px;border-radius:10px;margin-left:6px;font-weight:600;">運用更新</span></div>
+      <button onclick="closeBulkMasterAddModal()" style="background:none;border:none;font-size:18px;color:#888;cursor:pointer;">×</button>
+    </div>
+    <div style="padding:14px 24px;font-size:11px;color:#666;line-height:1.7;border-bottom:1px solid #f0f0f0;">
+      CSV取込で検出された未登録の値をマスタに一括追加します。<span style="color:#0e9077;font-weight:700;">緑枠</span>のセルは取込データから自動転写。必要に応じて他の列を編集して「登録」を押すと、マスタ追加 → プレビューが自動再判定されます。
+    </div>
+    <div style="padding:14px 24px;overflow-y:auto;flex:1;">
+      <div id="bulk-master-add-tablewrap" style="border:1px solid #e0e0e0;border-radius:8px;overflow:hidden;">
+        <table id="bulk-master-add-table" style="width:100%;border-collapse:collapse;font-size:12px;">
+          <thead id="bulk-master-add-thead"></thead>
+          <tbody id="bulk-master-add-tbody"></tbody>
+        </table>
+      </div>
+      <div style="margin-top:8px;text-align:left;">
+        <a href="#" onclick="event.preventDefault();bulkMasterAddAppendBlankRow();" style="font-size:11px;color:#1a73e8;text-decoration:underline;font-weight:600;">+ 行を追加 <span style="color:#888;font-weight:400;">(ついでに別マスタも登録したい場合)</span></a>
+      </div>
+    </div>
+    <div style="padding:14px 24px;border-top:1px solid #eee;display:flex;justify-content:flex-end;gap:10px;">
+      <button onclick="closeBulkMasterAddModal()" style="font-size:13px;padding:8px 16px;border:1px solid #ccc;background:#fff;border-radius:6px;cursor:pointer;color:#555;">キャンセル</button>
+      <button onclick="alert('一時保存しました (デモ): 続きは後で再開できます');" style="font-size:13px;padding:8px 16px;border:1px solid #e67e22;color:#e67e22;background:#fff;border-radius:6px;cursor:pointer;font-weight:600;">💾 一時保存</button>
+      <button onclick="confirmBulkMasterAdd()" style="font-size:13px;padding:8px 18px;border:none;background:#2ec4a0;color:#fff;border-radius:6px;cursor:pointer;font-weight:700;">📥 登録 (<span id="bulk-master-add-count">0</span>件)</button>
+    </div>
+  </div>
+</div>
+
 <!-- ★ マスタ追加モーダル (プレビュー C-type エラーから呼び出し) -->
 <div id="master-add-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9999;align-items:center;justify-content:center;">
   <div style="background:#fff;border-radius:12px;width:520px;max-width:92vw;padding:24px;box-shadow:0 10px 40px rgba(0,0,0,0.2);">
@@ -682,24 +711,21 @@
     <!-- 従業員セクション -->
     <div id="saas3single-sec-emp" class="saas3single-sec" style="display:none;">
       <div class="pv-summary">
-        <div class="pv-box pv-total"><div class="num">5</div><div class="lbl">データ行数</div></div>
+        <div class="pv-box pv-total"><div class="num">7</div><div class="lbl">データ行数</div></div>
         <div class="pv-box pv-new"><div class="num">3</div><div class="lbl">新規登録</div></div>
         <div class="pv-box pv-upd"><div class="num">1</div><div class="lbl">更新</div></div>
-        <div class="pv-box pv-err"><div class="num">1</div><div class="lbl">エラー</div></div>
+        <div class="pv-box pv-err"><div class="num">3</div><div class="lbl">エラー</div></div>
       </div>
-      <!-- ❌ エラー検知バナー (マスタ不整合 type C) -->
-      <div style="background:#ffebee;border:1px solid #ffcdd2;border-radius:8px;padding:12px 16px;margin-bottom:14px;">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+      <!-- ❌ エラー検知バナー (マスタ不整合 type C / 複数件想定) -->
+      <div id="emp-err-banner" style="background:#ffebee;border:1px solid #ffcdd2;border-radius:8px;padding:12px 16px;margin-bottom:14px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap;">
           <span style="font-size:18px;">❌</span>
-          <div style="font-size:13px;color:#c62828;font-weight:700;">1件のエラー: 雇用区分マスタに値「アルバイトD」が無いため取込失敗</div>
+          <div style="flex:1;font-size:13px;color:#c62828;font-weight:700;">3件のエラー: 雇用区分マスタに未登録の値があります (アルバイトD / 派遣社員X / 業務委託契約A)</div>
+          <button onclick="openBulkMasterAddModal('emptype', [{name:'アルバイトD'},{name:'派遣社員X'},{name:'業務委託契約A'}]);" style="font-size:12px;padding:7px 14px;border:none;color:#fff;background:#c62828;border-radius:6px;cursor:pointer;font-weight:700;white-space:nowrap;">➕ 未登録 3件をまとめて登録</button>
         </div>
         <div style="font-size:11px;color:#9c4d12;margin-left:28px;line-height:1.7;">
-          下のエラー行の <strong>「操作」</strong> から修正方法を選んでください。複数の修正方法があります:
-          <ul style="margin:4px 0 0 16px;padding:0;">
-            <li><strong>➕ マスタに追加</strong>: 「アルバイトD」を雇用区分マスタに登録 → 自動で取込再判定</li>
-            <li><strong>✏️ 行編集</strong>: 行の雇用区分を既存の値 (正社員A など) に変更</li>
-            <li><strong>⊘ スキップ</strong>: この行だけ取込対象から除外</li>
-          </ul>
+          まとめて登録 (上記ボタン) ・ 行ごとに個別対応 (下記操作列) のどちらか選択してください。<br>
+          <strong>個別対応の選択肢</strong>: ➕マスタに追加 (1件) / ✏️行編集 (CSVの値を書換) / ⊘スキップ (この行のみ除外)
         </div>
       </div>
       <div class="wcard" style="padding:0;overflow-x:auto;">
@@ -709,7 +735,9 @@
             <tr><td class="st-new">● 新規</td><td>山田太郎</td><td>yamada@example.com</td><td>渋谷店</td><td>正社員A</td><td></td></tr>
             <tr><td class="st-new">● 新規</td><td>佐藤花子</td><td>sato@example.com</td><td>新宿店</td><td>正社員A</td><td></td></tr>
             <tr><td class="st-new">● 新規</td><td>田中一郎</td><td>tanaka@example.com</td><td>池袋店</td><td>パートB</td><td></td></tr>
-            <tr style="background:#fffafa;"><td class="st-err">✗ エラー</td><td>鈴木次郎</td><td>suzuki@example.com</td><td>渋谷店</td><td style="color:#c62828;">アルバイトD <span style="font-size:10px;">(マスタ未登録)</span></td><td style="white-space:nowrap;font-size:0;"><button onclick="openMasterAddRedirect('emptype','アルバイトD');" style="font-size:10px;padding:4px 8px;border:1px solid #2ec4a0;color:#0e9077;background:#fff;border-radius:4px;cursor:pointer;margin-right:3px;font-weight:600;">➕ マスタに追加</button><button onclick="openRowEditModal('雇用区分','アルバイトD','正社員A');" style="font-size:10px;padding:4px 8px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;margin-right:3px;">✏️ 行編集</button><button onclick="markRowSkipped(this);" style="font-size:10px;padding:4px 8px;border:1px solid #ccc;color:#888;background:#fff;border-radius:4px;cursor:pointer;">⊘ スキップ</button></td></tr>
+            <tr data-err-val="アルバイトD" style="background:#fffafa;"><td class="st-err">✗ エラー</td><td>鈴木次郎</td><td>suzuki@example.com</td><td>渋谷店</td><td style="color:#c62828;">アルバイトD <span style="font-size:10px;">(マスタ未登録)</span></td><td style="white-space:nowrap;font-size:0;"><button onclick="openMasterAddRedirect('emptype','アルバイトD');" style="font-size:10px;padding:4px 8px;border:1px solid #2ec4a0;color:#0e9077;background:#fff;border-radius:4px;cursor:pointer;margin-right:3px;font-weight:600;">➕ マスタに追加</button><button onclick="openRowEditModal('雇用区分','アルバイトD','正社員A');" style="font-size:10px;padding:4px 8px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;margin-right:3px;">✏️ 行編集</button><button onclick="markRowSkipped(this);" style="font-size:10px;padding:4px 8px;border:1px solid #ccc;color:#888;background:#fff;border-radius:4px;cursor:pointer;">⊘ スキップ</button></td></tr>
+            <tr data-err-val="派遣社員X" style="background:#fffafa;"><td class="st-err">✗ エラー</td><td>渡辺健</td><td>watanabe@example.com</td><td>新宿店</td><td style="color:#c62828;">派遣社員X <span style="font-size:10px;">(マスタ未登録)</span></td><td style="white-space:nowrap;font-size:0;"><button onclick="openMasterAddRedirect('emptype','派遣社員X');" style="font-size:10px;padding:4px 8px;border:1px solid #2ec4a0;color:#0e9077;background:#fff;border-radius:4px;cursor:pointer;margin-right:3px;font-weight:600;">➕ マスタに追加</button><button onclick="openRowEditModal('雇用区分','派遣社員X','正社員A');" style="font-size:10px;padding:4px 8px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;margin-right:3px;">✏️ 行編集</button><button onclick="markRowSkipped(this);" style="font-size:10px;padding:4px 8px;border:1px solid #ccc;color:#888;background:#fff;border-radius:4px;cursor:pointer;">⊘ スキップ</button></td></tr>
+            <tr data-err-val="業務委託契約A" style="background:#fffafa;"><td class="st-err">✗ エラー</td><td>中村真理</td><td>nakamura@example.com</td><td>池袋店</td><td style="color:#c62828;">業務委託契約A <span style="font-size:10px;">(マスタ未登録)</span></td><td style="white-space:nowrap;font-size:0;"><button onclick="openMasterAddRedirect('emptype','業務委託契約A');" style="font-size:10px;padding:4px 8px;border:1px solid #2ec4a0;color:#0e9077;background:#fff;border-radius:4px;cursor:pointer;margin-right:3px;font-weight:600;">➕ マスタに追加</button><button onclick="openRowEditModal('雇用区分','業務委託契約A','正社員A');" style="font-size:10px;padding:4px 8px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;margin-right:3px;">✏️ 行編集</button><button onclick="markRowSkipped(this);" style="font-size:10px;padding:4px 8px;border:1px solid #ccc;color:#888;background:#fff;border-radius:4px;cursor:pointer;">⊘ スキップ</button></td></tr>
             <tr><td class="st-upd">● 更新</td><td>高橋美咲</td><td>takahashi@example.com</td><td>新宿店</td><td>日給スタッフC</td><td></td></tr>
           </tbody>
         </table>
@@ -3257,6 +3285,116 @@ function closeMasterAddModal() {
   if (ov) ov.style.display = 'none';
   _masterAddPending = null;
 }
+// ===== 一括マスタ追加モーダル (運用更新・複数件) =====
+var _bulkMasterAddPending = null;
+function bulkMasterAddRenderRow(rowIdx, def, missingValue) {
+  var cells = def.map(function(d) {
+    var val = d.autoFromMissing ? missingValue : '';
+    var bg = d.autoFromMissing ? '#f0faf6' : '#fff';
+    var border = d.autoFromMissing ? '1.5px solid #2ec4a0' : '1px solid #ccc';
+    var input;
+    if (d.type === 'select') {
+      input = '<select style="width:100%;font-size:12px;padding:6px 8px;border:' + border + ';border-radius:4px;background:' + bg + ';">' +
+        d.options.map(function(o){ return '<option>' + o + '</option>'; }).join('') +
+        '</select>';
+    } else {
+      input = '<input type="text" value="' + val.replace(/"/g,'&quot;') + '" placeholder="' + (d.placeholder||'') + '" style="width:100%;font-size:12px;padding:6px 8px;border:' + border + ';border-radius:4px;background:' + bg + ';box-sizing:border-box;">';
+    }
+    return '<td style="padding:8px 10px;border-bottom:1px solid #eee;">' + input + '</td>';
+  }).join('');
+  return '<tr data-bulk-row="' + rowIdx + '" data-missing="' + (missingValue||'') + '">' +
+    '<td style="padding:8px 10px;border-bottom:1px solid #eee;color:#888;font-size:11px;text-align:center;width:32px;">' + (rowIdx+1) + '</td>' +
+    cells +
+    '<td style="padding:8px 10px;border-bottom:1px solid #eee;text-align:center;width:40px;"><button onclick="bulkMasterAddRemoveRow(this)" style="font-size:14px;color:#c62828;background:none;border:1px solid #ffcdd2;border-radius:4px;cursor:pointer;padding:2px 8px;">×</button></td>' +
+    '</tr>';
+}
+function bulkMasterAddUpdateCount() {
+  var rows = document.querySelectorAll('#bulk-master-add-tbody tr');
+  var el = document.getElementById('bulk-master-add-count');
+  if (el) el.textContent = rows.length;
+}
+function bulkMasterAddRemoveRow(btn) {
+  var tr = btn.closest('tr');
+  if (tr) tr.parentElement.removeChild(tr);
+  bulkMasterAddUpdateCount();
+}
+function bulkMasterAddAppendBlankRow() {
+  if (!_bulkMasterAddPending) return;
+  var defs = MASTER_ADD_FIELDS[_bulkMasterAddPending.masterKey] || [];
+  var tbody = document.getElementById('bulk-master-add-tbody');
+  var idx = tbody.querySelectorAll('tr').length;
+  tbody.insertAdjacentHTML('beforeend', bulkMasterAddRenderRow(idx, defs, ''));
+  bulkMasterAddUpdateCount();
+}
+function openBulkMasterAddModal(masterKey, missingItems) {
+  // missingItems: [{ name: 'アルバイトD' }, ...]
+  _bulkMasterAddPending = { masterKey: masterKey, items: missingItems || [] };
+  var defs = MASTER_ADD_FIELDS[masterKey] || [];
+  var ttl = document.getElementById('bulk-master-add-title');
+  if (ttl) ttl.textContent = (TPL_TYPE_LABEL[masterKey] || masterKey) + 'マスタに追加';
+  // thead
+  var thead = document.getElementById('bulk-master-add-thead');
+  if (thead) {
+    var ths = defs.map(function(d) {
+      var reqMark = d.required ? ' <span style="color:#c62828;">*</span>' : '';
+      var note = d.autoFromMissing ? ' <span style="font-size:9px;color:#0e9077;background:#e8f9f4;border:1px solid #b8e6d6;padding:1px 6px;border-radius:8px;font-weight:600;margin-left:4px;">← 取込データ転写</span>' : '';
+      return '<th style="padding:10px;background:#f6f8fb;border-bottom:1px solid #e0e0e0;text-align:left;font-size:11px;color:#555;font-weight:700;">' + d.label + reqMark + note + '</th>';
+    }).join('');
+    thead.innerHTML = '<tr><th style="padding:10px;background:#f6f8fb;border-bottom:1px solid #e0e0e0;font-size:11px;color:#888;font-weight:700;width:32px;text-align:center;">#</th>' + ths + '<th style="padding:10px;background:#f6f8fb;border-bottom:1px solid #e0e0e0;font-size:11px;color:#555;font-weight:700;width:40px;text-align:center;">操作</th></tr>';
+  }
+  // tbody
+  var tbody = document.getElementById('bulk-master-add-tbody');
+  if (tbody) {
+    if (!missingItems || missingItems.length === 0) {
+      tbody.innerHTML = bulkMasterAddRenderRow(0, defs, '');
+    } else {
+      tbody.innerHTML = missingItems.map(function(it, i) {
+        return bulkMasterAddRenderRow(i, defs, it.name);
+      }).join('');
+    }
+  }
+  bulkMasterAddUpdateCount();
+  var ov = document.getElementById('bulk-master-add-overlay');
+  if (ov) ov.style.display = 'flex';
+}
+function closeBulkMasterAddModal() {
+  var ov = document.getElementById('bulk-master-add-overlay');
+  if (ov) ov.style.display = 'none';
+  _bulkMasterAddPending = null;
+}
+function confirmBulkMasterAdd() {
+  if (!_bulkMasterAddPending) { closeBulkMasterAddModal(); return; }
+  var p = _bulkMasterAddPending;
+  // 各行の missingValue を回収
+  var missingValues = [];
+  document.querySelectorAll('#bulk-master-add-tbody tr').forEach(function(tr){
+    var m = tr.getAttribute('data-missing');
+    if (m) missingValues.push(m);
+  });
+  closeBulkMasterAddModal();
+  alert('✓ ' + missingValues.length + '件を ' + (TPL_TYPE_LABEL[p.masterKey] || p.masterKey) + 'マスタに登録しました (デモ)。\n対応するエラー行を自動再判定します。');
+  // 対応エラー行をすべて「●新規」に置換
+  missingValues.forEach(function(mv){
+    var tr = document.querySelector('#saas3single-sec-emp tr[data-err-val="' + mv + '"]');
+    if (!tr) return;
+    tr.style.background = '';
+    tr.style.opacity = '';
+    tr.style.textDecoration = '';
+    var firstTd = tr.querySelector('td');
+    if (firstTd) { firstTd.className = 'st-new'; firstTd.textContent = '● 新規'; }
+    var tds = tr.querySelectorAll('td');
+    if (tds[4]) tds[4].innerHTML = mv + ' <span style="font-size:10px;color:#0e9077;">(新規登録)</span>';
+    if (tds[5]) tds[5].innerHTML = '';
+  });
+  // エラーバナー & エラー件数を更新
+  var banner = document.getElementById('emp-err-banner');
+  if (banner) banner.style.display = 'none';
+  var errBox = document.querySelector('#saas3single-sec-emp .pv-summary .pv-box.pv-err .num');
+  if (errBox) errBox.textContent = '0';
+  var newBox = document.querySelector('#saas3single-sec-emp .pv-summary .pv-box.pv-new .num');
+  if (newBox) newBox.textContent = String(parseInt(newBox.textContent||'0',10) + missingValues.length);
+}
+
 function confirmMasterAdd() {
   if (!_masterAddPending) { closeMasterAddModal(); return; }
   var p = _masterAddPending;
