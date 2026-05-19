@@ -2776,15 +2776,23 @@ sourceNote +
 '      <tbody>' + rows + '</tbody>' +
 '    </table>' +
 '  </div>' +
-'  <div class="wcard" style="margin-top:14px;padding:14px 16px;">' +
-'    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">' +
-'      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;color:#333;flex:1;">' +
-'        <input type="checkbox" checked style="accent-color:#2ec4a0;width:16px;height:16px;">' +
-'        <span><strong>次回もこのマッピング設定を保存</strong> <span style="font-size:11px;color:#888;font-weight:400;">(設定名: <input type="text" value="' + label + '_default_mapping" style="font-size:11px;padding:3px 8px;border:1px solid #ccc;border-radius:4px;width:200px;margin-left:4px;">)</span></span>' +
-'      </label>' +
-'      <button type="button" onclick="openSavedMappingListWithSrc(\'' + k + '\');" title="' + label + 'の保存済プロファイルだけ絞り込んで表示 (現在選択中の連携元で更に絞込)" style="font-size:11px;padding:7px 14px;border:1px solid #1a73e8;color:#1a73e8;background:#fff;border-radius:6px;cursor:pointer;font-weight:600;white-space:nowrap;display:inline-flex;align-items:center;gap:4px;">📁 ' + label + ' の保存済プロファイル一覧 →</button>' +
+'  <div class="wcard" style="margin-top:14px;padding:16px 18px;">' +
+'    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:12px;">' +
+'      <div style="font-size:14px;font-weight:700;color:#333;">💾 マッピングをプロファイルとして保存</div>' +
+'      <button type="button" onclick="openSavedMappingListWithSrc(\'' + k + '\');" title="' + label + 'の保存済プロファイルだけ絞り込んで表示" style="font-size:11px;padding:6px 12px;border:1px solid #1a73e8;color:#1a73e8;background:#fff;border-radius:6px;cursor:pointer;font-weight:600;white-space:nowrap;">📁 保存済プロファイル一覧 →</button>' +
 '    </div>' +
-'    <div style="font-size:10px;color:#888;margin-top:6px;margin-left:26px;line-height:1.6;">保存しておくと、次回以降の' + label + '取込で自動的にこのマッピングが適用されます (オフで都度設定)。一覧画面ではすべての保存済プロファイルを横断確認・編集・削除できます。</div>' +
+'    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;">' +
+'      <label for="saas-mapping-' + k + '-name" style="font-size:12px;color:#555;font-weight:600;min-width:70px;">保存名 <span style="color:#c62828;">*</span></label>' +
+'      <input type="text" id="saas-mapping-' + k + '-name" value="' + label + '_default_mapping" placeholder="例: ' + label + '_default_mapping" style="flex:1;min-width:240px;font-size:13px;padding:8px 12px;border:1px solid #ccc;border-radius:6px;">' +
+'    </div>' +
+'    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:12px;color:#444;padding:8px 0;">' +
+'      <input type="checkbox" checked style="accent-color:#2ec4a0;width:16px;height:16px;">' +
+'      <span><strong>保存後、このプロファイルをアクティブにする</strong> <span style="color:#888;font-weight:400;">(同 ' + label + '×連携元 の自動適用先になる)</span></span>' +
+'    </label>' +
+'    <div style="font-size:11px;color:#888;margin-top:6px;line-height:1.7;padding:8px 10px;background:#f6f8fb;border-radius:6px;">' +
+'      💡 保存名を入れて「プレビューへ」を押すと、その名前でプロファイルが保存されます。<br>' +
+'      　 保存せず今回限りにしたい場合は、保存名を空にしてから「プレビューへ」を押してください。' +
+'    </div>' +
 '  </div>' +
 '  <div class="btn-group" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">' +
 '    <button class="btn btn-ghost" onclick="go(\'s-saas-single-' + k + '\');">← アップロード画面に戻る</button>' +
