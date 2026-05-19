@@ -2472,6 +2472,35 @@ SAAS_SINGLE_CFG.forEach(function(c){ _singleSaasState[c.key] = { currentIdx:0, m
 // 直近で active になった source key (下流の確認/プレビュー画面が読む)
 var _activeSingleTplKey = null;
 var _activeSingleSaasKey = null;
+// SaaS 連携元サービス (キングオブタイム=kot / ジョブカン=jobcan)
+// upload画面 / マッピング画面 / 保存一覧画面 で連動
+var _activeSaasSource = 'kot';
+var SAAS_SOURCE_LABEL = { kot: 'キングオブタイム', jobcan: 'ジョブカン' };
+
+// 連携元サービスを選択 (3画面連動)
+function selectSaasSource(key, src) {
+  _activeSaasSource = src;
+  // 取込画面 (s-saas-single-{key}) のカード UI を更新
+  var cards = document.querySelectorAll('#saas-src-cards-' + key + ' .saas-src-card');
+  cards.forEach(function(c){
+    var active = (c.getAttribute('data-src') === src);
+    c.style.border = active ? '2px solid #2ec4a0' : '2px solid #e0e0e0';
+    c.style.background = active ? '#f0faf6' : '#fff';
+    var nameEl = c.querySelector('div:nth-child(2)');
+    if (nameEl) nameEl.style.color = active ? '#0e9077' : '';
+  });
+  // 既にレンダリング済みのマッピング画面ラベルも同期 (全種別)
+  ['brand','store','emptype','employee','admin'].forEach(function(k){
+    var lbl = document.getElementById('saas-mapping-' + k + '-src-label');
+    if (lbl) lbl.textContent = SAAS_SOURCE_LABEL[src] || src;
+  });
+}
+
+// 「保存済プロファイル一覧」ボタン: 現在の連携元も URL に乗せて owner-mock へ
+function openSavedMappingListWithSrc(key) {
+  var url = 'https://suguru789987.github.io/rakmy-owner-registration-mock/?openSavedMappingList=' + encodeURIComponent(key) + '&src=' + encodeURIComponent(_activeSaasSource) + '#saas-mapping-list';
+  window.open(url, '_blank', 'noopener');
+}
 
 // ===== HTML テンプレート =====
 function renderTplSingleScreen(cfg) {
@@ -2595,12 +2624,12 @@ futureBanner +
 '    <div class="fs"><span class="fs-num">4</span><span class="fs-label">完了</span></div>' +
 '  </div>' +
 '  <div class="wcard">' +
-'    <div class="wcard-title"><span class="num">1</span> 連携元サービスを選択</div>' +
-'    <div style="display:flex;gap:10px;flex-wrap:wrap;">' +
-'      <div class="saas-item selected" style="flex:1;min-width:160px;padding:14px;border:2px solid #2ec4a0;border-radius:8px;cursor:pointer;text-align:center;background:#fff;">' +
-'        <div style="font-size:24px;">⏰</div><div style="font-size:13px;font-weight:700;">キングオブタイム</div>' +
+'    <div class="wcard-title"><span class="num">1</span> 連携元サービスを選択 <span style="font-size:10px;color:#888;font-weight:400;">(マッピング / 保存一覧 と連動)</span></div>' +
+'    <div style="display:flex;gap:10px;flex-wrap:wrap;" id="saas-src-cards-' + k + '">' +
+'      <div class="saas-src-card" data-src="kot" onclick="selectSaasSource(\'' + k + '\',\'kot\')" style="flex:1;min-width:160px;padding:14px;border:2px solid #2ec4a0;border-radius:8px;cursor:pointer;text-align:center;background:#f0faf6;">' +
+'        <div style="font-size:24px;">⏰</div><div style="font-size:13px;font-weight:700;color:#0e9077;">キングオブタイム</div>' +
 '      </div>' +
-'      <div class="saas-item" style="flex:1;min-width:160px;padding:14px;border:2px solid #e0e0e0;border-radius:8px;cursor:pointer;text-align:center;background:#fff;">' +
+'      <div class="saas-src-card" data-src="jobcan" onclick="selectSaasSource(\'' + k + '\',\'jobcan\')" style="flex:1;min-width:160px;padding:14px;border:2px solid #e0e0e0;border-radius:8px;cursor:pointer;text-align:center;background:#fff;">' +
 '        <div style="font-size:24px;">📋</div><div style="font-size:13px;font-weight:700;">ジョブカン</div>' +
 '      </div>' +
 '    </div>' +
@@ -2734,6 +2763,7 @@ futureNote +
 '      <div style="font-size:13px;color:#0d47a1;font-weight:700;">' + label + ' エクスポート列 ⇄ ラクミー項目 のマッピング</div>' +
 '      <div style="font-size:11px;color:#555;margin-top:2px;">外部勤怠サービス側のエクスポート列名と、ラクミー側の対応項目を紐付けます。自動推定済みの内容を確認・編集できます。</div>' +
 '    </div>' +
+'    <span style="font-size:10px;color:#666;background:#fff;border:1px solid #ddd;border-radius:12px;padding:4px 10px;white-space:nowrap;">連携元: <strong id="saas-mapping-' + k + '-src-label" style="color:#0e9077;">キングオブタイム</strong></span>' +
 '  </div>' +
 warningBanner +
 sourceNote +
@@ -2752,7 +2782,7 @@ sourceNote +
 '        <input type="checkbox" checked style="accent-color:#2ec4a0;width:16px;height:16px;">' +
 '        <span><strong>次回もこのマッピング設定を保存</strong> <span style="font-size:11px;color:#888;font-weight:400;">(設定名: <input type="text" value="' + label + '_default_mapping" style="font-size:11px;padding:3px 8px;border:1px solid #ccc;border-radius:4px;width:200px;margin-left:4px;">)</span></span>' +
 '      </label>' +
-'      <button type="button" onclick="window.open(\'https://suguru789987.github.io/rakmy-owner-registration-mock/?openSavedMappingList=' + k + '#saas-mapping-list\',\'_blank\',\'noopener\');" title="' + label + 'の保存済プロファイルだけ絞り込んで表示" style="font-size:11px;padding:7px 14px;border:1px solid #1a73e8;color:#1a73e8;background:#fff;border-radius:6px;cursor:pointer;font-weight:600;white-space:nowrap;display:inline-flex;align-items:center;gap:4px;">📁 ' + label + ' の保存済プロファイル一覧 →</button>' +
+'      <button type="button" onclick="openSavedMappingListWithSrc(\'' + k + '\');" title="' + label + 'の保存済プロファイルだけ絞り込んで表示 (現在選択中の連携元で更に絞込)" style="font-size:11px;padding:7px 14px;border:1px solid #1a73e8;color:#1a73e8;background:#fff;border-radius:6px;cursor:pointer;font-weight:600;white-space:nowrap;display:inline-flex;align-items:center;gap:4px;">📁 ' + label + ' の保存済プロファイル一覧 →</button>' +
 '    </div>' +
 '    <div style="font-size:10px;color:#888;margin-top:6px;margin-left:26px;line-height:1.6;">保存しておくと、次回以降の' + label + '取込で自動的にこのマッピングが適用されます (オフで都度設定)。一覧画面ではすべての保存済プロファイルを横断確認・編集・削除できます。</div>' +
 '  </div>' +
@@ -3243,6 +3273,14 @@ function go(id) {
   // 運用更新 設定画面別の単一データ取込画面 入場時の初期化
   if (/^s-(tpl|saas)-single-/.test(id)) {
     if (typeof applyToSingleScreen === 'function') applyToSingleScreen(id);
+  }
+  // マッピング画面入場時: 連携元ラベル同期
+  if (/^s-saas-mapping-single-/.test(id)) {
+    var mk = id.replace('s-saas-mapping-single-','');
+    var lbl = document.getElementById('saas-mapping-' + mk + '-src-label');
+    if (lbl && typeof SAAS_SOURCE_LABEL !== 'undefined') {
+      lbl.textContent = SAAS_SOURCE_LABEL[_activeSaasSource] || _activeSaasSource;
+    }
   }
   // 運用更新 完了画面 → 招待メール行の表示制御
   if (id === 's-tpl3-single') {
