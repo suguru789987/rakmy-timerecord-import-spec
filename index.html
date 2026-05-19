@@ -712,8 +712,97 @@
     <!-- データ種別タブ (取込順) -->
     <div class="wcard" style="padding:0;margin-bottom:16px;background:#f5f7f9;border:1px solid #e0e0e0;">
       <div id="saas3single-tabs" style="display:flex;align-items:stretch;gap:0;flex-wrap:wrap;">
-        <button data-key="map-kot-emp"   onclick="switchSaasPreviewSingleTab('map-kot-emp')"   class="saas3single-tab" style="flex:1;min-width:140px;padding:12px 14px;border:none;background:#f5f7f9;border-bottom:3px solid transparent;cursor:pointer;font-size:12px;font-weight:600;color:#555;">従業員</button>
-        <button data-key="map-kot-admin" onclick="switchSaasPreviewSingleTab('map-kot-admin')" class="saas3single-tab" style="flex:1;min-width:140px;padding:12px 14px;border:none;background:#f5f7f9;border-bottom:3px solid transparent;cursor:pointer;font-size:12px;font-weight:600;color:#555;">管理者</button>
+        <button data-key="map-kot-brand"   onclick="switchSaasPreviewSingleTab('map-kot-brand')"   class="saas3single-tab" style="flex:1;min-width:120px;padding:12px 14px;border:none;background:#f5f7f9;border-bottom:3px solid transparent;cursor:pointer;font-size:12px;font-weight:600;color:#555;">業態・ブランド</button>
+        <button data-key="map-kot-store"   onclick="switchSaasPreviewSingleTab('map-kot-store')"   class="saas3single-tab" style="flex:1;min-width:120px;padding:12px 14px;border:none;background:#f5f7f9;border-bottom:3px solid transparent;cursor:pointer;font-size:12px;font-weight:600;color:#555;">店舗</button>
+        <button data-key="map-kot-emptype" onclick="switchSaasPreviewSingleTab('map-kot-emptype')" class="saas3single-tab" style="flex:1;min-width:120px;padding:12px 14px;border:none;background:#f5f7f9;border-bottom:3px solid transparent;cursor:pointer;font-size:12px;font-weight:600;color:#555;">雇用区分</button>
+        <button data-key="map-kot-emp"     onclick="switchSaasPreviewSingleTab('map-kot-emp')"     class="saas3single-tab" style="flex:1;min-width:120px;padding:12px 14px;border:none;background:#f5f7f9;border-bottom:3px solid transparent;cursor:pointer;font-size:12px;font-weight:600;color:#555;">従業員</button>
+        <button data-key="map-kot-admin"   onclick="switchSaasPreviewSingleTab('map-kot-admin')"   class="saas3single-tab" style="flex:1;min-width:120px;padding:12px 14px;border:none;background:#f5f7f9;border-bottom:3px solid transparent;cursor:pointer;font-size:12px;font-weight:600;color:#555;">管理者</button>
+      </div>
+    </div>
+
+    <!-- 業態・ブランド セクション -->
+    <div id="saas3single-sec-brand" class="saas3single-sec" style="display:none;">
+      <div class="pv-summary">
+        <div class="pv-box pv-total"><div class="num">3</div><div class="lbl">データ行数</div></div>
+        <div class="pv-box pv-new"><div class="num">2</div><div class="lbl">新規登録</div></div>
+        <div class="pv-box pv-upd"><div class="num">0</div><div class="lbl">更新</div></div>
+        <div class="pv-box pv-err"><div class="num">1</div><div class="lbl">エラー</div></div>
+      </div>
+      <div style="background:#ffebee;border:1px solid #ffcdd2;border-radius:8px;padding:12px 16px;margin-bottom:14px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap;">
+          <span style="font-size:18px;">❌</span>
+          <div style="flex:1;font-size:13px;color:#c62828;font-weight:700;">1件のエラー: 業態名重複</div>
+        </div>
+        <div style="font-size:11px;color:#9c4d12;margin-left:28px;line-height:1.8;">各行で1つ選択 ─ <strong>✏️ 行編集</strong>: 別名に変更 ／ <strong>⊘ スキップ</strong>: 取込まない</div>
+      </div>
+      <div class="wcard" style="padding:0;overflow-x:auto;">
+        <table class="pv-table">
+          <thead><tr><th>状態</th><th>業態・ブランド名</th><th>コード</th><th style="min-width:200px;">操作 (1つ選択)</th></tr></thead>
+          <tbody>
+            <tr><td class="st-new">● 新規</td><td>居酒屋</td><td>BRD001</td><td></td></tr>
+            <tr><td class="st-new">● 新規</td><td>カフェ</td><td>BRD002</td><td></td></tr>
+            <tr data-err-val="焼鳥" data-err-type="duplicate" style="background:#fffafa;"><td class="st-err">✗ エラー</td><td style="color:#c62828;">焼鳥 <span style="font-size:10px;color:#888;">(既存と重複)</span></td><td>BRD003</td><td style="white-space:nowrap;font-size:0;"><button onclick="openRowEditModal('業態・ブランド名','焼鳥','焼鳥(銀座)');" style="font-size:10px;padding:5px 10px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;margin-right:4px;">✏️ 行編集</button><button onclick="markRowSkipped(this);" style="font-size:10px;padding:5px 10px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;">⊘ スキップ</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 店舗 セクション -->
+    <div id="saas3single-sec-store" class="saas3single-sec" style="display:none;">
+      <div class="pv-summary">
+        <div class="pv-box pv-total"><div class="num">5</div><div class="lbl">データ行数</div></div>
+        <div class="pv-box pv-new"><div class="num">3</div><div class="lbl">新規登録</div></div>
+        <div class="pv-box pv-upd"><div class="num">1</div><div class="lbl">更新</div></div>
+        <div class="pv-box pv-err"><div class="num">1</div><div class="lbl">エラー</div></div>
+      </div>
+      <div style="background:#ffebee;border:1px solid #ffcdd2;border-radius:8px;padding:12px 16px;margin-bottom:14px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap;">
+          <span style="font-size:18px;">❌</span>
+          <div style="flex:1;font-size:13px;color:#c62828;font-weight:700;">1件のエラー: 業態マスタに合致しない値あり</div>
+          <button onclick="openBulkMasterAddModal('brand', [{name:'バー&ダイニング'}]);" style="font-size:12px;padding:7px 14px;border:none;color:#fff;background:#c62828;border-radius:6px;cursor:pointer;font-weight:700;white-space:nowrap;">➕ 業態 1件をまとめて登録</button>
+        </div>
+        <div style="font-size:11px;color:#9c4d12;margin-left:28px;line-height:1.8;">各行で1つ選択 ─ <strong>➕ マスタに追加</strong>: 新業態を登録 ／ <strong>✏️ 行編集</strong>: 既存業態に修正 ／ <strong>⊘ スキップ</strong>: 取込まない</div>
+      </div>
+      <div class="wcard" style="padding:0;overflow-x:auto;">
+        <table class="pv-table">
+          <thead><tr><th>状態</th><th>店舗名</th><th>業態</th><th>住所</th><th style="min-width:260px;">操作 (1つ選択)</th></tr></thead>
+          <tbody>
+            <tr><td class="st-new">● 新規</td><td>渋谷店</td><td>居酒屋</td><td>東京都渋谷区道玄坂1-1-1</td><td></td></tr>
+            <tr><td class="st-new">● 新規</td><td>新宿店</td><td>カフェ</td><td>東京都新宿区西新宿2-2-2</td><td></td></tr>
+            <tr><td class="st-new">● 新規</td><td>池袋店</td><td>居酒屋</td><td>東京都豊島区池袋3-3-3</td><td></td></tr>
+            <tr><td class="st-upd">● 更新</td><td>表参道店</td><td>カフェ</td><td>東京都港区南青山4-4-4</td><td></td></tr>
+            <tr data-err-val="バー&ダイニング" data-err-type="master-missing" style="background:#fffafa;"><td class="st-err">✗ エラー</td><td>六本木店</td><td style="color:#c62828;">バー&ダイニング <span style="font-size:10px;">(業態マスタ未登録)</span></td><td>東京都港区六本木5-5-5</td><td style="white-space:nowrap;font-size:0;"><button onclick="openMasterAddRedirect('brand','バー&ダイニング');" style="font-size:10px;padding:5px 10px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;margin-right:4px;">➕ マスタに追加</button><button onclick="openRowEditModal('業態','バー&ダイニング','居酒屋');" style="font-size:10px;padding:5px 10px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;margin-right:4px;">✏️ 行編集</button><button onclick="markRowSkipped(this);" style="font-size:10px;padding:5px 10px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;">⊘ スキップ</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 雇用区分 セクション -->
+    <div id="saas3single-sec-emptype" class="saas3single-sec" style="display:none;">
+      <div class="pv-summary">
+        <div class="pv-box pv-total"><div class="num">5</div><div class="lbl">データ行数</div></div>
+        <div class="pv-box pv-new"><div class="num">3</div><div class="lbl">新規登録</div></div>
+        <div class="pv-box pv-upd"><div class="num">1</div><div class="lbl">更新</div></div>
+        <div class="pv-box pv-err"><div class="num">1</div><div class="lbl">エラー</div></div>
+      </div>
+      <div style="background:#ffebee;border:1px solid #ffcdd2;border-radius:8px;padding:12px 16px;margin-bottom:14px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap;">
+          <span style="font-size:18px;">❌</span>
+          <div style="flex:1;font-size:13px;color:#c62828;font-weight:700;">1件のエラー: 給与体系の値が不正 (許可値以外)</div>
+        </div>
+        <div style="font-size:11px;color:#9c4d12;margin-left:28px;line-height:1.8;">各行で1つ選択 ─ <strong>✏️ 行編集</strong>: 値を正しい給与体系に修正 ／ <strong>⊘ スキップ</strong>: 取込まない</div>
+      </div>
+      <div class="wcard" style="padding:0;overflow-x:auto;">
+        <table class="pv-table">
+          <thead><tr><th>状態</th><th>区分名</th><th>コード</th><th>給与体系</th><th>基準金額</th><th style="min-width:200px;">操作 (1つ選択)</th></tr></thead>
+          <tbody>
+            <tr><td class="st-new">● 新規</td><td>正社員A</td><td>EMP-TYPE-001</td><td>月給</td><td>¥200,000</td><td></td></tr>
+            <tr><td class="st-new">● 新規</td><td>パートB</td><td>EMP-TYPE-002</td><td>時給</td><td>¥1,200</td><td></td></tr>
+            <tr><td class="st-new">● 新規</td><td>日給スタッフC</td><td>EMP-TYPE-003</td><td>日給</td><td>¥10,000</td><td></td></tr>
+            <tr><td class="st-upd">● 更新</td><td>正社員B</td><td>EMP-TYPE-004</td><td>月給</td><td>¥220,000</td><td></td></tr>
+            <tr data-err-val="成果報酬" data-err-type="invalid-value" style="background:#fffafa;"><td class="st-err">✗ エラー</td><td>業務委託α</td><td>EMP-TYPE-005</td><td style="color:#c62828;">成果報酬 <span style="font-size:10px;">(許可値: 月給/日給/時給)</span></td><td>¥0</td><td style="white-space:nowrap;font-size:0;"><button onclick="openRowEditModal('給与体系','成果報酬','月給');" style="font-size:10px;padding:5px 10px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;margin-right:4px;">✏️ 行編集</button><button onclick="markRowSkipped(this);" style="font-size:10px;padding:5px 10px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;">⊘ スキップ</button></td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
@@ -3361,7 +3450,7 @@ function showFloatToast(msg, opts) {
 var _previewDemoSnapshots = {};
 function snapshotPreviewDemo() {
   // 各 saas3single-sec-* のテーブル + バナー + 集計 box の initial HTML を保存
-  ['emp','admin'].forEach(function(k){
+  ['brand','store','emptype','emp','admin'].forEach(function(k){
     var sec = document.getElementById('saas3single-sec-' + k);
     if (sec && !_previewDemoSnapshots[k]) {
       _previewDemoSnapshots[k] = sec.innerHTML;
@@ -3370,7 +3459,7 @@ function snapshotPreviewDemo() {
 }
 function resetPreviewDemo() {
   var any = false;
-  ['emp','admin'].forEach(function(k){
+  ['brand','store','emptype','emp','admin'].forEach(function(k){
     var sec = document.getElementById('saas3single-sec-' + k);
     if (sec && _previewDemoSnapshots[k]) {
       sec.innerHTML = _previewDemoSnapshots[k];
@@ -3706,15 +3795,39 @@ function switchTplSingleTab(key) {
 // ============================================================
 // s-saas-preview-single: タブを「取り込んだ順」で並べる + 切替
 // ============================================================
-var SAAS_KEY_LABEL = { 'map-kot-admin':'管理者', 'map-kot-emp':'従業員' };
+var SAAS_KEY_LABEL = {
+  'map-kot-brand':'業態・ブランド',
+  'map-kot-store':'店舗',
+  'map-kot-emptype':'雇用区分',
+  'map-kot-emp':'従業員',
+  'map-kot-admin':'管理者'
+};
+// 5種すべて対応: brand/store/emptype/employee/admin
+var SAAS_PREVIEW_KEY_TO_SEC = {
+  'map-kot-brand':   'brand',
+  'map-kot-store':   'store',
+  'map-kot-emptype': 'emptype',
+  'map-kot-emp':     'emp',
+  'map-kot-admin':   'admin'
+};
+var SAAS_TYPE_TO_PREVIEW_KEY = {
+  brand:    'map-kot-brand',
+  store:    'map-kot-store',
+  emptype:  'map-kot-emptype',
+  employee: 'map-kot-emp',
+  admin:    'map-kot-admin'
+};
 function setupSaasPreviewSingleTabs() {
   var order = (typeof getSingleSaasOrder === 'function') ? getSingleSaasOrder() : [];
   if (!order || order.length === 0) {
-    var params = new URLSearchParams(window.location.search);
-    var t = params.get('type');
-    if (t === 'admin') order = ['map-kot-admin'];
-    else if (t === 'employee') order = ['map-kot-emp'];
-    else order = ['map-kot-emp'];
+    // _activeSingleSaasKey を優先, 次に URLパラメータ
+    var fallbackKey = _activeSingleSaasKey;
+    if (!fallbackKey) {
+      var params = new URLSearchParams(window.location.search);
+      fallbackKey = params.get('type');
+    }
+    var mapped = SAAS_TYPE_TO_PREVIEW_KEY[fallbackKey];
+    order = mapped ? [mapped] : ['map-kot-emp'];
   }
   var tabsEl = document.getElementById('saas3single-tabs');
   if (!tabsEl) return;
@@ -3743,7 +3856,8 @@ function switchSaasPreviewSingleTab(key) {
     b.style.fontWeight = active ? '700' : '600';
   });
   document.querySelectorAll('.saas3single-sec').forEach(function(s) { s.style.display = 'none'; });
-  var sec = document.getElementById('saas3single-sec-' + (key === 'map-kot-admin' ? 'admin' : 'emp'));
+  var secKey = SAAS_PREVIEW_KEY_TO_SEC[key] || 'emp';
+  var sec = document.getElementById('saas3single-sec-' + secKey);
   if (sec) sec.style.display = '';
 }
 
