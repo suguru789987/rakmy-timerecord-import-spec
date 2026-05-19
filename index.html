@@ -615,13 +615,11 @@
     <div class="flow-steps">
       <div class="fs done"><span class="fs-num">✓</span><span class="fs-label">連携元</span></div>
       <div class="fs-line done"></div>
-      <div class="fs done"><span class="fs-num">✓</span><span class="fs-label">対象・マッピング</span></div>
-      <div class="fs-line done"></div>
       <div class="fs done"><span class="fs-num">✓</span><span class="fs-label">アップロード</span></div>
       <div class="fs-line done"></div>
-      <div class="fs active"><span class="fs-num">4</span><span class="fs-label">プレビュー</span></div>
+      <div class="fs active"><span class="fs-num">3</span><span class="fs-label">プレビュー</span></div>
       <div class="fs-line"></div>
-      <div class="fs"><span class="fs-num">5</span><span class="fs-label">完了</span></div>
+      <div class="fs"><span class="fs-num">4</span><span class="fs-label">完了</span></div>
     </div>
 
     <div class="alert alert-info">起点: <strong id="saas3single-origin-label">—</strong>。複数アップ時は下のタブで切替。</div>
@@ -695,13 +693,11 @@
     <div class="flow-steps">
       <div class="fs done"><span class="fs-num">✓</span><span class="fs-label">連携元</span></div>
       <div class="fs-line done"></div>
-      <div class="fs done"><span class="fs-num">✓</span><span class="fs-label">対象・マッピング</span></div>
-      <div class="fs-line done"></div>
       <div class="fs done"><span class="fs-num">✓</span><span class="fs-label">アップロード</span></div>
       <div class="fs-line done"></div>
       <div class="fs done"><span class="fs-num">✓</span><span class="fs-label">プレビュー</span></div>
       <div class="fs-line done"></div>
-      <div class="fs active"><span class="fs-num">5</span><span class="fs-label">完了</span></div>
+      <div class="fs active"><span class="fs-num">4</span><span class="fs-label">完了</span></div>
     </div>
 
     <div class="wcard" style="text-align:center;padding:40px 24px;">
@@ -2614,20 +2610,21 @@ futureBanner +
 '    <span style="font-size:24px;">📥</span>' +
 '    <div style="flex:1;min-width:200px;">' +
 '      <div style="font-size:13px;color:#0d47a1;font-weight:700;">' + label + ' の外部勤怠取込 (運用更新動線)</div>' +
-'      <div style="font-size:11px;color:#555;margin-top:2px;">' + label + '一覧画面の「📥 CSVインポート」経由。' + (cfg.futureOnly ? '将来エクスポートテーブル追加時にこの動線で取込可能。' : '取込フロー: 連携元選択 → アップロード → マッピング → プレビュー → 完了。') + '</div>' +
+'      <div style="font-size:11px;color:#555;margin-top:2px;">' + label + '一覧画面の「📥 CSVインポート」経由。' + (cfg.futureOnly ? '将来エクスポートテーブル追加時にこの動線で取込可能。' : '取込フロー: 連携元 → アップロード → プレビュー → 完了。') + '</div>' +
 '    </div>' +
-'    <a href="#" onclick="event.preventDefault();singleSaasSwitchToTpl(\'' + k + '\');" style="font-size:11px;color:#2ec4a0;text-decoration:underline;font-weight:600;">📄 テンプレ取込に切替 →</a>' +
+'    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">' +
+'      <button class="btn btn-ghost" onclick="_activeSingleSaasKey=\'' + k + '\';go(\'s-saas-mapping-single-' + k + '\');" style="font-size:11px;padding:6px 12px;border:1px solid #ccc;background:#fff;border-radius:6px;cursor:pointer;color:#555;white-space:nowrap;">⚙️ マッピング設定</button>' +
+'      <a href="#" onclick="event.preventDefault();singleSaasSwitchToTpl(\'' + k + '\');" style="font-size:11px;color:#2ec4a0;text-decoration:underline;font-weight:600;">📄 テンプレ取込に切替 →</a>' +
+'    </div>' +
 '  </div>' +
 '  <div class="flow-steps">' +
 '    <div class="fs active"><span class="fs-num">1</span><span class="fs-label">連携元</span></div>' +
 '    <div class="fs-line"></div>' +
-'    <div class="fs"><span class="fs-num">2</span><span class="fs-label">対象・マッピング</span></div>' +
+'    <div class="fs"><span class="fs-num">2</span><span class="fs-label">アップロード</span></div>' +
 '    <div class="fs-line"></div>' +
-'    <div class="fs"><span class="fs-num">3</span><span class="fs-label">アップロード</span></div>' +
+'    <div class="fs"><span class="fs-num">3</span><span class="fs-label">プレビュー</span></div>' +
 '    <div class="fs-line"></div>' +
-'    <div class="fs"><span class="fs-num">4</span><span class="fs-label">プレビュー</span></div>' +
-'    <div class="fs-line"></div>' +
-'    <div class="fs"><span class="fs-num">5</span><span class="fs-label">完了</span></div>' +
+'    <div class="fs"><span class="fs-num">4</span><span class="fs-label">完了</span></div>' +
 '  </div>' +
 '  <div class="wcard">' +
 '    <div class="wcard-title"><span class="num">1</span> 連携元サービスを選択</div>' +
@@ -2641,16 +2638,14 @@ futureBanner +
 '    </div>' +
 '  </div>' +
 '  <div class="wcard">' +
-'    <div class="wcard-title"><span class="num">2</span> 取込対象 ・ マッピング</div>' +
+'    <div class="wcard-title"><span class="num">2</span> 取込対象</div>' +
 '    <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:#f0faf6;border:1px solid #b8e6d6;border-radius:8px;">' +
 '      <span style="font-size:20px;">📌</span>' +
 '      <div style="flex:1;">' +
 '        <div style="font-size:10px;color:#888;letter-spacing:0.5px;">取込対象 (起点固定)</div>' +
 '        <div style="font-size:16px;font-weight:700;color:#0e9077;margin-top:2px;">' + label + 'データ</div>' +
 '      </div>' +
-'      <button class="btn btn-ghost" onclick="_activeSingleSaasKey=\'' + k + '\';go(\'s-saas-mapping-single-' + k + '\');" style="font-size:11px;padding:7px 14px;border:1px solid #2ec4a0;color:#0e9077;background:#fff;border-radius:6px;cursor:pointer;font-weight:600;white-space:nowrap;">⚙️ マッピング設定 <span style="font-size:9px;color:#888;font-weight:400;">(任意)</span></button>' +
 '    </div>' +
-'    <div style="font-size:10px;color:#888;margin-top:6px;">マッピングは自動推定済み。変更が必要な場合のみ右上から編集してください。</div>' +
 '  </div>' +
 '  <div class="wcard">' +
 '    <div class="wcard-title"><span class="num">3</span> ファイルをアップロード</div>' +
@@ -2756,13 +2751,11 @@ futureNote +
 '  <div class="flow-steps">' +
 '    <div class="fs done"><span class="fs-num">✓</span><span class="fs-label">連携元</span></div>' +
 '    <div class="fs-line done"></div>' +
-'    <div class="fs active"><span class="fs-num">2</span><span class="fs-label">対象・マッピング</span></div>' +
+'    <div class="fs active"><span class="fs-num">2</span><span class="fs-label">アップロード</span></div>' +
 '    <div class="fs-line"></div>' +
-'    <div class="fs"><span class="fs-num">3</span><span class="fs-label">アップロード</span></div>' +
+'    <div class="fs"><span class="fs-num">3</span><span class="fs-label">プレビュー</span></div>' +
 '    <div class="fs-line"></div>' +
-'    <div class="fs"><span class="fs-num">4</span><span class="fs-label">プレビュー</span></div>' +
-'    <div class="fs-line"></div>' +
-'    <div class="fs"><span class="fs-num">5</span><span class="fs-label">完了</span></div>' +
+'    <div class="fs"><span class="fs-num">4</span><span class="fs-label">完了</span></div>' +
 '  </div>' +
 '  <div style="background:#e8f4fd;border:1px solid #b3d9f0;border-radius:8px;padding:14px 18px;margin-bottom:18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">' +
 '    <span style="font-size:24px;">⚙️</span>' +
