@@ -690,7 +690,12 @@
 
 <!-- s-saas-preview-single: 外部勤怠 プレビュー (運用更新) -->
 <div class="screen" id="s-saas-preview-single">
-  <div class="page-header"><h1 class="page-title">外部勤怠サービスから取り込み <span style="font-size:11px;color:#fff;background:#1a73e8;padding:3px 10px;border-radius:12px;margin-left:8px;">運用更新 ・ プレビュー</span></h1></div>
+  <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+    <h1 class="page-title" style="margin:0;">外部勤怠サービスから取り込み <span style="font-size:11px;color:#fff;background:#1a73e8;padding:3px 10px;border-radius:12px;margin-left:8px;">運用更新 ・ プレビュー</span></h1>
+    <button onclick="resetPreviewDemo();" title="エラー解消・スキップ・行編集などのデモ操作をすべて元に戻す" style="font-size:11px;padding:6px 12px;border:1px dashed #e67e22;background:#fff8ed;color:#e67e22;border-radius:6px;cursor:pointer;font-weight:600;white-space:nowrap;">🔄 デモ: エラー状態に戻す</button>
+  </div>
+  <!-- トースト通知 (プレビュー画面ローカル) -->
+  <div id="preview-toast" style="display:none;position:fixed;top:60px;right:24px;background:#0e9077;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,0.2);z-index:9998;"></div>
   <div class="content">
     <div class="flow-steps">
       <div class="fs done"><span class="fs-num">✓</span><span class="fs-label">連携元</span></div>
@@ -3325,6 +3330,40 @@ function bulkMasterAddRemoveRow(btn) {
   if (tr) tr.parentElement.removeChild(tr);
   bulkMasterAddUpdateCount();
 }
+// プレビュー画面のトースト通知 (右上)
+var _previewToastTimer = null;
+function showPreviewToast(msg) {
+  var t = document.getElementById('preview-toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.style.display = 'block';
+  if (_previewToastTimer) clearTimeout(_previewToastTimer);
+  _previewToastTimer = setTimeout(function(){ if (t) t.style.display = 'none'; }, 3000);
+}
+
+// デモ: 初期エラー状態のスナップショット + リセット
+var _previewDemoSnapshots = {};
+function snapshotPreviewDemo() {
+  // 各 saas3single-sec-* のテーブル + バナー + 集計 box の initial HTML を保存
+  ['emp','admin'].forEach(function(k){
+    var sec = document.getElementById('saas3single-sec-' + k);
+    if (sec && !_previewDemoSnapshots[k]) {
+      _previewDemoSnapshots[k] = sec.innerHTML;
+    }
+  });
+}
+function resetPreviewDemo() {
+  var any = false;
+  ['emp','admin'].forEach(function(k){
+    var sec = document.getElementById('saas3single-sec-' + k);
+    if (sec && _previewDemoSnapshots[k]) {
+      sec.innerHTML = _previewDemoSnapshots[k];
+      any = true;
+    }
+  });
+  if (any) showPreviewToast('🔄 デモ状態を初期化しました');
+}
+
 // 一時保存 (alert ではなく インラインステータス表示)
 function bulkMasterAddDraftSave() {
   var st = document.getElementById('bulk-master-add-status');
@@ -3387,7 +3426,7 @@ function confirmBulkMasterAdd() {
     if (m) missingValues.push(m);
   });
   closeBulkMasterAddModal();
-  alert('✓ ' + missingValues.length + '件を ' + (TPL_TYPE_LABEL[p.masterKey] || p.masterKey) + 'マスタに登録しました (デモ)。\n対応するエラー行を自動再判定します。');
+  showPreviewToast('✓ ' + missingValues.length + '件を ' + (TPL_TYPE_LABEL[p.masterKey] || p.masterKey) + 'マスタに登録 / 対応エラー行を再判定');
   // 対応エラー行をすべて「●新規」に置換
   missingValues.forEach(function(mv){
     var tr = document.querySelector('#saas3single-sec-emp tr[data-err-val="' + mv + '"]');
@@ -3414,7 +3453,7 @@ function confirmMasterAdd() {
   if (!_masterAddPending) { closeMasterAddModal(); return; }
   var p = _masterAddPending;
   closeMasterAddModal();
-  alert('✓ 「' + p.missingValue + '」を ' + (TPL_TYPE_LABEL[p.masterKey] || p.masterKey) + 'マスタに登録しました (デモ)。\nプレビューを再判定します。');
+  showPreviewToast('✓ 「' + p.missingValue + '」を ' + (TPL_TYPE_LABEL[p.masterKey] || p.masterKey) + 'マスタに登録 / 該当行を再判定');
   // デモ: エラー行を新規扱いに置換 (鈴木次郎 アルバイトD)
   var errRow = document.querySelector('#saas3single-sec-emp tr.demo-err-resolvable, #saas3single-sec-emp tr[data-err-key="' + p.missingValue + '"]');
   // フォールバック: クラス st-err を含む最初の行
@@ -3813,6 +3852,7 @@ function go(id) {
   }
   if (id === 's-saas-preview-single') {
     if (typeof setupSaasPreviewSingleTabs === 'function') setupSaasPreviewSingleTabs();
+    if (typeof snapshotPreviewDemo === 'function') snapshotPreviewDemo();
   }
   if (id === 's-tpl2') {
     updateTplConfirmSections();
