@@ -3196,8 +3196,9 @@ function returnToSourceSetting() {
     function applyRoute() {
       try {
         var targetId = null;
-        var tplKeys = ['brand','store','emptype','employee','admin'];
-        var saasKeys = ['employee','admin'];
+        // 2026-05-19: SaaS は 5 種すべて対応 (futureOnly 撤去)
+        var tplKeys  = ['brand','store','emptype','employee','admin'];
+        var saasKeys = ['brand','store','emptype','employee','admin'];
         if (mode === 'tpl' && tplKeys.indexOf(type) !== -1) {
           targetId = 's-tpl-single-' + type;
         } else if (mode === 'saas' && saasKeys.indexOf(type) !== -1) {
