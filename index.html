@@ -2513,12 +2513,13 @@ function renderTplSingleScreen(cfg) {
       '<a class="dl-link" href="#" onclick="event.stopPropagation();' + c.dlFn + '();" style="font-size:11px;">⬇ テンプレートDL</a>' +
     '</label>';
   }).join('');
-  var fallbackLink = (k === 'employee' || k === 'admin')
-    ? '<a href="#" onclick="event.preventDefault();singleTplSwitchToSaas(\'' + k + '\');" style="font-size:11px;color:#1a73e8;text-decoration:underline;font-weight:600;">🔄 外部勤怠取込に切替 →</a>'
+  var headerSwitchLink = (k === 'employee' || k === 'admin')
+    ? '<a href="#" onclick="event.preventDefault();singleTplSwitchToSaas(\'' + k + '\');" style="font-size:12px;color:#1a73e8;text-decoration:underline;font-weight:600;white-space:nowrap;">🔄 外部勤怠取込に切替 →</a>'
     : '';
   return '' +
 '<div class="page-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">' +
 '  <h1 class="page-title" style="margin:0;">' + label + ' のテンプレート取込 <span style="font-size:11px;color:#fff;background:#1a73e8;padding:3px 10px;border-radius:12px;margin-left:8px;">運用更新</span></h1>' +
+headerSwitchLink +
 '</div>' +
 '<div class="content">' +
 '  <div style="background:#e8f4fd;border:1px solid #b3d9f0;border-radius:8px;padding:14px 18px;margin-bottom:18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">' +
@@ -2526,7 +2527,7 @@ function renderTplSingleScreen(cfg) {
 '    <div style="flex:1;min-width:200px;">' +
 '      <div style="font-size:13px;color:#0d47a1;font-weight:700;">' + label + ' のテンプレート取込 (運用更新動線)</div>' +
 '      <div style="font-size:11px;color:#555;margin-top:2px;">' + label + '一覧画面の「📥 CSVインポート」経由。該当データのみのシンプルな取込フロー。</div>' +
-'    </div>' + fallbackLink +
+'    </div>' +
 '  </div>' +
 '  <div class="flow-steps">' +
 '    <div class="fs active"><span class="fs-num">1</span><span class="fs-label">アップロード</span></div>' +
@@ -2603,6 +2604,7 @@ function renderSaasSingleScreen(cfg) {
   return '' +
 '<div class="page-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">' +
 '  <h1 class="page-title" style="margin:0;">' + label + ' の外部勤怠取込 <span style="font-size:11px;color:#fff;background:#1a73e8;padding:3px 10px;border-radius:12px;margin-left:8px;">運用更新</span>' + (cfg.futureOnly ? ' <span style="font-size:10px;color:#5c4dac;background:#ede7f6;padding:3px 8px;border-radius:10px;margin-left:6px;">将来対応予定</span>' : '') + '</h1>' +
+'  <a href="#" onclick="event.preventDefault();singleSaasSwitchToTpl(\'' + k + '\');" style="font-size:12px;color:#2ec4a0;text-decoration:underline;font-weight:600;white-space:nowrap;">📄 テンプレ取込に切替 →</a>' +
 '</div>' +
 '<div class="content">' +
 futureBanner +
@@ -2613,9 +2615,6 @@ futureBanner +
 '      <div style="font-size:11px;color:#555;margin-top:2px;">' + label + '一覧画面の「📥 CSVインポート」経由。' + (cfg.futureOnly ? '将来エクスポートテーブル追加時にこの動線で取込可能。' : '取込フロー: 連携元 → アップロード → プレビュー → 完了。') + '</div>' +
 '    </div>' +
 '    <button class="btn btn-ghost" onclick="_activeSingleSaasKey=\'' + k + '\';go(\'s-saas-mapping-single-' + k + '\');" style="font-size:11px;padding:6px 12px;border:1px solid #ccc;background:#fff;border-radius:6px;cursor:pointer;color:#555;white-space:nowrap;">⚙️ マッピング設定</button>' +
-'  </div>' +
-'  <div style="text-align:right;margin-top:-10px;margin-bottom:14px;">' +
-'    <a href="#" onclick="event.preventDefault();singleSaasSwitchToTpl(\'' + k + '\');" style="font-size:11px;color:#2ec4a0;text-decoration:underline;font-weight:600;">📄 テンプレ取込に切替 →</a>' +
 '  </div>' +
 '  <div class="flow-steps">' +
 '    <div class="fs active"><span class="fs-num">1</span><span class="fs-label">連携元</span></div>' +
