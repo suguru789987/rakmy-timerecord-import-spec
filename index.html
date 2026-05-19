@@ -392,6 +392,24 @@
 <!-- ==================== -->
 
 <!-- ==================== -->
+<!-- ★ 招待メール一括送信 確認モーダル (運用更新完了画面から呼び出し) -->
+<div id="invite-mail-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:12px;width:480px;max-width:92vw;padding:24px;box-shadow:0 10px 40px rgba(0,0,0,0.2);">
+    <div style="font-size:18px;font-weight:700;color:#333;margin-bottom:12px;">📧 招待メール一括送信の確認</div>
+    <div style="font-size:13px;color:#555;line-height:1.8;margin-bottom:18px;">
+      以下の対象に招待メールを送信します。よろしいですか？
+      <div style="margin-top:10px;padding:10px 14px;background:#f6f8fb;border-radius:6px;font-size:12px;">
+        <div>・新規登録: <strong id="invite-target-new-label">対象者</strong> <strong>3件</strong></div>
+        <div>・差し替え対象: <strong>1件</strong> <span style="color:#888;">(旧招待は無効化)</span></div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;">
+      <button onclick="closeInviteMailModal()" style="font-size:13px;padding:8px 16px;border:1px solid #ccc;background:#fff;border-radius:6px;cursor:pointer;color:#555;">キャンセル</button>
+      <button onclick="confirmSendInviteMails()" style="font-size:13px;padding:8px 18px;border:none;background:#2ec4a0;color:#fff;border-radius:6px;cursor:pointer;font-weight:600;">📧 送信する</button>
+    </div>
+  </div>
+</div>
+
 <!-- ★ 運用更新専用 単一データ取込画面 (設定画面別・物理分離) -->
 <!--   2026-05-19 設定画面別に物理分離: -->
 <!--     tpl  5種 = s-tpl-single-{brand|store|emptype|employee|admin} -->
@@ -3064,11 +3082,26 @@ function setupInviteMailRow(kind) {
     row.style.display = 'none';
   }
 }
+// 招待メール一括送信: モーダルで確認 → 送信
+var _inviteMailPendingKind = null;
 function sendInviteMailsAfterImport(kind) {
   var key = (kind === 'tpl') ? _activeSingleTplKey : _activeSingleSaasKey;
   var target = (key === 'employee') ? '従業員' : (key === 'admin') ? '管理者' : '対象者';
-  alert('📧 招待メール一括送信 (デモ)\n\n対象: 新規登録された ' + target + ' (例: 3件)\n＋ 差し替え対象 (例: 1件 / 旧招待は無効化)\n\n送信完了後、設定画面に戻ります。');
-  // デモ: 送信後ボタンを送信済表記に
+  _inviteMailPendingKind = kind;
+  var lbl = document.getElementById('invite-target-new-label');
+  if (lbl) lbl.textContent = target;
+  var ov = document.getElementById('invite-mail-overlay');
+  if (ov) ov.style.display = 'flex';
+}
+function closeInviteMailModal() {
+  var ov = document.getElementById('invite-mail-overlay');
+  if (ov) ov.style.display = 'none';
+  _inviteMailPendingKind = null;
+}
+function confirmSendInviteMails() {
+  var kind = _inviteMailPendingKind;
+  closeInviteMailModal();
+  if (!kind) return;
   var row = document.getElementById(kind + '3-invite-mail-row');
   if (row) {
     row.innerHTML = '<div style="text-align:center;padding:14px;font-size:12px;color:#0e9077;font-weight:700;">✓ 招待メール送信済 (デモ)</div>';
