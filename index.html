@@ -3199,6 +3199,12 @@ function returnToSourceSetting() {
         // 2026-05-19: SaaS は 5 種すべて対応 (futureOnly 撤去)
         var tplKeys  = ['brand','store','emptype','employee','admin'];
         var saasKeys = ['brand','store','emptype','employee','admin'];
+        var goto_    = params.get('goto');
+        // ?goto=mapping&mode=saas → 直接 マッピング設定画面 へ
+        if (goto_ === 'mapping' && mode === 'saas' && saasKeys.indexOf(type) !== -1) {
+          if (typeof go === 'function') go('s-saas-mapping-single-' + type);
+          return;
+        }
         if (mode === 'tpl' && tplKeys.indexOf(type) !== -1) {
           targetId = 's-tpl-single-' + type;
         } else if (mode === 'saas' && saasKeys.indexOf(type) !== -1) {
