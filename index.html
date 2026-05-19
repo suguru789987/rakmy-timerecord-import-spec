@@ -404,12 +404,13 @@
       CSV取込で検出された未登録の値をマスタに一括追加します。<span style="color:#0e9077;font-weight:700;">緑枠</span>のセルは取込データから自動転写。必要に応じて他の列を編集して「登録」を押すと、マスタ追加 → プレビューが自動再判定されます。
     </div>
     <div style="padding:14px 24px;overflow-y:auto;flex:1;">
-      <div id="bulk-master-add-tablewrap" style="border:1px solid #e0e0e0;border-radius:8px;overflow:hidden;">
-        <table id="bulk-master-add-table" style="width:100%;border-collapse:collapse;font-size:12px;">
+      <div id="bulk-master-add-tablewrap" style="border:1px solid #e0e0e0;border-radius:8px;overflow-x:auto;overflow-y:visible;">
+        <table id="bulk-master-add-table" style="width:100%;border-collapse:collapse;font-size:12px;min-width:760px;">
           <thead id="bulk-master-add-thead"></thead>
           <tbody id="bulk-master-add-tbody"></tbody>
         </table>
       </div>
+      <div style="margin-top:4px;font-size:10px;color:#aaa;text-align:right;">※ 列が多い場合は表内を左右にスクロール</div>
       <div style="margin-top:8px;text-align:left;">
         <a href="#" onclick="event.preventDefault();bulkMasterAddAppendBlankRow();" style="font-size:11px;color:#1a73e8;text-decoration:underline;font-weight:600;">+ 行を追加 <span style="color:#888;font-weight:400;">(ついでに別マスタも登録したい場合)</span></a>
       </div>
