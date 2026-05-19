@@ -613,16 +613,18 @@
   <div class="page-header"><h1 class="page-title">外部勤怠サービスから取り込み <span style="font-size:11px;color:#fff;background:#1a73e8;padding:3px 10px;border-radius:12px;margin-left:8px;">運用更新 ・ プレビュー</span></h1></div>
   <div class="content">
     <div class="flow-steps">
+      <div class="fs done"><span class="fs-num">✓</span><span class="fs-label">連携元</span></div>
+      <div class="fs-line done"></div>
+      <div class="fs done"><span class="fs-num">✓</span><span class="fs-label">対象・マッピング</span></div>
+      <div class="fs-line done"></div>
       <div class="fs done"><span class="fs-num">✓</span><span class="fs-label">アップロード</span></div>
       <div class="fs-line done"></div>
-      <div class="fs done"><span class="fs-num">✓</span><span class="fs-label">マッピング</span></div>
-      <div class="fs-line done"></div>
-      <div class="fs active"><span class="fs-num">3</span><span class="fs-label">プレビュー</span></div>
+      <div class="fs active"><span class="fs-num">4</span><span class="fs-label">プレビュー</span></div>
       <div class="fs-line"></div>
-      <div class="fs"><span class="fs-num">4</span><span class="fs-label">完了</span></div>
+      <div class="fs"><span class="fs-num">5</span><span class="fs-label">完了</span></div>
     </div>
 
-    <div class="alert alert-info">外部勤怠データの取込内容を確認してください (admin/employee 専用)。<br><span style="font-size:11px;color:#666;">※ 起点 (遷移元の設定画面) のデータ種別が <strong id="saas3single-origin-label">—</strong> です。複数アップした場合は下のタブで切替できます。</span></div>
+    <div class="alert alert-info">起点: <strong id="saas3single-origin-label">—</strong>。複数アップ時は下のタブで切替。</div>
 
     <!-- データ種別タブ (取込順) -->
     <div class="wcard" style="padding:0;margin-bottom:16px;background:#f5f7f9;border:1px solid #e0e0e0;">
@@ -691,13 +693,15 @@
   <div class="page-header"><h1 class="page-title">外部勤怠サービスから取り込み <span style="font-size:11px;color:#fff;background:#1a73e8;padding:3px 10px;border-radius:12px;margin-left:8px;">運用更新 ・ 完了</span></h1></div>
   <div class="content">
     <div class="flow-steps">
-      <div class="fs done"><span class="fs-num">✓</span><span class="fs-label">アップロード</span></div>
+      <div class="fs done"><span class="fs-num">✓</span><span class="fs-label">連携元</span></div>
       <div class="fs-line done"></div>
-      <div class="fs done"><span class="fs-num">✓</span><span class="fs-label">マッピング</span></div>
+      <div class="fs done"><span class="fs-num">✓</span><span class="fs-label">対象・マッピング</span></div>
+      <div class="fs-line done"></div>
+      <div class="fs done"><span class="fs-num">✓</span><span class="fs-label">アップロード</span></div>
       <div class="fs-line done"></div>
       <div class="fs done"><span class="fs-num">✓</span><span class="fs-label">プレビュー</span></div>
       <div class="fs-line done"></div>
-      <div class="fs active"><span class="fs-num">4</span><span class="fs-label">完了</span></div>
+      <div class="fs active"><span class="fs-num">5</span><span class="fs-label">完了</span></div>
     </div>
 
     <div class="wcard" style="text-align:center;padding:40px 24px;">
@@ -2615,16 +2619,18 @@ futureBanner +
 '    <a href="#" onclick="event.preventDefault();singleSaasSwitchToTpl(\'' + k + '\');" style="font-size:11px;color:#2ec4a0;text-decoration:underline;font-weight:600;">📄 テンプレ取込に切替 →</a>' +
 '  </div>' +
 '  <div class="flow-steps">' +
-'    <div class="fs active"><span class="fs-num">1</span><span class="fs-label">アップロード</span></div>' +
+'    <div class="fs active"><span class="fs-num">1</span><span class="fs-label">連携元</span></div>' +
 '    <div class="fs-line"></div>' +
-'    <div class="fs"><span class="fs-num">2</span><span class="fs-label">マッピング</span></div>' +
+'    <div class="fs"><span class="fs-num">2</span><span class="fs-label">対象・マッピング</span></div>' +
 '    <div class="fs-line"></div>' +
-'    <div class="fs"><span class="fs-num">3</span><span class="fs-label">プレビュー</span></div>' +
+'    <div class="fs"><span class="fs-num">3</span><span class="fs-label">アップロード</span></div>' +
 '    <div class="fs-line"></div>' +
-'    <div class="fs"><span class="fs-num">4</span><span class="fs-label">完了</span></div>' +
+'    <div class="fs"><span class="fs-num">4</span><span class="fs-label">プレビュー</span></div>' +
+'    <div class="fs-line"></div>' +
+'    <div class="fs"><span class="fs-num">5</span><span class="fs-label">完了</span></div>' +
 '  </div>' +
 '  <div class="wcard">' +
-'    <div class="wcard-title"><span class="num">1</span> 連携元サービスを選択 <span style="font-size:10px;color:#888;font-weight:400;">(マッピング / 保存一覧 と連動)</span></div>' +
+'    <div class="wcard-title"><span class="num">1</span> 連携元サービスを選択</div>' +
 '    <div style="display:flex;gap:10px;flex-wrap:wrap;" id="saas-src-cards-' + k + '">' +
 '      <div class="saas-src-card" data-src="kot" onclick="selectSaasSource(\'' + k + '\',\'kot\')" style="flex:1;min-width:160px;padding:14px;border:2px solid #2ec4a0;border-radius:8px;cursor:pointer;text-align:center;background:#f0faf6;">' +
 '        <div style="font-size:24px;">⏰</div><div style="font-size:13px;font-weight:700;color:#0e9077;">キングオブタイム</div>' +
@@ -2749,13 +2755,15 @@ function renderSaasMappingSingleScreen(cfg) {
 '<div class="content">' +
 futureNote +
 '  <div class="flow-steps">' +
-'    <div class="fs done"><span class="fs-num">✓</span><span class="fs-label">アップロード</span></div>' +
+'    <div class="fs done"><span class="fs-num">✓</span><span class="fs-label">連携元</span></div>' +
 '    <div class="fs-line done"></div>' +
-'    <div class="fs active"><span class="fs-num">2</span><span class="fs-label">マッピング</span></div>' +
+'    <div class="fs active"><span class="fs-num">2</span><span class="fs-label">対象・マッピング</span></div>' +
 '    <div class="fs-line"></div>' +
-'    <div class="fs"><span class="fs-num">3</span><span class="fs-label">プレビュー</span></div>' +
+'    <div class="fs"><span class="fs-num">3</span><span class="fs-label">アップロード</span></div>' +
 '    <div class="fs-line"></div>' +
-'    <div class="fs"><span class="fs-num">4</span><span class="fs-label">完了</span></div>' +
+'    <div class="fs"><span class="fs-num">4</span><span class="fs-label">プレビュー</span></div>' +
+'    <div class="fs-line"></div>' +
+'    <div class="fs"><span class="fs-num">5</span><span class="fs-label">完了</span></div>' +
 '  </div>' +
 '  <div style="background:#e8f4fd;border:1px solid #b3d9f0;border-radius:8px;padding:14px 18px;margin-bottom:18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">' +
 '    <span style="font-size:24px;">⚙️</span>' +
@@ -2777,22 +2785,18 @@ sourceNote +
 '    </table>' +
 '  </div>' +
 '  <div class="wcard" style="margin-top:14px;padding:16px 18px;">' +
-'    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:12px;">' +
-'      <div style="font-size:14px;font-weight:700;color:#333;">💾 マッピングをプロファイルとして保存</div>' +
-'      <button type="button" onclick="openSavedMappingListWithSrc(\'' + k + '\');" title="' + label + 'の保存済プロファイルだけ絞り込んで表示" style="font-size:11px;padding:6px 12px;border:1px solid #1a73e8;color:#1a73e8;background:#fff;border-radius:6px;cursor:pointer;font-weight:600;white-space:nowrap;">📁 保存済プロファイル一覧 →</button>' +
+'    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:10px;">' +
+'      <div style="font-size:14px;font-weight:700;color:#333;">💾 プロファイル保存</div>' +
+'      <button type="button" onclick="openSavedMappingListWithSrc(\'' + k + '\');" style="font-size:11px;padding:6px 12px;border:1px solid #1a73e8;color:#1a73e8;background:#fff;border-radius:6px;cursor:pointer;font-weight:600;">📁 保存済一覧 →</button>' +
 '    </div>' +
-'    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;">' +
-'      <label for="saas-mapping-' + k + '-name" style="font-size:12px;color:#555;font-weight:600;min-width:70px;">保存名 <span style="color:#c62828;">*</span></label>' +
-'      <input type="text" id="saas-mapping-' + k + '-name" value="' + label + '_default_mapping" placeholder="例: ' + label + '_default_mapping" style="flex:1;min-width:240px;font-size:13px;padding:8px 12px;border:1px solid #ccc;border-radius:6px;">' +
+'    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;">' +
+'      <label for="saas-mapping-' + k + '-name" style="font-size:12px;color:#555;font-weight:600;min-width:60px;">保存名</label>' +
+'      <input type="text" id="saas-mapping-' + k + '-name" value="' + label + '_default_mapping" placeholder="空欄なら今回限り" style="flex:1;min-width:240px;font-size:13px;padding:8px 12px;border:1px solid #ccc;border-radius:6px;">' +
 '    </div>' +
-'    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:12px;color:#444;padding:8px 0;">' +
+'    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:#444;">' +
 '      <input type="checkbox" checked style="accent-color:#2ec4a0;width:16px;height:16px;">' +
-'      <span><strong>保存後、このプロファイルをアクティブにする</strong> <span style="color:#888;font-weight:400;">(同 ' + label + '×連携元 の自動適用先になる)</span></span>' +
+'      保存後アクティブにする' +
 '    </label>' +
-'    <div style="font-size:11px;color:#888;margin-top:6px;line-height:1.7;padding:8px 10px;background:#f6f8fb;border-radius:6px;">' +
-'      💡 保存名を入れて「プレビューへ」を押すと、その名前でプロファイルが保存されます。<br>' +
-'      　 保存せず今回限りにしたい場合は、保存名を空にしてから「プレビューへ」を押してください。' +
-'    </div>' +
 '  </div>' +
 '  <div class="btn-group" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">' +
 '    <button class="btn btn-ghost" onclick="go(\'s-saas-single-' + k + '\');">← アップロード画面に戻る</button>' +
