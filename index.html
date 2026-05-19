@@ -575,7 +575,7 @@
     </div>
 
     <div class="btn-group">
-      <button class="btn btn-ghost" onclick="history.back();">← 戻る</button>
+      <button class="btn btn-ghost" onclick="goBackToTplSingle();">← 戻る</button>
       <button class="btn btn-primary" onclick="go('s-tpl3-single');">✓ インポート実行</button>
     </div>
 
@@ -693,7 +693,7 @@
     </div>
 
     <div class="btn-group" style="margin-top:14px;">
-      <button class="btn btn-ghost" onclick="history.back();">← 戻る</button>
+      <button class="btn btn-ghost" onclick="goBackToSaasSingle();">← 戻る</button>
       <button class="btn btn-primary" onclick="go('s-saas-done-single');">✓ インポート実行</button>
     </div>
 
@@ -2575,7 +2575,8 @@ headerSwitchLink +
 '    <div style="border:2px dashed #ccc;border-radius:8px;padding:30px;text-align:center;color:#888;background:#fafafa;">' +
 '      <div style="font-size:32px;margin-bottom:8px;">📎</div>' +
 '      <div style="font-size:13px;">ファイルをドラッグ&ドロップ または</div>' +
-'      <div style="margin-top:10px;"><button class="btn btn-primary" style="font-size:12px;" onclick="singleTplAdvance(\'' + k + '\')">ファイルを選択 (デモ: 次のアップ口へ)</button></div>' +
+'      <div style="margin-top:10px;"><button class="btn btn-primary" style="font-size:12px;" onclick="singleTplFileSelected(\'' + k + '\')">ファイルを選択</button></div>' +
+'      <div id="single-tpl-' + k + '-upload-log" style="margin-top:10px;font-size:11px;color:#888;line-height:1.7;text-align:left;"></div>' +
 '      <div style="margin-top:8px;font-size:10px;color:#aaa;">CSV / TSV (最大10MB)</div>' +
 '    </div>' +
 '  </div>' +
@@ -2674,7 +2675,8 @@ futureBanner +
 '    <div style="border:2px dashed #ccc;border-radius:8px;padding:30px;text-align:center;color:#888;background:#fafafa;">' +
 '      <div style="font-size:32px;margin-bottom:8px;">📎</div>' +
 '      <div style="font-size:13px;">ファイルをドラッグ&ドロップ または</div>' +
-'      <div style="margin-top:10px;"><button class="btn btn-primary" style="font-size:12px;" onclick="singleSaasAdvance(\'' + k + '\')">ファイルを選択 (デモ: 次のアップ口へ)</button></div>' +
+'      <div style="margin-top:10px;"><button class="btn btn-primary" style="font-size:12px;" onclick="singleSaasFileSelected(\'' + k + '\')">ファイルを選択</button></div>' +
+'      <div id="single-saas-' + k + '-upload-log" style="margin-top:10px;font-size:11px;color:#888;line-height:1.7;text-align:left;"></div>' +
 '      <div style="margin-top:8px;font-size:10px;color:#aaa;">CSV / TSV (最大10MB)</div>' +
 '    </div>' +
 '  </div>' +
@@ -3082,6 +3084,62 @@ function setupInviteMailRow(kind) {
     row.style.display = 'none';
   }
 }
+// 戻るボタン用: アクティブな key を見て s-{tpl|saas}-single-{key} に戻る
+function goBackToTplSingle() {
+  var key = _activeSingleTplKey;
+  if (key && _singleTplState[key]) go('s-tpl-single-' + key);
+  else go('s-top');
+}
+function goBackToSaasSingle() {
+  var key = _activeSingleSaasKey;
+  if (key && _singleSaasState[key]) go('s-saas-single-' + key);
+  else go('s-top');
+}
+
+// ファイル選択: アップロード完了として記録するだけ (遷移はしない)
+function singleTplFileSelected(key) {
+  var st = _singleTplState[key]; if (!st) return;
+  var order = getSingleTplOrder(key);
+  if (order.length === 0) { alert('対象データを選択してください'); return; }
+  var targetType = order[st.currentIdx];
+  var typeLabel = TPL_TYPE_LABEL[targetType] || targetType;
+  var fileName = typeLabel + '_export.csv';
+  var nowStr = new Date().toLocaleTimeString('ja-JP', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+  var logEl = document.getElementById('single-tpl-' + key + '-upload-log');
+  if (logEl) {
+    logEl.innerHTML +=
+      '<div style="padding:6px 10px;background:#e8f9f4;border-left:3px solid #2ec4a0;border-radius:4px;margin-bottom:4px;">' +
+      '<span style="color:#0e9077;font-weight:700;">✓ 一時保存中</span> <span style="color:#555;">' + fileName + '</span> <span style="color:#aaa;font-size:10px;">(' + nowStr + ')</span>' +
+      '</div>';
+  }
+  // 次のアップロード口があれば進める (multi 取込モード時)
+  if (st.currentIdx + 1 < order.length) {
+    st.currentIdx++;
+    updateSingleTplUploadOrder(key);
+  }
+  // 最後の口でも 自動遷移しない (ユーザが「次へ」を押すまで停留)
+}
+function singleSaasFileSelected(key) {
+  var st = _singleSaasState[key]; if (!st) return;
+  var order = getSingleSaasOrder(key);
+  if (order.length === 0) { alert('対象データを選択してください'); return; }
+  var targetMap = order[st.currentIdx];
+  var typeLabel = SAAS_TYPE_LABEL[targetMap] || targetMap;
+  var fileName = typeLabel.replace('データ','').replace('(','_').replace(')','') + '_export.csv';
+  var nowStr = new Date().toLocaleTimeString('ja-JP', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+  var logEl = document.getElementById('single-saas-' + key + '-upload-log');
+  if (logEl) {
+    logEl.innerHTML +=
+      '<div style="padding:6px 10px;background:#e8f9f4;border-left:3px solid #2ec4a0;border-radius:4px;margin-bottom:4px;">' +
+      '<span style="color:#0e9077;font-weight:700;">✓ 一時保存中</span> <span style="color:#555;">' + fileName + '</span> <span style="color:#aaa;font-size:10px;">(' + nowStr + ')</span>' +
+      '</div>';
+  }
+  if (st.currentIdx + 1 < order.length) {
+    st.currentIdx++;
+    updateSingleSaasUploadOrder(key);
+  }
+}
+
 // 招待メール一括送信: モーダルで確認 → 送信
 var _inviteMailPendingKind = null;
 function sendInviteMailsAfterImport(kind) {
