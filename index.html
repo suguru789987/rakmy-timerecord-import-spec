@@ -3158,6 +3158,11 @@ function returnToSourceSetting() {
 })();
 
 function go(id) {
+  // フォールバック: per-key single系のプレースホルダーが未レンダリングなら遅延レンダリング
+  var lazyEl = document.getElementById(id);
+  if (lazyEl && lazyEl.classList.contains('screen') && !lazyEl.dataset.rendered && /^s-(tpl|saas)(-mapping)?-single-/.test(id)) {
+    if (typeof renderSingleScreens === 'function') renderSingleScreens();
+  }
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   document.querySelectorAll('.demo-nav button').forEach(b => b.classList.remove('current'));
