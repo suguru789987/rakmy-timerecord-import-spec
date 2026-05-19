@@ -2649,19 +2649,66 @@ futureBanner +
 // ===== 設定画面別 マッピング設定画面 (s-saas-mapping-single-{key}) =====
 function renderSaasMappingSingleScreen(cfg) {
   var k = cfg.key, label = cfg.label;
-  // 種別別の代表的マッピング行 (デモ用サンプル)
+  // [src列名, ラクミー項目名, 必須?, サンプル値1行目]
   var sampleRowsByKey = {
-    brand:    [['業態コード','brand_code'],['業態名','brand_name']],
-    store:    [['店舗コード','store_code'],['店舗名','store_name'],['業態','brand'],['住所','address']],
-    emptype:  [['区分コード','emptype_code'],['区分名','emptype_name'],['給与体系','pay_type'],['基準金額','base_pay']],
-    employee: [['従業員コード','staff_code'],['氏名','name'],['メール','email'],['電話','phone'],['店舗','store'],['雇用区分','emptype'],['交通費','commute']],
-    admin:    [['管理者コード','admin_code'],['氏名','name'],['メール','email'],['店舗','store'],['権限','role']]
+    brand:    [
+      ['業態コード','brand_code',false,'BRD001'],
+      ['業態名','brand_name',true,'居酒屋']
+    ],
+    store:    [
+      ['店舗コード','store_code',false,'ST001'],
+      ['店舗名','store_name',true,'渋谷店'],
+      ['業態','brand',false,'居酒屋'],
+      ['住所','address',false,'東京都渋谷区渋谷1-1-1']
+    ],
+    emptype:  [
+      ['区分コード','emptype_code',false,'EMP-TYPE-001'],
+      ['区分名','emptype_name',true,'正社員A'],
+      ['給与体系','pay_type',false,'月給'],
+      ['基準金額','base_pay',false,'¥200,000']
+    ],
+    employee: [
+      ['従業員コード','staff_code',true,'EMP001'],
+      ['氏名','name',true,'山田 太郎'],
+      ['メール','email',false,'yamada@example.com'],
+      ['電話','phone',false,'090-1234-5678'],
+      ['店舗','store',true,'渋谷店'],
+      ['雇用区分','emptype',true,'正社員A'],
+      ['交通費','commute',false,'¥30,000/月']
+    ],
+    admin:    [
+      ['管理者コード','admin_code',false,'ADM001'],
+      ['氏名','name',true,'山本 健一'],
+      ['メール','email',true,'yamamoto@example.jp'],
+      ['店舗','store',false,'渋谷店'],
+      ['権限','role',false,'店舗管理者']
+    ]
   };
-  var rows = (sampleRowsByKey[k] || []).map(function(r){
-    return '<tr><td style="padding:8px 12px;border-bottom:1px solid #eee;font-size:12px;color:#555;">' + r[0] + '</td>' +
+  var defs = sampleRowsByKey[k] || [];
+  // ① 4列テーブル (列名 / → / ラクミー項目 / サンプル値)
+  var rows = defs.map(function(r){
+    var srcCol = r[0], rkmField = r[1], required = r[2], sample = r[3];
+    var reqBadge = required ? ' <span style="font-size:9px;padding:1px 6px;background:#ffebee;color:#c62828;border-radius:8px;font-weight:700;">必須</span>' : '';
+    return '<tr><td style="padding:8px 12px;border-bottom:1px solid #eee;font-size:12px;color:#555;">' + srcCol + '</td>' +
            '<td style="padding:8px 12px;border-bottom:1px solid #eee;text-align:center;color:#aaa;">→</td>' +
-           '<td style="padding:8px 12px;border-bottom:1px solid #eee;"><select style="width:100%;padding:4px 8px;border:1px solid #ccc;border-radius:4px;font-size:12px;"><option>' + r[1] + ' (自動推定)</option><option>(マッピングしない)</option></select></td></tr>';
+           '<td style="padding:8px 12px;border-bottom:1px solid #eee;"><select style="width:100%;padding:4px 8px;border:1px solid #ccc;border-radius:4px;font-size:12px;"><option>' + rkmField + ' (自動推定)</option><option>(マッピングしない)</option></select>' + reqBadge + '</td>' +
+           '<td style="padding:8px 12px;border-bottom:1px solid #eee;font-size:12px;color:#0e9077;font-family:monospace;background:#f8fcfb;">' + sample + '</td></tr>';
   }).join('');
+  // ② 警告バナー (employee/admin: 招待メール送信不可警告など — デモ用に email が任意で空のケースを警告風に表示)
+  var inviteFlag = (k === 'employee' || k === 'admin');
+  var warningBanner = '';
+  if (inviteFlag) {
+    warningBanner =
+      '<div style="background:#fff8ed;border:1px solid #fde68a;border-radius:8px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:flex-start;gap:10px;">' +
+      '  <span style="font-size:18px;">⚠️</span>' +
+      '  <div style="flex:1;font-size:12px;line-height:1.7;color:#9c4d12;">' +
+      '    <strong>マッピング検証 (デモ):</strong> ' + (k === 'admin' ? '<strong>メール</strong>列が未マッピングの場合、招待メールを送信できません。' : '<strong>メール</strong>列を未マッピングにすると、登録後に招待メールを送信できません。') + '<br>' +
+      '    必須マッピングの過不足は実行時に自動チェックされ、不足があるとプレビュー画面でエラー行として可視化されます。' +
+      '  </div>' +
+      '</div>';
+  }
+  // ④ CSV列名は実ファイルのヘッダー由来である旨の注記
+  var sourceNote = '<div style="font-size:10px;color:#888;margin-bottom:8px;line-height:1.6;">※ 左カラム「連携元 列名」は、アップロード済 <strong>' + label + 'エクスポート CSV (例: ' + label + '_export.csv)</strong> のヘッダー行から自動取得しています。実ファイルの列名と一致しない場合は、外部勤怠サービス側でヘッダーをご確認ください。</div>';
   var futureNote = cfg.futureOnly
     ? '<div style="background:#fff8ed;border:1px solid #fde68a;border-radius:8px;padding:12px 16px;margin-bottom:14px;font-size:12px;color:#9c4d12;line-height:1.7;">⏳ <strong>将来対応予定:</strong> ' + label + 'は現状外部勤怠のエクスポート未対応のため、マッピング設定は将来対応時に有効になります。下記はサンプル表示です。</div>'
     : '';
@@ -2687,18 +2734,28 @@ futureNote +
 '      <div style="font-size:11px;color:#555;margin-top:2px;">外部勤怠サービス側のエクスポート列名と、ラクミー側の対応項目を紐付けます。自動推定済みの内容を確認・編集できます。</div>' +
 '    </div>' +
 '  </div>' +
+warningBanner +
+sourceNote +
 '  <div class="wcard" style="padding:0;overflow:hidden;">' +
-'    <div style="padding:10px 14px;background:#f6f8fb;border-bottom:1px solid #e5e7eb;font-size:12px;font-weight:600;color:#333;display:grid;grid-template-columns:1fr 40px 1fr;align-items:center;">' +
-'      <span>連携元 (外部勤怠) 列名</span><span style="text-align:center;color:#888;">→</span><span>ラクミー項目</span>' +
+'    <div style="padding:10px 14px;background:#f6f8fb;border-bottom:1px solid #e5e7eb;font-size:12px;font-weight:600;color:#333;display:grid;grid-template-columns:1fr 40px 1.4fr 1.2fr;align-items:center;gap:6px;">' +
+'      <span>連携元 (外部勤怠) 列名</span><span style="text-align:center;color:#888;">→</span><span>ラクミー項目</span><span style="color:#0e9077;">プレビュー (1行目)</span>' +
 '    </div>' +
-'    <table style="width:100%;border-collapse:collapse;">' +
+'    <table style="width:100%;border-collapse:collapse;table-layout:fixed;">' +
+'      <colgroup><col style="width:25%"><col style="width:6%"><col style="width:38%"><col style="width:31%"></colgroup>' +
 '      <tbody>' + rows + '</tbody>' +
 '    </table>' +
+'  </div>' +
+'  <div class="wcard" style="margin-top:14px;padding:14px 16px;">' +
+'    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;color:#333;">' +
+'      <input type="checkbox" checked style="accent-color:#2ec4a0;width:16px;height:16px;">' +
+'      <span><strong>次回もこのマッピング設定を保存</strong> <span style="font-size:11px;color:#888;font-weight:400;">(設定名: <input type="text" value="' + label + '_default_mapping" style="font-size:11px;padding:3px 8px;border:1px solid #ccc;border-radius:4px;width:200px;margin-left:4px;">)</span></span>' +
+'    </label>' +
+'    <div style="font-size:10px;color:#888;margin-top:6px;margin-left:26px;line-height:1.6;">保存しておくと、次回以降の' + label + '取込で自動的にこのマッピングが適用されます (オフで都度設定)。</div>' +
 '  </div>' +
 '  <div class="btn-group" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">' +
 '    <button class="btn btn-ghost" onclick="go(\'s-saas-single-' + k + '\');">← アップロード画面に戻る</button>' +
 '    <div style="display:flex;gap:10px;flex-wrap:wrap;">' +
-'      <button class="btn btn-ghost" onclick="alert(\'マッピングをリセットしました (デモ)\');">↺ リセット</button>' +
+'      <button class="btn btn-ghost" onclick="alert(\'マッピングを自動推定の初期値にリセットしました (デモ)\');">↺ 初期値にリセット</button>' +
 '      <button class="btn btn-primary" onclick="alert(\'マッピングを保存しました (デモ)\');go(\'s-saas-preview-single\');">💾 保存して プレビュー →</button>' +
 '    </div>' +
 '  </div>' +
@@ -2706,6 +2763,7 @@ futureNote +
 '    💡 <strong>仕様メモ (運用更新動線・設定画面別物理分離):</strong><br>' +
 '    • 設定画面 <code>' + cfg.settingsHash + '</code> 専用のマッピング設定画面 (id: <code>s-saas-mapping-single-' + k + '</code>)<br>' +
 '    • 既存 s-saas2 (初回マッピング設定・新規登録動線) とは <strong>完全独立</strong><br>' +
+'    • <strong>追加4機能</strong>: ① CSV1行目のサンプル値プレビュー / ② 必須マッピング不足の警告バナー (employee/admin) / ③ 「次回も保存」プロファイル名指定 / ④ 連携元列が実ファイルのヘッダー由来である旨注記<br>' +
 '    • 「← アップロード画面に戻る」で起点の取込画面に戻る (キャンセル相当)<br>' +
 '    • 「💾 保存して プレビュー」で保存後プレビュー画面に進む' +
 '  </div>' +
