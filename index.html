@@ -281,6 +281,9 @@
     <button onclick="go('s-tpl2-single')" style="color:#1a73e8;font-size:11px;">→ 確認・実行 (共通)</button>
     <button onclick="go('s-tpl3-single')" style="color:#1a73e8;font-size:11px;">→ 完了 (共通)</button>
     <div style="font-size:10px;color:#1a73e8;font-weight:700;padding:6px 8px 2px;">★ 運用更新: 外部勤怠取込 (設定画面別)</div>
+    <button onclick="go('s-saas-single-brand')"    style="color:#1a73e8;font-size:11px;">└ 業態・ブランド <span style="font-size:9px;color:#5c4dac;">(将来)</span></button>
+    <button onclick="go('s-saas-single-store')"    style="color:#1a73e8;font-size:11px;">└ 店舗 <span style="font-size:9px;color:#5c4dac;">(将来)</span></button>
+    <button onclick="go('s-saas-single-emptype')"  style="color:#1a73e8;font-size:11px;">└ 雇用区分 <span style="font-size:9px;color:#5c4dac;">(将来)</span></button>
     <button onclick="go('s-saas-single-employee')" style="color:#1a73e8;font-size:11px;">└ 従業員</button>
     <button onclick="go('s-saas-single-admin')"    style="color:#1a73e8;font-size:11px;">└ 管理者</button>
     <button onclick="go('s-saas-preview-single')" style="color:#1a73e8;font-size:11px;">→ プレビュー (共通)</button>
@@ -395,6 +398,9 @@
 <div class="screen" id="s-tpl-single-employee" data-single-tpl-key="employee"></div>
 <div class="screen" id="s-tpl-single-admin"    data-single-tpl-key="admin"></div>
 
+<div class="screen" id="s-saas-single-brand"    data-single-saas-key="brand"></div>
+<div class="screen" id="s-saas-single-store"    data-single-saas-key="store"></div>
+<div class="screen" id="s-saas-single-emptype"  data-single-saas-key="emptype"></div>
 <div class="screen" id="s-saas-single-employee" data-single-saas-key="employee"></div>
 <div class="screen" id="s-saas-single-admin"    data-single-saas-key="admin"></div>
 
@@ -566,6 +572,15 @@
       <h2 style="font-size:22px;font-weight:700;color:#0e9077;margin:0 0 8px 0;">インポート完了</h2>
       <div style="font-size:14px;color:#333;margin-bottom:6px;"><strong>5件</strong>のデータの取込が完了しました。</div>
       <div style="font-size:12px;color:#888;margin-bottom:24px;">続けて<strong>遷移元の設定画面</strong>で登録結果の一覧をご確認ください。</div>
+      <!-- 招待メール送信ボタン (employee/admin 取込時のみ表示) -->
+      <div id="tpl3-invite-mail-row" style="display:none;margin-bottom:16px;padding:14px 16px;background:#f0faf6;border:1px solid #b8e6d6;border-radius:8px;">
+        <div style="font-size:12px;color:#0e9077;font-weight:700;margin-bottom:8px;">📧 取込済データに対する招待メール</div>
+        <div style="font-size:11px;color:#555;margin-bottom:10px;line-height:1.7;">
+          新規登録された<span id="tpl3-invite-target-label">対象者</span>に対して招待メールを送信できます。<br>
+          差し替え対象 (旧招待が無効化される) も含めて一括送信されます。
+        </div>
+        <button class="btn btn-primary" style="font-size:13px;padding:10px 18px;" onclick="sendInviteMailsAfterImport('tpl');">📧 招待メールを一括送信</button>
+      </div>
       <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
         <button class="btn btn-primary" style="font-size:14px;padding:12px 22px;" onclick="returnToSourceSetting();">← 設定画面に戻る</button>
       </div>
@@ -573,7 +588,8 @@
 
     <div style="margin-top:24px;padding:12px 14px;background:#fff8ed;border:1px solid #fde68a;border-radius:8px;font-size:11px;color:#9c4d12;line-height:1.7;">
       💡 <strong>仕様メモ:</strong> 運用更新動線の完了画面 (s-tpl3-single)。新規登録用 s-tpl3 とは <strong>完全独立</strong>。<br>
-      ・<strong>完了後の挙動</strong>: インポート完了 → 短いサマリ表示 → <strong>「設定画面に戻る」で遷移元設定画面に復帰</strong> (自動戻り機能は廃止)。<br>
+      ・<strong>完了後の挙動</strong>: インポート完了 → 短いサマリ表示 → <strong>「設定画面に戻る」で遷移元設定画面に復帰</strong>。<br>
+      ・<strong>📧 招待メール送信ボタン</strong>: 起点が 従業員 / 管理者 の場合のみ表示。新規/差し替え判定後の対象者に一括送信。<br>
       ・<strong>データの最終確認</strong>は遷移元の設定画面（登録一覧）で行う。完了画面に再度同じ一覧を出すと冗長なため省略。
     </div>
   </div>
@@ -676,6 +692,15 @@
       <h2 style="font-size:22px;font-weight:700;color:#0e9077;margin:0 0 8px 0;">インポート完了</h2>
       <div style="font-size:14px;color:#333;margin-bottom:6px;"><strong>5件</strong>の外部勤怠データの取込が完了しました。</div>
       <div style="font-size:12px;color:#888;margin-bottom:24px;">続けて<strong>遷移元の設定画面</strong>で登録結果の一覧をご確認ください。</div>
+      <!-- 招待メール送信ボタン (employee/admin 取込時のみ表示) -->
+      <div id="saas3-invite-mail-row" style="display:none;margin-bottom:16px;padding:14px 16px;background:#f0faf6;border:1px solid #b8e6d6;border-radius:8px;">
+        <div style="font-size:12px;color:#0e9077;font-weight:700;margin-bottom:8px;">📧 取込済データに対する招待メール</div>
+        <div style="font-size:11px;color:#555;margin-bottom:10px;line-height:1.7;">
+          新規登録された<span id="saas3-invite-target-label">対象者</span>に対して招待メールを送信できます。<br>
+          差し替え対象 (旧招待が無効化される) も含めて一括送信されます。
+        </div>
+        <button class="btn btn-primary" style="font-size:13px;padding:10px 18px;" onclick="sendInviteMailsAfterImport('saas');">📧 招待メールを一括送信</button>
+      </div>
       <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
         <button class="btn btn-primary" style="font-size:14px;padding:12px 22px;" onclick="returnToSourceSetting();">← 設定画面に戻る</button>
       </div>
@@ -683,7 +708,8 @@
 
     <div style="margin-top:24px;padding:12px 14px;background:#fff8ed;border:1px solid #fde68a;border-radius:8px;font-size:11px;color:#9c4d12;line-height:1.7;">
       💡 <strong>仕様メモ:</strong> 運用更新動線の完了画面 (s-saas-done-single)。新規登録用 s-saas4 とは <strong>完全独立</strong>。<br>
-      ・<strong>完了後の挙動</strong>: インポート完了 → 短いサマリ表示 → <strong>「設定画面に戻る」で遷移元設定画面に復帰</strong> (自動戻り機能は廃止)。<br>
+      ・<strong>完了後の挙動</strong>: インポート完了 → 短いサマリ表示 → <strong>「設定画面に戻る」で遷移元設定画面に復帰</strong>。<br>
+      ・<strong>📧 招待メール送信ボタン</strong>: 起点が 従業員 / 管理者 の場合のみ表示。新規/差し替え判定後の対象者に一括送信。<br>
       ・データ最終確認は遷移元の設定画面（登録一覧）で行う想定 (完了画面に再掲しない)。
     </div>
   </div>
@@ -1131,8 +1157,11 @@
       </div>
       <div style="font-size:10px;color:#1a73e8;">
         ➡️ 運用更新の単一データ取込は設定画面別の専用画面で確認:
+        <a href="#" onclick="event.preventDefault();go('s-saas-single-brand');"    style="color:#5c4dac;font-weight:700;">業態(将来)</a> /
+        <a href="#" onclick="event.preventDefault();go('s-saas-single-store');"    style="color:#5c4dac;font-weight:700;">店舗(将来)</a> /
+        <a href="#" onclick="event.preventDefault();go('s-saas-single-emptype');"  style="color:#5c4dac;font-weight:700;">雇用区分(将来)</a> /
         <a href="#" onclick="event.preventDefault();go('s-saas-single-employee');" style="color:#1a73e8;font-weight:700;">従業員</a> /
-        <a href="#" onclick="event.preventDefault();go('s-saas-single-admin');" style="color:#1a73e8;font-weight:700;">管理者</a>
+        <a href="#" onclick="event.preventDefault();go('s-saas-single-admin');"    style="color:#1a73e8;font-weight:700;">管理者</a>
       </div>
     </div>
   </div>
@@ -2393,7 +2422,14 @@ function singleSwitchToSaas() {
 //   各 screen はこのファイル下部の renderSingleScreens で構築
 // ============================================================
 var TPL_TYPE_LABEL = { brand:'業態・ブランド', store:'店舗', emptype:'雇用区分', employee:'従業員', admin:'管理者' };
-var SAAS_TYPE_LABEL = { 'map-kot-emp':'従業員データ', 'map-kot-hr':'従業員一覧(補完)', 'map-kot-admin':'管理者データ' };
+var SAAS_TYPE_LABEL = {
+  'map-kot-brand':   '業態・ブランドデータ',
+  'map-kot-store':   '店舗データ',
+  'map-kot-emptype': '雇用区分データ',
+  'map-kot-emp':     '従業員データ',
+  'map-kot-hr':      '従業員一覧(補完)',
+  'map-kot-admin':   '管理者データ'
+};
 
 var TPL_SINGLE_CFG = [
   { key:'brand',    label:'業態・ブランド', dlFn:'downloadBrandTemplate',    settingsHash:'brand-ops-settings' },
@@ -2402,9 +2438,15 @@ var TPL_SINGLE_CFG = [
   { key:'employee', label:'従業員',         dlFn:'downloadEmployeeTemplate', settingsHash:'emp-ops-settings' },
   { key:'admin',    label:'管理者',         dlFn:'downloadAdminTemplate',    settingsHash:'d1' }
 ];
+// SaaS は外部勤怠サービスのエクスポート可否で「現状対応」「将来対応予定」を分ける。
+// 設定画面別の物理分離は 5 種類すべてに揃え、未対応種別は将来エクスポートテーブル追加時に
+// この画面の枠を流用できるよう「ストブ + 注意バナー」で先行配置する。
 var SAAS_SINGLE_CFG = [
-  { key:'employee', label:'従業員', mapKey:'map-kot-emp',   settingsHash:'emp-ops-settings', required:true },
-  { key:'admin',    label:'管理者', mapKey:'map-kot-admin', settingsHash:'d1',               required:false }
+  { key:'brand',    label:'業態・ブランド', mapKey:'map-kot-brand',   settingsHash:'brand-ops-settings', required:false, futureOnly:true  },
+  { key:'store',    label:'店舗',           mapKey:'map-kot-store',   settingsHash:'store-ops-settings', required:false, futureOnly:true  },
+  { key:'emptype',  label:'雇用区分',       mapKey:'map-kot-emptype', settingsHash:'emptype-ops-settings', required:false, futureOnly:true  },
+  { key:'employee', label:'従業員',         mapKey:'map-kot-emp',     settingsHash:'emp-ops-settings',   required:true,  futureOnly:false },
+  { key:'admin',    label:'管理者',         mapKey:'map-kot-admin',   settingsHash:'d1',                 required:false, futureOnly:false }
 ];
 
 // per-key state (currentIdx + multi-mode flag)
@@ -2505,26 +2547,39 @@ function renderTplSingleScreen(cfg) {
 function renderSaasSingleScreen(cfg) {
   var k = cfg.key, label = cfg.label;
   var multiChecks = SAAS_SINGLE_CFG.map(function(c){
-    return '<label class="single-check" data-map="' + c.mapKey + '" onclick="setTimeout(function(){updateSingleSaasUploadOrder(\'' + k + '\')},0);" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #e8e8e8;border-radius:6px;cursor:pointer;background:#fff;">' +
+    var futureBadge = c.futureOnly ? ' <span style="font-size:9px;padding:1px 7px;background:#ede7f6;color:#5c4dac;border-radius:10px;font-weight:600;margin-left:4px;">将来対応予定</span>' : '';
+    return '<label class="single-check" data-map="' + c.mapKey + '" onclick="setTimeout(function(){updateSingleSaasUploadOrder(\'' + k + '\')},0);" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #e8e8e8;border-radius:6px;cursor:pointer;background:#fff;' + (c.futureOnly ? 'opacity:0.7;' : '') + '">' +
       '<input type="checkbox" style="accent-color:#2ec4a0;width:16px;height:16px;"' + (c.key === k ? ' checked' : '') + '>' +
       '<div style="flex:1;font-size:13px;font-weight:600;">' + c.label + 'データ ' +
       (c.required
         ? '<span style="font-size:9px;padding:1px 7px;background:#e8f9f4;color:#0e9077;border-radius:10px;font-weight:600;margin-left:6px;">必須</span>'
         : '<span style="font-size:9px;padding:1px 7px;background:#fef3e2;color:#e67e22;border-radius:10px;font-weight:600;margin-left:6px;">任意</span>') +
+      futureBadge +
       (c.key === k ? ' <span style="font-size:9px;color:#0e9077;background:#e8f8f5;padding:1px 6px;border-radius:8px;margin-left:4px;">起点</span>' : '') +
       '</div>' +
     '</label>';
   }).join('');
+  // 将来対応予定 (現状未対応) バナー
+  var futureBanner = cfg.futureOnly
+    ? '  <div style="background:#fff8ed;border:1px solid #fde68a;border-radius:8px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:flex-start;gap:10px;">' +
+      '    <span style="font-size:20px;">⏳</span>' +
+      '    <div style="flex:1;font-size:12px;line-height:1.7;color:#9c4d12;">' +
+      '      <strong>将来対応予定:</strong> 現時点では外部勤怠サービス側の<strong>エクスポートテーブル未提供</strong>のため、' + label + 'の外部勤怠取込はご利用いただけません。<br>' +
+      '      外部勤怠サービスでのデータ作成・権限解放等によりエクスポート可能になり次第、この画面で取込できるようになります。当面は<a href="#" onclick="event.preventDefault();singleSaasSwitchToTpl(\'' + k + '\');" style="color:#1a73e8;font-weight:700;">テンプレ取込</a>をご利用ください。' +
+      '    </div>' +
+      '  </div>'
+    : '';
   return '' +
 '<div class="page-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">' +
-'  <h1 class="page-title" style="margin:0;">' + label + ' の外部勤怠取込 <span style="font-size:11px;color:#fff;background:#1a73e8;padding:3px 10px;border-radius:12px;margin-left:8px;">運用更新</span></h1>' +
+'  <h1 class="page-title" style="margin:0;">' + label + ' の外部勤怠取込 <span style="font-size:11px;color:#fff;background:#1a73e8;padding:3px 10px;border-radius:12px;margin-left:8px;">運用更新</span>' + (cfg.futureOnly ? ' <span style="font-size:10px;color:#5c4dac;background:#ede7f6;padding:3px 8px;border-radius:10px;margin-left:6px;">将来対応予定</span>' : '') + '</h1>' +
 '</div>' +
 '<div class="content">' +
+futureBanner +
 '  <div style="background:#e8f4fd;border:1px solid #b3d9f0;border-radius:8px;padding:14px 18px;margin-bottom:18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">' +
 '    <span style="font-size:24px;">📥</span>' +
 '    <div style="flex:1;min-width:200px;">' +
 '      <div style="font-size:13px;color:#0d47a1;font-weight:700;">' + label + ' の外部勤怠取込 (運用更新動線)</div>' +
-'      <div style="font-size:11px;color:#555;margin-top:2px;">' + label + '一覧画面の「📥 CSVインポート」経由。admin/employee のみ対応。</div>' +
+'      <div style="font-size:11px;color:#555;margin-top:2px;">' + label + '一覧画面の「📥 CSVインポート」経由。' + (cfg.futureOnly ? '将来エクスポートテーブル追加時にこの動線で取込可能。' : '取込フロー: 連携元選択 → アップロード → マッピング → プレビュー → 完了。') + '</div>' +
 '    </div>' +
 '    <a href="#" onclick="event.preventDefault();singleSaasSwitchToTpl(\'' + k + '\');" style="font-size:11px;color:#2ec4a0;text-decoration:underline;font-weight:600;">📄 テンプレ取込に切替 →</a>' +
 '  </div>' +
@@ -2635,6 +2690,12 @@ function toggleSingleTplMulti(key, expand) {
   st.currentIdx = 0;
   updateSingleTplUploadOrder(key);
 }
+function getSaasMapKey(key) {
+  for (var i = 0; i < SAAS_SINGLE_CFG.length; i++) {
+    if (SAAS_SINGLE_CFG[i].key === key) return SAAS_SINGLE_CFG[i].mapKey;
+  }
+  return '';
+}
 function toggleSingleSaasMulti(key, expand) {
   var st = _singleSaasState[key]; if (!st) return;
   st.multi = !!expand;
@@ -2643,7 +2704,7 @@ function toggleSingleSaasMulti(key, expand) {
   if (simple) simple.style.display = expand ? 'none' : '';
   if (multi)  multi.style.display  = expand ? '' : 'none';
   if (expand) {
-    var originMap = (key === 'admin') ? 'map-kot-admin' : 'map-kot-emp';
+    var originMap = getSaasMapKey(key);
     document.querySelectorAll('#s-saas-single-' + key + ' .single-check[data-map]').forEach(function(lbl) {
       var cb = lbl.querySelector('input[type=checkbox]');
       var match = (lbl.getAttribute('data-map') === originMap);
@@ -2674,7 +2735,7 @@ function getSingleTplOrder(key) {
 function getSingleSaasOrder(key) {
   if (!key) key = _activeSingleSaasKey;
   if (!key) return [];
-  var originMap = (key === 'admin') ? 'map-kot-admin' : (key === 'employee') ? 'map-kot-emp' : '';
+  var originMap = getSaasMapKey(key);
   var st = _singleSaasState[key];
   if (!st || !st.multi) return originMap ? [originMap] : [];
   var checked = [];
@@ -2774,8 +2835,9 @@ function singleSaasAdvance(key) {
 
 // ===== モード間切替 (tpl ⇄ saas) =====
 function singleTplSwitchToSaas(key) {
-  if (key !== 'employee' && key !== 'admin') {
-    alert(TPL_TYPE_LABEL[key] + ' は外部勤怠サービスから取得できません。テンプレ取込のみ対応です。');
+  // 5 種すべて対応 (brand/store/emptype は futureOnly バナーで案内)
+  if (!_singleSaasState[key]) {
+    alert(TPL_TYPE_LABEL[key] + ' の外部勤怠取込画面は未定義です。');
     return;
   }
   _activeSingleSaasKey = key;
@@ -2818,7 +2880,7 @@ function applyToSingleScreen(screenId) {
     var multi2  = document.getElementById('single-saas-' + key + '-mode-multi');
     if (simple2) simple2.style.display = '';
     if (multi2)  multi2.style.display  = 'none';
-    var originMap = (key === 'admin') ? 'map-kot-admin' : 'map-kot-emp';
+    var originMap = getSaasMapKey(key);
     document.querySelectorAll('#s-saas-single-' + key + ' .single-check[data-map]').forEach(function(lbl) {
       var cb = lbl.querySelector('input[type=checkbox]');
       var match = (lbl.getAttribute('data-map') === originMap);
@@ -2830,6 +2892,30 @@ function applyToSingleScreen(screenId) {
 }
 
 // 設定画面に戻る (key付き直接版)
+// ===== 招待メール送信 (完了画面・employee/admin 限定) =====
+function setupInviteMailRow(kind) {
+  var key = (kind === 'tpl') ? _activeSingleTplKey : _activeSingleSaasKey;
+  var row = document.getElementById(kind + '3-invite-mail-row');
+  var lbl = document.getElementById(kind + '3-invite-target-label');
+  if (!row) return;
+  if (key === 'employee' || key === 'admin') {
+    row.style.display = '';
+    if (lbl) lbl.textContent = (key === 'employee') ? '従業員' : '管理者';
+  } else {
+    row.style.display = 'none';
+  }
+}
+function sendInviteMailsAfterImport(kind) {
+  var key = (kind === 'tpl') ? _activeSingleTplKey : _activeSingleSaasKey;
+  var target = (key === 'employee') ? '従業員' : (key === 'admin') ? '管理者' : '対象者';
+  alert('📧 招待メール一括送信 (デモ)\n\n対象: 新規登録された ' + target + ' (例: 3件)\n＋ 差し替え対象 (例: 1件 / 旧招待は無効化)\n\n送信完了後、設定画面に戻ります。');
+  // デモ: 送信後ボタンを送信済表記に
+  var row = document.getElementById(kind + '3-invite-mail-row');
+  if (row) {
+    row.innerHTML = '<div style="text-align:center;padding:14px;font-size:12px;color:#0e9077;font-weight:700;">✓ 招待メール送信済 (デモ)</div>';
+  }
+}
+
 function returnToSourceSettingByKey(hash) {
   window.location.href = 'https://suguru789987.github.io/rakmy-owner-registration-mock/#' + hash;
 }
@@ -3019,6 +3105,13 @@ function go(id) {
   // 運用更新 設定画面別の単一データ取込画面 入場時の初期化
   if (/^s-(tpl|saas)-single-/.test(id)) {
     if (typeof applyToSingleScreen === 'function') applyToSingleScreen(id);
+  }
+  // 運用更新 完了画面 → 招待メール行の表示制御
+  if (id === 's-tpl3-single') {
+    if (typeof setupInviteMailRow === 'function') setupInviteMailRow('tpl');
+  }
+  if (id === 's-saas-done-single') {
+    if (typeof setupInviteMailRow === 'function') setupInviteMailRow('saas');
   }
   // 運用更新 確認/プレビュー画面 → 取込順タブをセットアップ
   if (id === 's-tpl2-single') {
