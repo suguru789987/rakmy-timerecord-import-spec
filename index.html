@@ -3197,20 +3197,36 @@ function openMasterAddRedirect(masterKey, missingValue) {
   alert('「' + missingValue + '」を' + (TPL_TYPE_LABEL[masterKey] || masterKey) + 'マスタに追加してください (デモ)。\n追加後、このプレビュー画面に戻って「再判定」を押すと取込可能になります。');
 }
 
-// 行スキップ: 視覚的にグレーアウト + 「スキップ済」表示
+// 行スキップ: グレーアウト + 「スキップ済」表示 (元の操作セル HTML をスナップショット)
 function markRowSkipped(btn) {
   var tr = btn.closest('tr');
   if (!tr) return;
+  var actCell = btn.parentElement;
+  if (!actCell) return;
+  // 元の HTML を保存
+  if (!actCell.dataset.originalActions) {
+    actCell.dataset.originalActions = actCell.innerHTML;
+  }
+  // 元の row style も保存
+  if (typeof tr.dataset.originalBg === 'undefined') tr.dataset.originalBg = tr.style.background || '';
   tr.style.opacity = '0.45';
   tr.style.textDecoration = 'line-through';
-  var actCell = btn.parentElement;
-  if (actCell) actCell.innerHTML = '<span style="font-size:10px;color:#888;font-weight:600;">⊘ スキップ済</span> <button onclick="unmarkRowSkipped(this)" style="font-size:10px;padding:3px 6px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;">元に戻す</button>';
+  actCell.innerHTML = '<span style="font-size:10px;color:#888;font-weight:600;">⊘ スキップ済</span> <button onclick="unmarkRowSkipped(this)" style="font-size:10px;padding:3px 6px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;">元に戻す</button>';
 }
 function unmarkRowSkipped(btn) {
   var tr = btn.closest('tr');
   if (!tr) return;
-  // デモなので簡易に: リロード推奨表示
-  alert('「元に戻す」: デモではこの行の操作を元に戻すには画面を再読み込みしてください。');
+  var actCell = btn.parentElement;
+  if (!actCell) return;
+  // スタイル復元
+  tr.style.opacity = '';
+  tr.style.textDecoration = '';
+  if (typeof tr.dataset.originalBg !== 'undefined') tr.style.background = tr.dataset.originalBg;
+  // 操作セル復元
+  if (actCell.dataset.originalActions) {
+    actCell.innerHTML = actCell.dataset.originalActions;
+    delete actCell.dataset.originalActions;
+  }
 }
 
 // 行編集モーダル制御
