@@ -281,15 +281,15 @@
     <button onclick="go('s-tpl2-single')" style="color:#1a73e8;font-size:11px;">→ 確認・実行 (共通)</button>
     <button onclick="go('s-tpl3-single')" style="color:#1a73e8;font-size:11px;">→ 完了 (共通)</button>
     <div style="font-size:10px;color:#1a73e8;font-weight:700;padding:6px 8px 2px;">★ 運用更新: 外部勤怠取込 (設定画面別)</div>
-    <button onclick="go('s-saas-single-brand')"    style="color:#1a73e8;font-size:11px;">└ 業態・ブランド <span style="font-size:9px;color:#5c4dac;">(将来)</span></button>
-    <button onclick="go('s-saas-single-store')"    style="color:#1a73e8;font-size:11px;">└ 店舗 <span style="font-size:9px;color:#5c4dac;">(将来)</span></button>
-    <button onclick="go('s-saas-single-emptype')"  style="color:#1a73e8;font-size:11px;">└ 雇用区分 <span style="font-size:9px;color:#5c4dac;">(将来)</span></button>
+    <button onclick="go('s-saas-single-brand')"    style="color:#1a73e8;font-size:11px;">└ 業態・ブランド</button>
+    <button onclick="go('s-saas-single-store')"    style="color:#1a73e8;font-size:11px;">└ 店舗</button>
+    <button onclick="go('s-saas-single-emptype')"  style="color:#1a73e8;font-size:11px;">└ 雇用区分</button>
     <button onclick="go('s-saas-single-employee')" style="color:#1a73e8;font-size:11px;">└ 従業員</button>
     <button onclick="go('s-saas-single-admin')"    style="color:#1a73e8;font-size:11px;">└ 管理者</button>
     <div style="font-size:10px;color:#1a73e8;font-weight:700;padding:6px 8px 2px;">★ 運用更新: マッピング設定 (設定画面別)</div>
-    <button onclick="go('s-saas-mapping-single-brand')"    style="color:#5c4dac;font-size:11px;">└ 業態・ブランド (将来)</button>
-    <button onclick="go('s-saas-mapping-single-store')"    style="color:#5c4dac;font-size:11px;">└ 店舗 (将来)</button>
-    <button onclick="go('s-saas-mapping-single-emptype')"  style="color:#5c4dac;font-size:11px;">└ 雇用区分 (将来)</button>
+    <button onclick="go('s-saas-mapping-single-brand')"    style="color:#1a73e8;font-size:11px;">└ 業態・ブランド</button>
+    <button onclick="go('s-saas-mapping-single-store')"    style="color:#1a73e8;font-size:11px;">└ 店舗</button>
+    <button onclick="go('s-saas-mapping-single-emptype')"  style="color:#1a73e8;font-size:11px;">└ 雇用区分</button>
     <button onclick="go('s-saas-mapping-single-employee')" style="color:#1a73e8;font-size:11px;">└ 従業員</button>
     <button onclick="go('s-saas-mapping-single-admin')"    style="color:#1a73e8;font-size:11px;">└ 管理者</button>
     <button onclick="go('s-saas-preview-single')" style="color:#1a73e8;font-size:11px;">→ プレビュー (共通)</button>
@@ -1170,9 +1170,9 @@
       </div>
       <div style="font-size:10px;color:#1a73e8;">
         ➡️ 運用更新の単一データ取込は設定画面別の専用画面で確認:
-        <a href="#" onclick="event.preventDefault();go('s-saas-single-brand');"    style="color:#5c4dac;font-weight:700;">業態(将来)</a> /
-        <a href="#" onclick="event.preventDefault();go('s-saas-single-store');"    style="color:#5c4dac;font-weight:700;">店舗(将来)</a> /
-        <a href="#" onclick="event.preventDefault();go('s-saas-single-emptype');"  style="color:#5c4dac;font-weight:700;">雇用区分(将来)</a> /
+        <a href="#" onclick="event.preventDefault();go('s-saas-single-brand');"    style="color:#1a73e8;font-weight:700;">業態</a> /
+        <a href="#" onclick="event.preventDefault();go('s-saas-single-store');"    style="color:#1a73e8;font-weight:700;">店舗</a> /
+        <a href="#" onclick="event.preventDefault();go('s-saas-single-emptype');"  style="color:#1a73e8;font-weight:700;">雇用区分</a> /
         <a href="#" onclick="event.preventDefault();go('s-saas-single-employee');" style="color:#1a73e8;font-weight:700;">従業員</a> /
         <a href="#" onclick="event.preventDefault();go('s-saas-single-admin');"    style="color:#1a73e8;font-weight:700;">管理者</a>
       </div>
@@ -2451,15 +2451,16 @@ var TPL_SINGLE_CFG = [
   { key:'employee', label:'従業員',         dlFn:'downloadEmployeeTemplate', settingsHash:'emp-ops-settings' },
   { key:'admin',    label:'管理者',         dlFn:'downloadAdminTemplate',    settingsHash:'d1' }
 ];
-// SaaS は外部勤怠サービスのエクスポート可否で「現状対応」「将来対応予定」を分ける。
-// 設定画面別の物理分離は 5 種類すべてに揃え、未対応種別は将来エクスポートテーブル追加時に
-// この画面の枠を流用できるよう「ストブ + 注意バナー」で先行配置する。
+// 2026-05-19 設計変更: SaaS のエクスポート対応列は顧客の契約/設定で千差万別なので、
+//   全種別アップ可能なUIを用意し、実データが無ければ顧客がスキップ判断する方針へ統一。
+//   futureOnly フラグは撤去 (全種別 active)。必須項目不足はマッピング警告/プレビューエラー
+//   で可視化する。
 var SAAS_SINGLE_CFG = [
-  { key:'brand',    label:'業態・ブランド', mapKey:'map-kot-brand',   settingsHash:'brand-ops-settings', required:false, futureOnly:true  },
-  { key:'store',    label:'店舗',           mapKey:'map-kot-store',   settingsHash:'store-ops-settings', required:false, futureOnly:true  },
-  { key:'emptype',  label:'雇用区分',       mapKey:'map-kot-emptype', settingsHash:'emptype-ops-settings', required:false, futureOnly:true  },
-  { key:'employee', label:'従業員',         mapKey:'map-kot-emp',     settingsHash:'emp-ops-settings',   required:true,  futureOnly:false },
-  { key:'admin',    label:'管理者',         mapKey:'map-kot-admin',   settingsHash:'d1',                 required:false, futureOnly:false }
+  { key:'brand',    label:'業態・ブランド', mapKey:'map-kot-brand',   settingsHash:'brand-ops-settings', required:false },
+  { key:'store',    label:'店舗',           mapKey:'map-kot-store',   settingsHash:'store-ops-settings', required:false },
+  { key:'emptype',  label:'雇用区分',       mapKey:'map-kot-emptype', settingsHash:'emptype-ops-settings', required:false },
+  { key:'employee', label:'従業員',         mapKey:'map-kot-emp',     settingsHash:'emp-ops-settings',   required:true  },
+  { key:'admin',    label:'管理者',         mapKey:'map-kot-admin',   settingsHash:'d1',                 required:false }
 ];
 
 // per-key state (currentIdx + multi-mode flag)
