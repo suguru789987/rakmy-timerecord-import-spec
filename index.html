@@ -2612,10 +2612,10 @@ futureBanner +
 '      <div style="font-size:13px;color:#0d47a1;font-weight:700;">' + label + ' の外部勤怠取込 (運用更新動線)</div>' +
 '      <div style="font-size:11px;color:#555;margin-top:2px;">' + label + '一覧画面の「📥 CSVインポート」経由。' + (cfg.futureOnly ? '将来エクスポートテーブル追加時にこの動線で取込可能。' : '取込フロー: 連携元 → アップロード → プレビュー → 完了。') + '</div>' +
 '    </div>' +
-'    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">' +
-'      <button class="btn btn-ghost" onclick="_activeSingleSaasKey=\'' + k + '\';go(\'s-saas-mapping-single-' + k + '\');" style="font-size:11px;padding:6px 12px;border:1px solid #ccc;background:#fff;border-radius:6px;cursor:pointer;color:#555;white-space:nowrap;">⚙️ マッピング設定</button>' +
-'      <a href="#" onclick="event.preventDefault();singleSaasSwitchToTpl(\'' + k + '\');" style="font-size:11px;color:#2ec4a0;text-decoration:underline;font-weight:600;">📄 テンプレ取込に切替 →</a>' +
-'    </div>' +
+'    <button class="btn btn-ghost" onclick="_activeSingleSaasKey=\'' + k + '\';go(\'s-saas-mapping-single-' + k + '\');" style="font-size:11px;padding:6px 12px;border:1px solid #ccc;background:#fff;border-radius:6px;cursor:pointer;color:#555;white-space:nowrap;">⚙️ マッピング設定</button>' +
+'  </div>' +
+'  <div style="text-align:right;margin-top:-10px;margin-bottom:14px;">' +
+'    <a href="#" onclick="event.preventDefault();singleSaasSwitchToTpl(\'' + k + '\');" style="font-size:11px;color:#2ec4a0;text-decoration:underline;font-weight:600;">📄 テンプレ取込に切替 →</a>' +
 '  </div>' +
 '  <div class="flow-steps">' +
 '    <div class="fs active"><span class="fs-num">1</span><span class="fs-label">連携元</span></div>' +
