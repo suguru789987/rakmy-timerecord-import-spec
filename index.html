@@ -2328,66 +2328,7 @@
 </div>
 
 <!-- ==================== -->
-<!-- SAAS: STEP 3 - 確認（旧、マッピング経由用 → リダイレクト） -->
-<!-- ==================== -->
-<div class="screen" id="s-saas3">
-  <div class="page-header"><h1 class="page-title">外部勤怠サービスから取り込み</h1></div>
-  <div class="content">
-
-    <div class="flow-steps">
-      <div class="fs done"><span class="fs-num">✓</span><span class="fs-label">アップロード</span></div>
-      <div class="fs-line done"></div>
-      <div class="fs done"><span class="fs-num">✓</span><span class="fs-label">マッピング</span></div>
-      <div class="fs-line done"></div>
-      <div class="fs active"><span class="fs-num">3</span><span class="fs-label">確認・実行</span></div>
-      <div class="fs-line"></div>
-      <div class="fs"><span class="fs-num">4</span><span class="fs-label">完了</span></div>
-    </div>
-
-    <div class="pv-summary">
-      <div class="pv-box pv-total"><div class="num">15</div><div class="lbl">データ行数</div></div>
-      <div class="pv-box pv-new"><div class="num">12</div><div class="lbl">新規登録</div></div>
-      <div class="pv-box pv-upd"><div class="num">2</div><div class="lbl">更新</div></div>
-      <div class="pv-box pv-err"><div class="num">1</div><div class="lbl">エラー</div></div>
-    </div>
-
-    <div class="alert alert-warn">電話番号・メールアドレスはインポート後に従業員画面から個別入力が必要です。交通費は全員「月額 ¥0」で登録されます。</div>
-
-    <div class="wcard" style="padding:0;overflow-x:auto;">
-      <div class="stabs" style="padding:0 14px;">
-        <div class="stab active">すべて (15)</div>
-        <div class="stab" style="color:#e74c3c">エラー (1)</div>
-      </div>
-      <table class="pv-table">
-        <thead>
-          <tr><th>行</th><th>状態</th><th>名前</th><th>従業員コード</th><th>雇用区分</th><th>交通費単位</th><th>交通費</th><th>備考</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>2</td><td class="st-new">● 新規</td><td>山田太郎</td><td>EMP-001</td><td>正社員</td><td class="default-val">月額</td><td class="default-val">¥0</td><td></td></tr>
-          <tr><td>3</td><td class="st-new">● 新規</td><td>佐藤花子</td><td>EMP-002</td><td>パート</td><td class="default-val">月額</td><td class="default-val">¥0</td><td></td></tr>
-          <tr><td>4</td><td class="st-upd">● 更新</td><td>田中一郎</td><td>EMP-003</td><td>正社員</td><td>月額</td><td>¥30,000</td><td>雇用区分を変更</td></tr>
-          <tr><td>5</td><td class="st-upd">● 更新</td><td>鈴木次郎</td><td>EMP-004</td><td>正社員</td><td>月額</td><td>¥50,000</td><td>名前を変更</td></tr>
-          <tr><td>6</td><td class="st-err">✗ エラー</td><td>-</td><td>EMP-005</td><td style="color:#e74c3c">契約社員</td><td>-</td><td>-</td><td style="color:#e74c3c;font-size:11px">雇用区分「契約社員」が未登録</td></tr>
-          <tr><td>7</td><td class="st-new">● 新規</td><td>高橋美咲</td><td>EMP-006</td><td>パート</td><td class="default-val">月額</td><td class="default-val">¥0</td><td></td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="wcard">
-      <div class="wcard-title" style="margin-bottom:8px">重複時の処理</div>
-      <div class="dup-sel">
-        <div class="dup-opt selected" onclick="selDup(this)">上書き更新</div>
-        <div class="dup-opt" onclick="selDup(this)">スキップ（既存を保持）</div>
-      </div>
-    </div>
-
-    <div class="btn-group">
-      <button class="btn btn-ghost" onclick="go('s-saas2')">← 戻る</button>
-      <button class="btn btn-primary" onclick="go('s-saas4')">エラー行を除いてインポート実行（14件）</button>
-    </div>
-  </div>
-</div>
-
+<!-- SAAS: STEP 3 (旧 s-saas3) は廃止・削除（2026-06-03）。マッピング経由のプレビュー(s-saas-preview / s-saas-preview-single)に置換済みで、どの遷移からも到達しない孤立画面だったため撤去。 -->
 <!-- ==================== -->
 <!-- SAAS: STEP 4 - 完了 -->
 <!-- ==================== -->
@@ -4046,10 +3987,6 @@ function go(id) {
         info = { type:'saas', completed:2, total:5, currentStep:'s-saas-fix', label:'③ エラー/未マップ項目 修正中', preview_changed:true, fix_state: fs };
         attachUpstreamItems(info);
       }
-      else if (id === 's-saas3') {
-        info = { type:'saas', completed:2, total:5, currentStep:'s-saas3', label:'③ プレビュー・確認' };
-        attachUpstreamItems(info);
-      }
       else if (id === 's-tpl3' || id === 's-saas4') {
         localStorage.removeItem('import_in_progress');
       }
@@ -5681,10 +5618,6 @@ window.addEventListener('beforeunload', function() {
       info = { type:'saas', completed:2, total:5, currentStep:'s-saas-fix', label:'③ エラー/未マップ項目 修正中', preview_changed: true, fix_state: window._saasFixState || prevFixState || { error_action:null, error_new_value:'', defaults_skipped:false } };
       attachUp(info);
     }
-    else if (id === 's-saas3') {
-      info = { type:'saas', completed:2, total:5, currentStep:'s-saas3', label:'③ プレビュー・確認' };
-      attachUp(info);
-    }
     if (info) {
       info.savedAt = Date.now();
       info.autoSaved = true;
@@ -5728,8 +5661,6 @@ function saveImportDraftMappingStep(screenId) {
       preview_changed: true,
       fix_state: window._saasFixState || { error_action: null, error_new_value: '', defaults_skipped: false }
     };
-  } else if (screenId === 's-saas3') {
-    info = { type:'saas', completed:2, total:5, currentStep:'s-saas3', label:'③ プレビュー・確認' };
   }
   if (!info) return;
   info.savedAt = Date.now();
@@ -5905,7 +5836,6 @@ function saveImportDraftAndExit() {
   else if (id === 's-saas2') { info = { type:'saas', completed:1, total:5, currentStep:'s-saas2', label:'② マッピング設定', mapping_changed: !!window._mockSaasMappingChanged }; attachUp2(info); }
   else if (id === 's-saas-preview') { info = { type:'saas', completed:2, total:5, currentStep:'s-saas-preview', label:'③ プレビュー・マッピング修正', preview_changed: !!window._mockSaasPreviewChanged }; attachUp2(info); if (prevFs2 && !info.fix_state) info.fix_state = prevFs2; }
   else if (id === 's-saas-fix') { info = { type:'saas', completed:2, total:5, currentStep:'s-saas-fix', label:'③ エラー/未マップ項目 修正中', preview_changed:true, fix_state: window._saasFixState || prevFs2 || { error_action:null, error_new_value:'', defaults_skipped:false } }; attachUp2(info); }
-  else if (id === 's-saas3') { info = { type:'saas', completed:2, total:5, currentStep:'s-saas3', label:'③ プレビュー・確認' }; attachUp2(info); }
   if (!info) {
     alert('保存可能な画面ではありません。');
     return;
