@@ -1699,8 +1699,8 @@
               <td style="padding:8px 10px;border-bottom:1px solid #eee;font-size:11px;">employee_info</td>
               <td style="padding:8px 10px;border-bottom:1px solid #eee;">2026/03/28</td>
               <td style="padding:8px 10px;border-bottom:1px solid #eee;">
-                <button class="btn btn-ghost" style="font-size:10px;padding:3px 8px;" onclick="alert('この設定を読み込みます')">読み込む</button>
-                <button class="btn btn-ghost" style="font-size:10px;padding:3px 8px;color:#e74c3c;" onclick="alert('この設定を削除します')">削除</button>
+                <button class="btn btn-ghost" style="font-size:10px;padding:3px 8px;" onclick="showFloatToast('この設定を読み込みます')">読み込む</button>
+                <button class="btn btn-ghost" style="font-size:10px;padding:3px 8px;color:#e74c3c;" onclick="showFloatToast('この設定を削除します')">削除</button>
               </td>
             </tr>
             <tr>
@@ -1709,8 +1709,8 @@
               <td style="padding:8px 10px;font-size:11px;">staff-info-</td>
               <td style="padding:8px 10px;">2026/03/20</td>
               <td style="padding:8px 10px;">
-                <button class="btn btn-ghost" style="font-size:10px;padding:3px 8px;" onclick="alert('この設定を読み込みます')">読み込む</button>
-                <button class="btn btn-ghost" style="font-size:10px;padding:3px 8px;color:#e74c3c;" onclick="alert('この設定を削除します')">削除</button>
+                <button class="btn btn-ghost" style="font-size:10px;padding:3px 8px;" onclick="showFloatToast('この設定を読み込みます')">読み込む</button>
+                <button class="btn btn-ghost" style="font-size:10px;padding:3px 8px;color:#e74c3c;" onclick="showFloatToast('この設定を削除します')">削除</button>
               </td>
             </tr>
           </tbody>
@@ -2406,7 +2406,7 @@
           <div style="font-size:14px;font-weight:700;margin-bottom:4px;">個別編集（従業員画面）</div>
           <div style="font-size:11px;color:#888;line-height:1.5;margin-bottom:10px;">従業員一覧画面から各従業員を個別に編集します。少人数の場合に適しています。</div>
           <div style="font-size:11px;color:#888;margin-bottom:8px;">未入力項目がある従業員をフィルター表示できます。</div>
-          <button class="btn btn-outline-g" style="font-size:12px;padding:6px 14px;" onclick="alert('従業員一覧画面へ遷移し、未入力項目がある従業員のみフィルター表示します。\n\n※ 実際の従業員一覧画面はインポート機能の外にあるため、モックでは遷移しません。')">従業員一覧（未入力フィルター） →</button>
+          <button class="btn btn-outline-g" style="font-size:12px;padding:6px 14px;" onclick="showFloatToast('従業員一覧画面へ遷移し、未入力項目がある従業員のみフィルター表示します。\n\n※ 実際の従業員一覧画面はインポート機能の外にあるため、モックでは遷移しません。')">従業員一覧（未入力フィルター） →</button>
         </div>
       </div>
     </div>
@@ -3131,7 +3131,7 @@ function updateSingleSaasUploadOrder(key) {
 function singleTplAdvance(key) {
   var st = _singleTplState[key]; if (!st) return;
   var order = getSingleTplOrder(key);
-  if (order.length === 0) { alert('対象データを選択してください'); return; }
+  if (order.length === 0) { showFloatToast('対象データを選択してください'); return; }
   if (st.currentIdx + 1 < order.length) {
     st.currentIdx++;
     updateSingleTplUploadOrder(key);
@@ -3144,7 +3144,7 @@ function singleTplAdvance(key) {
 function singleSaasAdvance(key) {
   var st = _singleSaasState[key]; if (!st) return;
   var order = getSingleSaasOrder(key);
-  if (order.length === 0) { alert('対象データを選択してください'); return; }
+  if (order.length === 0) { showFloatToast('対象データを選択してください'); return; }
   if (st.currentIdx + 1 < order.length) {
     st.currentIdx++;
     updateSingleSaasUploadOrder(key);
@@ -3159,7 +3159,7 @@ function singleSaasAdvance(key) {
 function singleTplSwitchToSaas(key) {
   // 5 種すべて対応 (brand/store/emptype は futureOnly バナーで案内)
   if (!_singleSaasState[key]) {
-    alert(TPL_TYPE_LABEL[key] + ' の外部勤怠取込画面は未定義です。');
+    showFloatToast(TPL_TYPE_LABEL[key] + ' の外部勤怠取込画面は未定義です。');
     return;
   }
   _activeSingleSaasKey = key;
@@ -3595,7 +3595,7 @@ function applyMappingErrorContext(key) {
 function singleTplFileSelected(key) {
   var st = _singleTplState[key]; if (!st) return;
   var order = getSingleTplOrder(key);
-  if (order.length === 0) { alert('対象データを選択してください'); return; }
+  if (order.length === 0) { showFloatToast('対象データを選択してください'); return; }
   var targetType = order[st.currentIdx];
   var typeLabel = TPL_TYPE_LABEL[targetType] || targetType;
   var fileName = typeLabel + '_export.csv';
@@ -3617,7 +3617,7 @@ function singleTplFileSelected(key) {
 function singleSaasFileSelected(key) {
   var st = _singleSaasState[key]; if (!st) return;
   var order = getSingleSaasOrder(key);
-  if (order.length === 0) { alert('対象データを選択してください'); return; }
+  if (order.length === 0) { showFloatToast('対象データを選択してください'); return; }
   var targetMap = order[st.currentIdx];
   var typeLabel = SAAS_TYPE_LABEL[targetMap] || targetMap;
   var fileName = typeLabel.replace('データ','').replace('(','_').replace(')','') + '_export.csv';
@@ -5698,7 +5698,7 @@ function saveImportDraftWithItems(type) {
   }
   // アップデータなし(チェック0件)ならガード
   if (itemsCompleted.length === 0) {
-    alert('⚠️ アップデータなしのため保存不要\n\nチェック項目やアップロードファイルがありません。\n少なくとも1項目を選択またはアップロードしてから一時保存してください。');
+    showFloatToast('⚠️ アップデータなしのため保存不要\n\nチェック項目やアップロードファイルがありません。\n少なくとも1項目を選択またはアップロードしてから一時保存してください。');
     return;
   }
   var total = (type === 'template') ? 4 : 5;
@@ -5806,7 +5806,7 @@ function saveImportDraftAndExit() {
       if (cb.checked) checkedCount++;
     });
     if (checkedCount === 0) {
-      alert('⚠️ アップデータなしのため保存不要\n\nチェック項目やアップロードファイルがありません。\n少なくとも1項目を選択またはアップロードしてから一時保存してください。');
+      showFloatToast('⚠️ アップデータなしのため保存不要\n\nチェック項目やアップロードファイルがありません。\n少なくとも1項目を選択またはアップロードしてから一時保存してください。');
       return;
     }
   }
@@ -5837,7 +5837,7 @@ function saveImportDraftAndExit() {
   else if (id === 's-saas-preview') { info = { type:'saas', completed:2, total:5, currentStep:'s-saas-preview', label:'③ プレビュー・マッピング修正', preview_changed: !!window._mockSaasPreviewChanged }; attachUp2(info); if (prevFs2 && !info.fix_state) info.fix_state = prevFs2; }
   else if (id === 's-saas-fix') { info = { type:'saas', completed:2, total:5, currentStep:'s-saas-fix', label:'③ エラー/未マップ項目 修正中', preview_changed:true, fix_state: window._saasFixState || prevFs2 || { error_action:null, error_new_value:'', defaults_skipped:false } }; attachUp2(info); }
   if (!info) {
-    alert('保存可能な画面ではありません。');
+    showFloatToast('保存可能な画面ではありません。');
     return;
   }
   info.savedAt = Date.now();
