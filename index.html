@@ -1093,7 +1093,7 @@
     <!-- ★ 取り込みデータ種別タブ (2026-05-18 追加・大タブ) -->
     <div class="wcard" style="padding:0;margin-bottom:16px;background:#f5f7f9;border:1px solid #e0e0e0;">
       <div style="display:flex;align-items:stretch;gap:0;">
-        <button onclick="switchTplDataTypeTab('master')" id="tpl-typetab-master" style="flex:1;padding:14px 16px;border:none;background:#fff;border-bottom:3px solid #2ec4a0;cursor:pointer;font-size:13px;font-weight:700;color:#0e9077;">① 設定マスタ <span style="font-size:10px;color:#888;font-weight:400;">(業態2/店舗2/雇用区分3)</span></button>
+        <button onclick="switchTplDataTypeTab('master')" id="tpl-typetab-master" style="flex:1;padding:14px 16px;border:none;background:#fff;border-bottom:3px solid #2ec4a0;cursor:pointer;font-size:13px;font-weight:700;color:#0e9077;">①〜③ 設定マスタ系 <span style="font-size:10px;color:#888;font-weight:400;">(業態2/店舗2/雇用区分3)</span></button>
         <button onclick="switchTplDataTypeTab('employee')" id="tpl-typetab-employee" style="flex:1;padding:14px 16px;border:none;background:#f5f7f9;border-bottom:3px solid transparent;cursor:pointer;font-size:13px;font-weight:600;color:#555;">② 従業員 <span style="font-size:10px;color:#888;font-weight:400;">(8件 / エラー1)</span></button>
         <button onclick="switchTplDataTypeTab('admin')" id="tpl-typetab-admin" style="flex:1;padding:14px 16px;border:none;background:#f5f7f9;border-bottom:3px solid transparent;cursor:pointer;font-size:13px;font-weight:600;color:#555;">③ 管理者 <span style="font-size:10px;color:#888;font-weight:400;">(任意・5件)</span></button>
       </div>
@@ -1148,7 +1148,7 @@
     <!-- 従業員データ確認セクション -->
     <div id="tpl-confirm-employee">
     <div class="map-section-header" style="margin-top:24px;"><span style="background:#2ec4a0;color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;">②</span> 従業員データ</div>
-    <div class="alert alert-info">② 従業員データ: <strong>8件</strong>のデータを検出しました。</div>
+    <div class="alert alert-info">④ 従業員: <strong>8件</strong>のデータを検出しました。</div>
 
     <div class="pv-summary">
       <div class="pv-box pv-total"><div class="num">8</div><div class="lbl">データ行数</div></div>
@@ -1183,7 +1183,7 @@
     <!-- ★ 管理者データ確認セクション (2026-05-18 追加 / 5分岐自動判定) -->
     <div id="tpl-confirm-admin">
     <div class="map-section-header" style="margin-top:24px;"><span style="background:#2ec4a0;color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;">③</span> 管理者データ <span style="font-size:10px;color:#888;font-weight:400;margin-left:6px;">(任意・5分岐自動判定)</span></div>
-    <div class="alert alert-info">③ 管理者データ: <strong>5件</strong>のデータを検出し、メアド突合で 5分岐自動判定しました。</div>
+    <div class="alert alert-info">⑤ 管理者: <strong>5件</strong>のデータを検出し、メアド突合で 5分岐自動判定しました。</div>
 
     <div class="pv-summary">
       <div class="pv-box pv-total"><div class="num">5</div><div class="lbl">データ行数</div></div>
@@ -1319,15 +1319,15 @@
         <h2>インポート完了</h2>
         <p>設定マスタ・従業員データが正常に登録されました</p>
         <div class="result-detail">
-          <div style="font-size:11px;font-weight:600;color:#888;padding-bottom:4px;">① 設定マスタ</div>
+          <div style="font-size:11px;font-weight:600;color:#888;padding-bottom:4px;">①〜③ 設定マスタ系</div>
           <div class="rd-row"><span>業態・ブランド</span><span class="rd-val rd-green">2件 登録</span></div>
           <div class="rd-row"><span>店舗情報</span><span class="rd-val rd-green">2件 登録</span></div>
           <div class="rd-row"><span>雇用区分</span><span class="rd-val rd-green">3件 登録</span></div>
-          <div style="font-size:11px;font-weight:600;color:#888;padding:8px 0 4px;border-top:2px solid #e0e0e0;margin-top:8px;">② 従業員データ</div>
+          <div style="font-size:11px;font-weight:600;color:#888;padding:8px 0 4px;border-top:2px solid #e0e0e0;margin-top:8px;">④ 従業員</div>
           <div class="rd-row"><span>新規登録</span><span class="rd-val rd-green">6件</span></div>
           <div class="rd-row"><span>更新</span><span class="rd-val rd-yellow">1件</span></div>
           <div class="rd-row"><span>エラー（スキップ）</span><span class="rd-val rd-red">1件</span></div>
-          <div style="font-size:11px;font-weight:600;color:#888;padding:8px 0 4px;border-top:2px solid #e0e0e0;margin-top:8px;">③ 管理者データ(任意)</div>
+          <div style="font-size:11px;font-weight:600;color:#888;padding:8px 0 4px;border-top:2px solid #e0e0e0;margin-top:8px;">⑤ 管理者(任意)</div>
           <div class="rd-row"><span>新規アカウント</span><span class="rd-val rd-green">2件</span></div>
           <div class="rd-row"><span>既存従業員に管理者ロール追加</span><span class="rd-val rd-yellow">1件</span></div>
         </div>
@@ -1988,13 +1988,13 @@
     <!-- ★ 取り込みデータ種別タブ (2026-05-18 追加・大タブ・テンプレ取込と統一) -->
     <div class="wcard" style="padding:0;margin-bottom:16px;background:#f5f7f9;border:1px solid #e0e0e0;">
       <div style="display:flex;align-items:stretch;gap:0;">
-        <button onclick="switchSaasDataTypeTab('master')" id="saas-typetab-master" style="flex:1;padding:14px 16px;border:none;background:#f5f7f9;border-bottom:3px solid transparent;cursor:pointer;font-size:13px;font-weight:600;color:#555;">① 設定マスタ <span style="font-size:10px;color:#888;font-weight:400;">(取得不可)</span></button>
+        <button onclick="switchSaasDataTypeTab('master')" id="saas-typetab-master" style="flex:1;padding:14px 16px;border:none;background:#f5f7f9;border-bottom:3px solid transparent;cursor:pointer;font-size:13px;font-weight:600;color:#555;">①〜③ 設定マスタ系 <span style="font-size:10px;color:#888;font-weight:400;">(取得不可)</span></button>
         <button onclick="switchSaasDataTypeTab('employee')" id="saas-typetab-employee" style="flex:1;padding:14px 16px;border:none;background:#fff;border-bottom:3px solid #2ec4a0;cursor:pointer;font-size:13px;font-weight:700;color:#0e9077;">② 従業員 <span style="font-size:10px;color:#888;font-weight:400;">(15件 / エラー1)</span></button>
         <button onclick="switchSaasDataTypeTab('admin')" id="saas-typetab-admin" style="flex:1;padding:14px 16px;border:none;background:#f5f7f9;border-bottom:3px solid transparent;cursor:pointer;font-size:13px;font-weight:600;color:#555;">③ 管理者 <span style="font-size:10px;color:#888;font-weight:400;">(任意・5件)</span></button>
       </div>
     </div>
 
-    <!-- ① 設定マスタセクション (派生取込結果プレビュー) -->
+    <!-- ①〜③ 設定マスタ系セクション (業態・ブランド/店舗/雇用区分の派生取込結果プレビュー) -->
     <div id="saas-confirm-master" style="display:none;">
       <div class="map-section-header"><span style="background:#2ec4a0;color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;">①</span> 設定マスタ <span style="font-size:10px;color:#888;font-weight:400;margin-left:6px;">(業態・店舗・雇用区分)</span></div>
       <div class="wcard" style="padding:30px 40px;text-align:center;">
@@ -2017,7 +2017,7 @@
       </div>
     </div>
 
-    <!-- ② 従業員データセクション (既存) -->
+    <!-- ④ 従業員セクション (既存) -->
     <div id="saas-confirm-employee">
     <!-- 取り込みデータプレビュー -->
     <div class="pv-summary">
@@ -2138,7 +2138,7 @@
     <!-- ★ 管理者データ確認セクション (2026-05-18 追加 / 5分岐自動判定) -->
     <div id="saas-confirm-admin" style="display:none;margin-top:24px;">
       <div class="map-section-header"><span style="background:#2ec4a0;color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;">③</span> 管理者データ <span style="font-size:10px;color:#888;font-weight:400;margin-left:6px;">(任意・5分岐自動判定)</span></div>
-      <div class="alert alert-info">③ 管理者データ: <strong>5件</strong>のデータを検出し、メアド突合で 5分岐自動判定しました。</div>
+      <div class="alert alert-info">⑤ 管理者: <strong>5件</strong>のデータを検出し、メアド突合で 5分岐自動判定しました。</div>
 
       <div class="pv-summary">
         <div class="pv-box pv-total"><div class="num">5</div><div class="lbl">データ行数</div></div>
@@ -2398,7 +2398,7 @@
           <button class="btn btn-outline-g" style="font-size:12px;padding:6px 14px;" onclick="downloadHokanTemplate()">⬇ 補完用テンプレートをダウンロード</button>
           <div id="hokan-done" style="display:none;margin-top:8px;">
             <div style="font-size:11px;color:#2ec4a0;font-weight:600;margin-bottom:6px;">✓ ダウンロード完了</div>
-            <div style="font-size:11px;color:#888;line-height:1.5;">入力後、テンプレートインポートの「② 従業員データ」で<br>重複時の処理を「上書き更新」にしてインポートしてください。</div>
+            <div style="font-size:11px;color:#888;line-height:1.5;">入力後、テンプレートインポートの「④ 従業員」で<br>重複時の処理を「上書き更新」にしてインポートしてください。</div>
             <button class="btn btn-primary" style="font-size:12px;padding:6px 14px;margin-top:8px;" onclick="goTplWithEmployeeSelected()">テンプレートインポートへ →</button>
           </div>
         </div>
@@ -3920,7 +3920,7 @@ function go(id) {
   }
   if (id === 's-tpl2') {
     updateTplConfirmSections();
-    // 大タブ初期表示: ① 設定マスタ (s-tpl2 は常に複数選択モード)
+    // 大タブ初期表示: ①〜③ 設定マスタ系 (s-tpl2 は常に複数選択モード)
     if (typeof switchTplDataTypeTab === 'function') switchTplDataTypeTab('master');
   }
   if (id === 's-saas-preview') {
