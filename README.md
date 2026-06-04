@@ -7,6 +7,21 @@
 
 ---
 
+## 📍 入口（owner-mock を必ず確認）
+
+本リポは **インポート機能の仕様** を扱います。タイムレコード全体の正本は **owner-mock** 側にあるので、エンジニアはまず以下を確認してください。
+
+- **入口**: [owner-mock / HANDOFF.md](https://github.com/suguru789987/rakmy-owner-registration-mock/blob/main/HANDOFF.md)
+- **メイン仕様書**: [新規登録 / 運用登録 完全分離仕様書](https://github.com/suguru789987/rakmy-owner-registration-mock/blob/main/20260501_新規登録運用登録分離仕様.md) — 本リポと接続する章は **§9 インポート機能との連携**
+- **ライブモック (owner)**: https://suguru789987.github.io/rakmy-owner-registration-mock/
+
+**正本の使い分け**:
+- 意図・条件分岐・状態判定 → owner-mock の仕様書（現行範囲のみ）
+- UI挙動の細部 → モック `import-mock.html`（本リポ） / `index.html`（owner-mock）
+- データ項目（CSV列・型・必須） → 本リポのテンプレTSV5本
+
+---
+
 ## 見どころ
 
 > 🔄 **2026-06-03 更新**: 旧「2テンプレート方式（①設定マスタ/②従業員データ）」から、現行の**5テンプレート方式（エンティティ別）**に記述を更新。実ファイル・モック画面・owner-mock 仕様と整合。
