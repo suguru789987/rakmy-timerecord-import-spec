@@ -262,7 +262,7 @@
       <a href="#">👤 従業員</a>
       <a href="#">👥 雇用区分</a>
       <a href="#">🏠 店舗情報</a>
-      <a href="#">🏷 業態・ブランド</a>
+      <a href="#">🏷 業態</a>
       <a href="#">🔑 管理者</a>
       <a href="#">🏢 会社情報</a>
       <a href="#">🔗 外部連携</a>
@@ -273,7 +273,7 @@
     <button class="current" onclick="go('s-top')">トップ</button>
     <div class="dn-sep"></div>
     <div style="font-size:10px;color:#1a73e8;font-weight:700;padding:6px 8px 2px;">★ 運用更新: テンプレ取込 (設定画面別)</div>
-    <button onclick="go('s-tpl-single-brand')"    style="color:#1a73e8;font-size:11px;">└ 業態・ブランド</button>
+    <button onclick="go('s-tpl-single-brand')"    style="color:#1a73e8;font-size:11px;">└ 業態</button>
     <button onclick="go('s-tpl-single-store')"    style="color:#1a73e8;font-size:11px;">└ 店舗</button>
     <button onclick="go('s-tpl-single-emptype')"  style="color:#1a73e8;font-size:11px;">└ 雇用区分</button>
     <button onclick="go('s-tpl-single-employee')" style="color:#1a73e8;font-size:11px;">└ 従業員</button>
@@ -281,13 +281,13 @@
     <button onclick="go('s-tpl2-single')" style="color:#1a73e8;font-size:11px;">→ 確認・実行 (共通)</button>
     <button onclick="go('s-tpl3-single')" style="color:#1a73e8;font-size:11px;">→ 完了 (共通)</button>
     <div style="font-size:10px;color:#1a73e8;font-weight:700;padding:6px 8px 2px;">★ 運用更新: 外部勤怠取込 (設定画面別)</div>
-    <button onclick="go('s-saas-single-brand')"    style="color:#1a73e8;font-size:11px;">└ 業態・ブランド</button>
+    <button onclick="go('s-saas-single-brand')"    style="color:#1a73e8;font-size:11px;">└ 業態</button>
     <button onclick="go('s-saas-single-store')"    style="color:#1a73e8;font-size:11px;">└ 店舗</button>
     <button onclick="go('s-saas-single-emptype')"  style="color:#1a73e8;font-size:11px;">└ 雇用区分</button>
     <button onclick="go('s-saas-single-employee')" style="color:#1a73e8;font-size:11px;">└ 従業員</button>
     <button onclick="go('s-saas-single-admin')"    style="color:#1a73e8;font-size:11px;">└ 管理者</button>
     <div style="font-size:10px;color:#1a73e8;font-weight:700;padding:6px 8px 2px;">★ 運用更新: マッピング設定 (設定画面別)</div>
-    <button onclick="go('s-saas-mapping-single-brand')"    style="color:#1a73e8;font-size:11px;">└ 業態・ブランド</button>
+    <button onclick="go('s-saas-mapping-single-brand')"    style="color:#1a73e8;font-size:11px;">└ 業態</button>
     <button onclick="go('s-saas-mapping-single-store')"    style="color:#1a73e8;font-size:11px;">└ 店舗</button>
     <button onclick="go('s-saas-mapping-single-emptype')"  style="color:#1a73e8;font-size:11px;">└ 雇用区分</button>
     <button onclick="go('s-saas-mapping-single-employee')" style="color:#1a73e8;font-size:11px;">└ 従業員</button>
@@ -364,7 +364,7 @@
       <div class="history-list">
         <div class="history-row">
           <span class="history-badge badge-tpl">テンプレート</span>
-          <span class="history-file">①業態ブランド_20260331.tsv</span>
+          <span class="history-file">①業態_20260331.tsv</span>
           <span class="history-date">2026/03/31 14:20</span>
           <span class="history-result result-ok">✓ 成功 7件</span>
         </div>
@@ -519,7 +519,7 @@
     <!-- データ種別タブ (アップ済のみ active) -->
     <div class="wcard" style="padding:0;margin-bottom:16px;background:#f5f7f9;border:1px solid #e0e0e0;">
       <div id="tpl2single-tabs" style="display:flex;align-items:stretch;gap:0;flex-wrap:wrap;">
-        <button data-key="brand"   onclick="switchTplSingleTab('brand')"   class="tpl2single-tab" style="flex:1;min-width:140px;padding:12px 14px;border:none;background:#f5f7f9;border-bottom:3px solid transparent;cursor:pointer;font-size:12px;font-weight:600;color:#555;">業態・ブランド <span style="font-size:10px;color:#888;">(2)</span></button>
+        <button data-key="brand"   onclick="switchTplSingleTab('brand')"   class="tpl2single-tab" style="flex:1;min-width:140px;padding:12px 14px;border:none;background:#f5f7f9;border-bottom:3px solid transparent;cursor:pointer;font-size:12px;font-weight:600;color:#555;">業態 <span style="font-size:10px;color:#888;">(2)</span></button>
         <button data-key="store"   onclick="switchTplSingleTab('store')"   class="tpl2single-tab" style="flex:1;min-width:140px;padding:12px 14px;border:none;background:#f5f7f9;border-bottom:3px solid transparent;cursor:pointer;font-size:12px;font-weight:600;color:#555;">店舗 <span style="font-size:10px;color:#888;">(2)</span></button>
         <button data-key="emptype" onclick="switchTplSingleTab('emptype')" class="tpl2single-tab" style="flex:1;min-width:140px;padding:12px 14px;border:none;background:#f5f7f9;border-bottom:3px solid transparent;cursor:pointer;font-size:12px;font-weight:600;color:#555;">雇用区分 <span style="font-size:10px;color:#888;">(3)</span></button>
         <button data-key="employee" onclick="switchTplSingleTab('employee')" class="tpl2single-tab" style="flex:1;min-width:140px;padding:12px 14px;border:none;background:#f5f7f9;border-bottom:3px solid transparent;cursor:pointer;font-size:12px;font-weight:600;color:#555;">従業員 <span style="font-size:10px;color:#888;">(5)</span></button>
@@ -527,7 +527,7 @@
       </div>
     </div>
 
-    <!-- 業態・ブランド -->
+    <!-- 業態 -->
     <div id="tpl2single-sec-brand" class="tpl2single-sec" style="display:none;">
       <div class="pv-summary">
         <div class="pv-box pv-total"><div class="num">2</div><div class="lbl">データ行数</div></div>
@@ -537,7 +537,7 @@
       </div>
       <div class="wcard" style="padding:0;overflow:hidden;">
         <table class="pv-table">
-          <thead><tr><th style="width:80px;">状態</th><th>業態・ブランド名</th></tr></thead>
+          <thead><tr><th style="width:80px;">状態</th><th>業態名</th></tr></thead>
           <tbody>
             <tr><td class="st-new">● 新規</td><td>居酒屋</td></tr>
             <tr><td class="st-upd">● 更新</td><td>カフェ</td></tr>
@@ -556,7 +556,7 @@
       </div>
       <div class="wcard" style="padding:0;overflow-x:auto;">
         <table class="pv-table">
-          <thead><tr><th style="width:80px;">状態</th><th>店舗名</th><th>業態・ブランド</th><th>郵便番号</th><th>住所</th></tr></thead>
+          <thead><tr><th style="width:80px;">状態</th><th>店舗名</th><th>業態</th><th>郵便番号</th><th>住所</th></tr></thead>
           <tbody>
             <tr><td class="st-new">● 新規</td><td>渋谷店</td><td>居酒屋</td><td>150-0002</td><td>東京都渋谷区渋谷1-1-1</td></tr>
             <tr><td class="st-upd">● 更新</td><td>新宿店</td><td>カフェ</td><td>160-0022</td><td>東京都新宿区新宿3-3-3</td></tr>
@@ -712,7 +712,7 @@
     <!-- データ種別タブ (取込順) -->
     <div class="wcard" style="padding:0;margin-bottom:16px;background:#f5f7f9;border:1px solid #e0e0e0;">
       <div id="saas3single-tabs" style="display:flex;align-items:stretch;gap:0;flex-wrap:wrap;">
-        <button data-key="map-kot-brand"   onclick="switchSaasPreviewSingleTab('map-kot-brand')"   class="saas3single-tab" style="flex:1;min-width:120px;padding:12px 14px;border:none;background:#f5f7f9;border-bottom:3px solid transparent;cursor:pointer;font-size:12px;font-weight:600;color:#555;">業態・ブランド</button>
+        <button data-key="map-kot-brand"   onclick="switchSaasPreviewSingleTab('map-kot-brand')"   class="saas3single-tab" style="flex:1;min-width:120px;padding:12px 14px;border:none;background:#f5f7f9;border-bottom:3px solid transparent;cursor:pointer;font-size:12px;font-weight:600;color:#555;">業態</button>
         <button data-key="map-kot-store"   onclick="switchSaasPreviewSingleTab('map-kot-store')"   class="saas3single-tab" style="flex:1;min-width:120px;padding:12px 14px;border:none;background:#f5f7f9;border-bottom:3px solid transparent;cursor:pointer;font-size:12px;font-weight:600;color:#555;">店舗</button>
         <button data-key="map-kot-emptype" onclick="switchSaasPreviewSingleTab('map-kot-emptype')" class="saas3single-tab" style="flex:1;min-width:120px;padding:12px 14px;border:none;background:#f5f7f9;border-bottom:3px solid transparent;cursor:pointer;font-size:12px;font-weight:600;color:#555;">雇用区分</button>
         <button data-key="map-kot-emp"     onclick="switchSaasPreviewSingleTab('map-kot-emp')"     class="saas3single-tab" style="flex:1;min-width:120px;padding:12px 14px;border:none;background:#f5f7f9;border-bottom:3px solid transparent;cursor:pointer;font-size:12px;font-weight:600;color:#555;">従業員</button>
@@ -720,7 +720,7 @@
       </div>
     </div>
 
-    <!-- 業態・ブランド セクション -->
+    <!-- 業態 セクション -->
     <div id="saas3single-sec-brand" class="saas3single-sec" style="display:none;">
       <div class="pv-summary">
         <div class="pv-box pv-total"><div class="num">3</div><div class="lbl">データ行数</div></div>
@@ -737,11 +737,11 @@
       </div>
       <div class="wcard" style="padding:0;overflow-x:auto;">
         <table class="pv-table">
-          <thead><tr><th>状態</th><th>業態・ブランド名</th><th>コード</th><th style="min-width:260px;">操作 (1つ選択)</th></tr></thead>
+          <thead><tr><th>状態</th><th>業態名</th><th style="min-width:260px;">操作 (1つ選択)</th></tr></thead>
           <tbody>
-            <tr><td class="st-new">● 新規</td><td>居酒屋</td><td>BRD001</td><td></td></tr>
-            <tr><td class="st-new">● 新規</td><td>カフェ</td><td>BRD002</td><td></td></tr>
-            <tr data-err-val="焼鳥" data-err-type="duplicate" style="background:#fffafa;"><td class="st-err">✗ エラー</td><td style="color:#c62828;">焼鳥 <span style="font-size:10px;color:#888;">(既存と重複)</span></td><td>BRD003</td><td style="white-space:nowrap;font-size:0;"><button onclick="openMasterAddRedirect('brand','焼鳥');" style="font-size:10px;padding:5px 10px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;margin-right:4px;">➕ マスタに追加</button><button onclick="openRowEditModal('業態・ブランド名','焼鳥','焼鳥(銀座)');" style="font-size:10px;padding:5px 10px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;margin-right:4px;">✏️ 行編集</button><button onclick="markRowSkipped(this);" style="font-size:10px;padding:5px 10px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;">⊘ スキップ</button></td></tr>
+            <tr><td class="st-new">● 新規</td><td>居酒屋</td><td></td></tr>
+            <tr><td class="st-new">● 新規</td><td>カフェ</td><td></td></tr>
+            <tr data-err-val="焼鳥" data-err-type="duplicate" style="background:#fffafa;"><td class="st-err">✗ エラー</td><td style="color:#c62828;">焼鳥 <span style="font-size:10px;color:#888;">(既存と重複)</span></td><td style="white-space:nowrap;font-size:0;"><button onclick="openMasterAddRedirect('brand','焼鳥');" style="font-size:10px;padding:5px 10px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;margin-right:4px;">➕ マスタに追加</button><button onclick="openRowEditModal('業態名','焼鳥','焼鳥(銀座)');" style="font-size:10px;padding:5px 10px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;margin-right:4px;">✏️ 行編集</button><button onclick="markRowSkipped(this);" style="font-size:10px;padding:5px 10px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;">⊘ スキップ</button></td></tr>
           </tbody>
         </table>
       </div>
@@ -975,7 +975,7 @@
           <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #e8e8e8;border-radius:6px;cursor:pointer;background:#fff;" class="source-check checked" data-tpl="brand" onclick="toggleCheck(this)">
             <input type="checkbox" checked style="accent-color:#2ec4a0;width:16px;height:16px;">
             <div style="flex:1;">
-              <div style="font-size:13px;font-weight:600;">① 業態・ブランド</div>
+              <div style="font-size:13px;font-weight:600;">① 業態</div>
               <div style="font-size:11px;color:#888;">3列</div>
             </div>
             <a class="dl-link" href="#" onclick="event.stopPropagation();downloadBrandTemplate();" style="font-size:11px;">⬇ テンプレートDL</a>
@@ -1037,12 +1037,12 @@
       <!-- アップロード対象ラベル(JSで動的更新、初期は必須Step 1) -->
       <div id="tpl-up-current-label" style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
         <span id="tpl-up-current-badge" style="background:#1a73e8;color:#fff;padding:2px 10px;border-radius:4px;font-size:10px;font-weight:700;">1st</span>
-        <span style="font-size:13px;font-weight:600;" id="tpl-up-current-name">① 業態・ブランド</span>
+        <span style="font-size:13px;font-weight:600;" id="tpl-up-current-name">① 業態</span>
         <span style="font-size:11px;color:#1a73e8;font-weight:600;" id="tpl-up-current-hint">をアップロードしてください</span>
       </div>
       <!-- 1つ選択時のラベル(旧仕様残骸・新仕様では未使用) -->
       <div id="tpl-up-single-label" style="display:none;margin-bottom:8px;">
-        <span style="font-size:13px;font-weight:600;" id="tpl-up-single-name">① 業態・ブランド</span>
+        <span style="font-size:13px;font-weight:600;" id="tpl-up-single-name">① 業態</span>
         <span style="font-size:11px;color:#888;">をアップロードしてください</span>
       </div>
 
@@ -1102,7 +1102,7 @@
     <!-- 設定マスタ確認セクション -->
     <div id="tpl-confirm-master">
     <div class="map-section-header"><span style="background:#2ec4a0;color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;">①</span> 設定マスタ</div>
-    <div class="alert alert-info">内部仕分け結果: <strong>業態・ブランド 2件</strong> ・ <strong>店舗 2件</strong> ・ <strong>雇用区分 3件</strong> を新規登録します。</div>
+    <div class="alert alert-info">内部仕分け結果: <strong>業態 2件</strong> ・ <strong>店舗 2件</strong> ・ <strong>雇用区分 3件</strong> を新規登録します。</div>
 
     <div class="pv-summary">
       <div class="pv-box pv-total"><div class="num">5</div><div class="lbl">データ行数</div></div>
@@ -1113,13 +1113,13 @@
 
     <div class="wcard" style="padding:0;overflow:hidden;">
       <div class="stabs" style="padding: 0 14px;">
-        <div class="stab active" onclick="switchMasterTab(this,0)">業態・ブランド (2)</div>
+        <div class="stab active" onclick="switchMasterTab(this,0)">業態 (2)</div>
         <div class="stab" onclick="switchMasterTab(this,1)">店舗 (2)</div>
         <div class="stab" onclick="switchMasterTab(this,2)">雇用区分 (3)</div>
       </div>
-      <!-- 業態・ブランド -->
+      <!-- 業態 -->
       <table class="pv-table master-tab-content" id="master-tab-0">
-        <thead><tr><th style="width:60px">状態</th><th>業態・ブランド名</th></tr></thead>
+        <thead><tr><th style="width:60px">状態</th><th>業態名</th></tr></thead>
         <tbody>
           <tr><td class="st-new">● 新規</td><td>居酒屋</td></tr>
           <tr><td class="st-new">● 新規</td><td>カフェ</td></tr>
@@ -1127,7 +1127,7 @@
       </table>
       <!-- 店舗 -->
       <table class="pv-table master-tab-content" id="master-tab-1" style="display:none;">
-        <thead><tr><th style="width:60px">状態</th><th>店舗名</th><th>業態・ブランド</th><th>郵便番号</th><th>住所</th></tr></thead>
+        <thead><tr><th style="width:60px">状態</th><th>店舗名</th><th>業態</th><th>郵便番号</th><th>住所</th></tr></thead>
         <tbody>
           <tr><td class="st-new">● 新規</td><td>渋谷店</td><td>居酒屋</td><td>150-0002</td><td>東京都渋谷区渋谷1-1-1</td></tr>
           <tr><td class="st-new">● 新規</td><td>新宿店</td><td>カフェ</td><td>160-0022</td><td>東京都新宿区新宿3-3-3</td></tr>
@@ -1320,7 +1320,7 @@
         <p>設定マスタ・従業員データが正常に登録されました</p>
         <div class="result-detail">
           <div style="font-size:11px;font-weight:600;color:#888;padding-bottom:4px;">①〜③ 設定マスタ系</div>
-          <div class="rd-row"><span>業態・ブランド</span><span class="rd-val rd-green">2件 登録</span></div>
+          <div class="rd-row"><span>業態</span><span class="rd-val rd-green">2件 登録</span></div>
           <div class="rd-row"><span>店舗情報</span><span class="rd-val rd-green">2件 登録</span></div>
           <div class="rd-row"><span>雇用区分</span><span class="rd-val rd-green">3件 登録</span></div>
           <div style="font-size:11px;font-weight:600;color:#888;padding:8px 0 4px;border-top:2px solid #e0e0e0;margin-top:8px;">④ 従業員</div>
@@ -1416,11 +1416,11 @@
       </div>
       <div style="display:none;" id="saas-source-hint"></div>
 
-      <!-- 業態・ブランド(テンプレ): 両モードで表示 -->
+      <!-- 業態(テンプレ): 両モードで表示 -->
       <label id="saas-brand-check" style="display:none;align-items:center;gap:10px;padding:10px 12px;border:1px solid #e8e8e8;border-radius:8px;margin-bottom:8px;cursor:pointer;background:#fff;" class="source-check checked" data-saas-extra="brand" onclick="toggleSaasBrandCheck(this)">
         <input type="checkbox" checked style="accent-color:#2ec4a0;width:16px;height:16px;">
         <div style="flex:1;">
-          <div style="font-size:13px;font-weight:600;">業態・ブランド <span style="font-size:9px;padding:1px 7px;background:#f3e5f5;color:#7b1fa2;border-radius:10px;font-weight:600;margin-left:6px;">テンプレ</span></div>
+          <div style="font-size:13px;font-weight:600;">業態 <span style="font-size:9px;padding:1px 7px;background:#f3e5f5;color:#7b1fa2;border-radius:10px;font-weight:600;margin-left:6px;">テンプレ</span></div>
         </div>
         <a class="dl-link" href="#" onclick="event.stopPropagation();downloadBrandTemplate();" style="font-size:11px;">⬇ テンプレートDL</a>
       </label>
@@ -1496,7 +1496,7 @@
         <div style="font-size:11px;color:#0e9077;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
           <span style="font-weight:700;">アップロード順序</span>
           <span style="background:#7b1fa2;color:#fff;padding:1px 7px;border-radius:4px;font-size:10px;font-weight:700;">1st</span>
-          <span>業態・ブランド</span>
+          <span>業態</span>
           <span style="color:#ccc;">→</span>
           <span style="background:#1a73e8;color:#fff;padding:1px 7px;border-radius:4px;font-size:10px;font-weight:700;">2nd〜</span>
           <span>外部CSVデータ</span>
@@ -1994,14 +1994,14 @@
       </div>
     </div>
 
-    <!-- ①〜③ 設定マスタ系セクション (業態・ブランド/店舗/雇用区分の派生取込結果プレビュー) -->
+    <!-- ①〜③ 設定マスタ系セクション (業態/店舗/雇用区分の派生取込結果プレビュー) -->
     <div id="saas-confirm-master" style="display:none;">
       <div class="map-section-header"><span style="background:#2ec4a0;color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;">①</span> 設定マスタ <span style="font-size:10px;color:#888;font-weight:400;margin-left:6px;">(業態・店舗・雇用区分)</span></div>
       <div class="wcard" style="padding:30px 40px;text-align:center;">
         <div style="font-size:42px;margin-bottom:14px;">⚠️</div>
         <h3 style="font-size:16px;font-weight:700;margin:0 0 10px 0;color:#555;">設定マスタは外部勤怠サービスから取得できません</h3>
         <div style="font-size:13px;color:#666;line-height:1.8;margin-bottom:20px;">
-          業態・ブランド / 店舗 / 雇用区分 は外部勤怠サービス (KoT / ジョブカン等) から<br>
+          業態 / 店舗 / 雇用区分 は外部勤怠サービス (KoT / ジョブカン等) から<br>
           取得できないため、<strong>「テンプレートで取り込み」</strong>から事前に登録してください。<br>
           <span style="font-size:11px;color:#888;">(2026-05-18: 派生取込仕様廃止。詳細マスタ情報の整合性確保のため。)</span>
         </div>
@@ -2573,9 +2573,9 @@ function singleSwitchToSaas() {
 //   saas 2種: employee / admin
 //   各 screen はこのファイル下部の renderSingleScreens で構築
 // ============================================================
-var TPL_TYPE_LABEL = { brand:'業態・ブランド', store:'店舗', emptype:'雇用区分', employee:'従業員', admin:'管理者' };
+var TPL_TYPE_LABEL = { brand:'業態', store:'店舗', emptype:'雇用区分', employee:'従業員', admin:'管理者' };
 var SAAS_TYPE_LABEL = {
-  'map-kot-brand':   '業態・ブランドデータ',
+  'map-kot-brand':   '業態データ',
   'map-kot-store':   '店舗データ',
   'map-kot-emptype': '雇用区分データ',
   'map-kot-emp':     '従業員データ',
@@ -2584,7 +2584,7 @@ var SAAS_TYPE_LABEL = {
 };
 
 var TPL_SINGLE_CFG = [
-  { key:'brand',    label:'業態・ブランド', dlFn:'downloadBrandTemplate',    settingsHash:'brand-ops-settings' },
+  { key:'brand',    label:'業態', dlFn:'downloadBrandTemplate',    settingsHash:'brand-ops-settings' },
   { key:'store',    label:'店舗',           dlFn:'downloadStoreTemplate',    settingsHash:'store-ops-settings' },
   { key:'emptype',  label:'雇用区分',       dlFn:'downloadEmptypeTemplate',  settingsHash:'emptype-ops-settings' },
   { key:'employee', label:'従業員',         dlFn:'downloadEmployeeTemplate', settingsHash:'emp-ops-settings' },
@@ -2595,7 +2595,7 @@ var TPL_SINGLE_CFG = [
 //   futureOnly フラグは撤去 (全種別 active)。必須項目不足はマッピング警告/プレビューエラー
 //   で可視化する。
 var SAAS_SINGLE_CFG = [
-  { key:'brand',    label:'業態・ブランド', mapKey:'map-kot-brand',   settingsHash:'brand-ops-settings', required:false },
+  { key:'brand',    label:'業態', mapKey:'map-kot-brand',   settingsHash:'brand-ops-settings', required:false },
   { key:'store',    label:'店舗',           mapKey:'map-kot-store',   settingsHash:'store-ops-settings', required:false },
   { key:'emptype',  label:'雇用区分',       mapKey:'map-kot-emptype', settingsHash:'emptype-ops-settings', required:false },
   { key:'employee', label:'従業員',         mapKey:'map-kot-emp',     settingsHash:'emp-ops-settings',   required:true  },
@@ -2822,7 +2822,6 @@ function renderSaasMappingSingleScreen(cfg) {
   // [src列名, ラクミー項目名, 必須?, サンプル値1行目]
   var sampleRowsByKey = {
     brand:    [
-      ['業態コード','brand_code',false,'BRD001'],
       ['業態名','brand_name',true,'居酒屋']
     ],
     store:    [
@@ -3270,11 +3269,11 @@ var MASTER_HASH_MAP = {
 //   missingValue: 取込データから抽出した未登録の値
 var _masterAddPending = null;
 var MASTER_ADD_FIELDS = {
-  brand:    [{ k:'name',    label:'業態・ブランド名', required:true, autoFromMissing:true },
+  brand:    [{ k:'name',    label:'業態名', required:true, autoFromMissing:true },
              { k:'code',    label:'コード',           required:false }],
   store:    [{ k:'name',    label:'店舗名',           required:true, autoFromMissing:true },
              { k:'code',    label:'コード',           required:false },
-             { k:'brand',   label:'業態・ブランド',   required:false },
+             { k:'brand',   label:'業態',   required:false },
              { k:'address', label:'住所',             required:false }],
   emptype:  [{ k:'name',    label:'区分名',           required:true, autoFromMissing:true },
              { k:'code',    label:'区分コード',       required:false },
@@ -3675,7 +3674,7 @@ if (document.readyState === 'loading') {
 // ============================================================
 // s-tpl2-single: タブを「取り込んだ順」で並べる + 切替
 // ============================================================
-var TPL_KEY_LABEL = { brand:'業態・ブランド', store:'店舗', emptype:'雇用区分', employee:'従業員', admin:'管理者' };
+var TPL_KEY_LABEL = { brand:'業態', store:'店舗', emptype:'雇用区分', employee:'従業員', admin:'管理者' };
 function setupTplSingleTabs() {
   // s-tpl-single でチェック済の順番 (起点=1番) を採用
   var order = (typeof getSingleTplOrder === 'function') ? getSingleTplOrder() : [];
@@ -3728,7 +3727,7 @@ function switchTplSingleTab(key) {
 // s-saas-preview-single: タブを「取り込んだ順」で並べる + 切替
 // ============================================================
 var SAAS_KEY_LABEL = {
-  'map-kot-brand':'業態・ブランド',
+  'map-kot-brand':'業態',
   'map-kot-store':'店舗',
   'map-kot-emptype':'雇用区分',
   'map-kot-emp':'従業員',
@@ -4218,12 +4217,12 @@ var SAAS_UPLOAD_ORDINALS = ['1st','2nd','3rd','4th'];
 
 function getSaasUploadQueue() {
   var queue = [];
-  // 業態・ブランドがチェック済みなら先頭(テンプレ補完)
+  // 業態がチェック済みなら先頭(テンプレ補完)
   var brandCheck = document.getElementById('saas-brand-check');
   if (brandCheck && brandCheck.style.display !== 'none') {
     var bcb = brandCheck.querySelector('input[type="checkbox"]');
     if (bcb && bcb.checked) {
-      queue.push({ key: 'brand', name: '業態・ブランド', isBrand: true });
+      queue.push({ key: 'brand', name: '業態', isBrand: true });
     }
   }
   // 連携元データソース
@@ -5003,28 +5002,28 @@ function goTplCompleteExec() {
   go('s-tpl3');
 }
 
-// ① 業態・ブランド テンプレート
+// ① 業態 テンプレート
 function downloadBrandTemplate() {
   var rows = [
-    '業態\tブランド名\tブランドコード',
-    '飲食店\t居酒屋ラクミー\tIZA',
-    '飲食店\tカフェラクミー\tCAF',
-    '小売店\tラクミーマート\tMRT'
+    '業態名',
+    '飲食店',
+    'カフェ',
+    '居酒屋・バー'
   ];
   var blob = new Blob([rows.join('\n')], {type:'text/tab-separated-values'});
   var a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'ラクミー_インポートテンプレート_①業態ブランド.tsv';
+  a.download = 'ラクミー_インポートテンプレート_①業態.tsv';
   a.click();
 }
 
 // ② 店舗 テンプレート
 function downloadStoreTemplate() {
   var rows = [
-    '店舗名\t所属ブランドコード\t郵便番号\t住所\t開店時間\t閉店時間',
-    '渋谷店\tIZA\t150-0002\t東京都渋谷区渋谷1-1-1\t11:00\t23:00',
-    '新宿店\tCAF\t160-0022\t東京都新宿区新宿3-3-3\t08:00\t22:00',
-    '池袋店\tMRT\t171-0021\t東京都豊島区西池袋1-1-1\t10:00\t22:00'
+    '店舗名\t所属業態\t郵便番号\t住所\t開店時間\t閉店時間',
+    '渋谷店\t飲食店\t150-0002\t東京都渋谷区渋谷1-1-1\t11:00\t23:00',
+    '新宿店\tカフェ\t160-0022\t東京都新宿区新宿3-3-3\t08:00\t22:00',
+    '池袋店\t居酒屋・バー\t171-0021\t東京都豊島区西池袋1-1-1\t10:00\t22:00'
   ];
   var blob = new Blob([rows.join('\n')], {type:'text/tab-separated-values'});
   var a = document.createElement('a');
@@ -5180,7 +5179,7 @@ function applySaasMode(mode) {
     btn.style.borderColor = isActive ? '#2ec4a0' : '#ccc';
     btn.style.fontWeight = isActive ? '700' : '400';
   });
-  // 業態・ブランドチェック項目: 両モードで表示(ユーザー任意でON/OFF)
+  // 業態チェック項目: 両モードで表示(ユーザー任意でON/OFF)
   var brandCheck = document.getElementById('saas-brand-check');
   if (brandCheck) brandCheck.style.display = 'flex';
   // アップロード順序バナーは setup モード時のみ表示(順序必須を明示)
@@ -5199,7 +5198,7 @@ function applySaasMode(mode) {
   }
 }
 
-// 業態・ブランドチェックボックスのトグル
+// 業態チェックボックスのトグル
 function toggleSaasBrandCheck(el) {
   var cb = el.querySelector('input[type="checkbox"]');
   setTimeout(function() {
@@ -5230,7 +5229,7 @@ function renderSetupProgressChips(targetRowId) {
   // import-spec単独では本物のdoneを知り得ないため、デモ用に固定値(0/4)
   var done = 0;
   var total = 4;
-  var stepNames = ['業態・ブランド', '店舗', '雇用区分', '従業員'];
+  var stepNames = ['業態', '店舗', '雇用区分', '従業員'];
   var stepNums = ['①', '②', '③', '④'];
   var pct = (done / total) * 100;
   var html;
@@ -5246,7 +5245,7 @@ function renderSetupProgressChips(targetRowId) {
   rowEl.innerHTML = html;
 }
 
-var TPL_FOCUS_LABELS = { brand: '業態・ブランド', store: '店舗', emptype: '雇用区分', employee: '従業員', admin: '管理者' };
+var TPL_FOCUS_LABELS = { brand: '業態', store: '店舗', emptype: '雇用区分', employee: '従業員', admin: '管理者' };
 
 // 指定キーだけON、他はOFFで初期化(運用画面ごとの「フォーカスインポート」用)
 function initTplFocusOnly(key) {

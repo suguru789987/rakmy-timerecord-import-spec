@@ -1,7 +1,7 @@
 No	CSV一括インポート種別	一時保存ポイント	一時保存トリガー大項目	一時保存トリガー中項目	一時保存トリガー小項目	保存トリガー(ユーザー操作)	シナリオID	開始画面	保存先キー	保存内容(主要フィールド)	打刻記録CTA文言	再開URL	復元される状態	整合性	関連コミット	備考
-1	新規登録	設定画面登録 中断:	取込進捗ステップ	業態・ブランド登録		モーダル入力途中(自動下書き)	F2	page-brand-settings	sessionStorage.b0Draft_1	入力中の各セル値配列	▶ STEP 1 業態・ブランド(下書きN件) から再開	-	モーダル復元 (restoreDraftToModal)	✅	-	b0Draft_N機構
-2	新規登録	設定画面登録 中断:	取込進捗ステップ	業態・ブランド登録		登録ボタン押下 → done=1	-	page-brand-settings	sessionStorage.b0Done=1, b0Counts[0]+=n	-	-	-	モーダル→次STEP橋渡しCTA	✅	-	b0SubmitBatch
-3	新規登録	設定画面登録 中断:	取込進捗ステップ	業態・ブランド登録		タブ閉じ(モーダル開放中)	-	page-brand-settings	sessionStorage.b0Draft_1	入力中の値	▶ STEP 1 業態・ブランド(下書きN件) から再開	-	再オープン時 b0DraftがUI復元	✅	-	beforeunload なし、入力時に自動保存
+1	新規登録	設定画面登録 中断:	取込進捗ステップ	業態登録		モーダル入力途中(自動下書き)	F2	page-brand-settings	sessionStorage.b0Draft_1	入力中の各セル値配列	▶ STEP 1 業態(下書きN件) から再開	-	モーダル復元 (restoreDraftToModal)	✅	-	b0Draft_N機構
+2	新規登録	設定画面登録 中断:	取込進捗ステップ	業態登録		登録ボタン押下 → done=1	-	page-brand-settings	sessionStorage.b0Done=1, b0Counts[0]+=n	-	-	-	モーダル→次STEP橋渡しCTA	✅	-	b0SubmitBatch
+3	新規登録	設定画面登録 中断:	取込進捗ステップ	業態登録		タブ閉じ(モーダル開放中)	-	page-brand-settings	sessionStorage.b0Draft_1	入力中の値	▶ STEP 1 業態(下書きN件) から再開	-	再オープン時 b0DraftがUI復元	✅	-	beforeunload なし、入力時に自動保存
 4	新規登録	設定画面登録 中断:	取込進捗ステップ	店舗登録		モーダル入力途中	F2	page-store-settings	sessionStorage.b0Draft_2	入力配列	▶ STEP 2 店舗(下書きN件) から再開	-	モーダル復元	✅	-
 5	新規登録	設定画面登録 中断:	取込進捗ステップ	店舗登録		登録ボタン押下	-	page-store-settings	b0Done=2, b0Counts[1]+=n	-	-	-	橋渡しCTA	✅	-
 6	新規登録	設定画面登録 中断:	取込進捗ステップ	店舗登録		タブ閉じ	-	page-store-settings	sessionStorage.b0Draft_2	入力配列	▶ STEP 2 店舗(下書きN件) から再開	-	再オープン時 復元	✅	-
@@ -13,10 +13,10 @@ No	CSV一括インポート種別	一時保存ポイント	一時保存トリガ
 12	新規登録	設定画面登録 中断:	取込進捗ステップ	従業員登録		タブ閉じ	-	page-emp-settings	b0Draft_4	入力配列	▶ STEP 4 従業員(下書きN件) から再開	-	復元	✅	-
 13	新規登録	設定画面登録 中断:	取込進捗ステップ	管理者登録		モーダル入力途中	-	b-setup-admin-overlay	(下書き永続化なし)	-	(なし)	-	(なし、再度モーダルから)	⚠	-	下書き機構なし(任意のため)
 14	新規登録	設定画面登録 中断:	取込進捗ステップ	管理者登録		登録ボタン押下	-	b-setup-admin-overlay	b0Counts[4]+=1	-	-	-	bShowSetupAdminCompleteModal	✅	-
-15	新規登録	CSV(テンプレ) 中断:	取込項目	業態・ブランド登録		btn-group「💾 一時保存」	A1	s-tpl1	localStorage	itemsCompleted=['brand']	📥 アップ済(1/4) 一時保存中 / 📋 業態・ブランド (1件)	?resume=s-tpl1#tpl-setup	checkbox+_mockTplUploaded+復元バナー	✅	fe33a92
-16	新規登録	CSV(テンプレ) 中断:	取込項目	業態・ブランド登録		ヘッダー「💾 一時保存して中断」	A6	s-tpl1	localStorage	snapshotTplState	同上	?resume=s-tpl1#tpl-setup	同上	✅	fe33a92	saveImportDraftAndExit
-17	新規登録	CSV(テンプレ) 中断:	取込項目	業態・ブランド登録		タブ閉じ(beforeunload自動)	A7	s-tpl1	localStorage + autoSaved=true	snapshotTplState	同上	(再オープン)	同上+showRestoreToast	✅	fe33a92
-18	新規登録	CSV(テンプレ) 中断:	取込項目	業態・ブランド登録		画面遷移自動 (s-tpl1→s-tpl2)	A10	s-tpl1→s-tpl2	localStorage (attachUp保持)	currentStep=s-tpl2 + itemsCompleted保持	📥 アップ済(1/4) 一時保存中 / 📋 業態・ブランド (1件)	?resume=s-tpl2#tpl-setup	s-tpl2画面表示	✅	fe33a92
+15	新規登録	CSV(テンプレ) 中断:	取込項目	業態登録		btn-group「💾 一時保存」	A1	s-tpl1	localStorage	itemsCompleted=['brand']	📥 アップ済(1/4) 一時保存中 / 📋 業態 (1件)	?resume=s-tpl1#tpl-setup	checkbox+_mockTplUploaded+復元バナー	✅	fe33a92
+16	新規登録	CSV(テンプレ) 中断:	取込項目	業態登録		ヘッダー「💾 一時保存して中断」	A6	s-tpl1	localStorage	snapshotTplState	同上	?resume=s-tpl1#tpl-setup	同上	✅	fe33a92	saveImportDraftAndExit
+17	新規登録	CSV(テンプレ) 中断:	取込項目	業態登録		タブ閉じ(beforeunload自動)	A7	s-tpl1	localStorage + autoSaved=true	snapshotTplState	同上	(再オープン)	同上+showRestoreToast	✅	fe33a92
+18	新規登録	CSV(テンプレ) 中断:	取込項目	業態登録		画面遷移自動 (s-tpl1→s-tpl2)	A10	s-tpl1→s-tpl2	localStorage (attachUp保持)	currentStep=s-tpl2 + itemsCompleted保持	📥 アップ済(1/4) 一時保存中 / 📋 業態 (1件)	?resume=s-tpl2#tpl-setup	s-tpl2画面表示	✅	fe33a92
 19	新規登録	CSV(テンプレ) 中断:	取込項目	店舗登録		btn-group「💾」	A2	s-tpl1	localStorage	itemsCompleted=['store'](業態と組合せ)	📥 / 📋 店舗 (...件)	?resume=s-tpl1#tpl-setup	checkbox(store)復元	✅	fe33a92
 20	新規登録	CSV(テンプレ) 中断:	取込項目	店舗登録		ヘッダー「💾」	A6	s-tpl1	同上	snapshotTplState	同上	?resume=s-tpl1#tpl-setup	同上	✅	fe33a92
 21	新規登録	CSV(テンプレ) 中断:	取込項目	店舗登録		タブ閉じ	A7	s-tpl1	同上+autoSaved	snapshotTplState	同上	(再オープン)	同上	✅	fe33a92
@@ -32,10 +32,10 @@ No	CSV一括インポート種別	一時保存ポイント	一時保存トリガ
 31	新規登録	CSV(テンプレ) 中断:	取込項目	管理者登録(任意)		btn-group「💾」	A5	s-tpl1	localStorage	itemsCompleted=['admin']	📋 / 管理者(任意)	?resume=s-tpl1#tpl-setup	checkbox(admin)復元	✅	fe33a92
 32	新規登録	CSV(テンプレ) 中断:	取込項目	管理者登録(任意)		ヘッダー「💾」	A6	s-tpl1	同上	snapshotTplState	同上	?resume=s-tpl1#tpl-setup	同上	✅	fe33a92
 33	新規登録	CSV(テンプレ) 中断:	取込項目	管理者登録(任意)		タブ閉じ	A7	s-tpl1	同上+autoSaved	snapshotTplState	同上	(再オープン)	同上	✅	fe33a92
-34	新規登録	CSV(外部勤怠) 中断:	取込項目	業態・ブランド登録(saas-brand-check)		btn-group「💾」	B14	s-saas1	localStorage	itemsCompleted=['saas-brand-check'](setup時のみ)	📥 / 📋 業態・ブランド	?resume=s-saas1#saas-setup	saas-brand-check復元	✅	fe33a92
-35	新規登録	CSV(外部勤怠) 中断:	取込項目	業態・ブランド登録(saas-brand-check)		ヘッダー「💾」	B9	s-saas1	同上	snapshotSaasState	同上	?resume=s-saas1#saas-setup	同上	✅	fe33a92
-36	新規登録	CSV(外部勤怠) 中断:	取込項目	業態・ブランド登録(saas-brand-check)		タブ閉じ	B10	s-saas1	同上+autoSaved	snapshotSaasState	同上	(再オープン)	同上+復元	✅	fe33a92
-37	新規登録	CSV(外部勤怠) 中断:	取込項目	業態・ブランド登録(saas-brand-check)		画面遷移自動	B11	s-saas1→s-saas2	localStorage(attachUp)	itemsCompleted保持	マッピング設定(プリセット適用済) / 📋	?resume=s-saas2#saas-setup	s-saas2	✅	fe33a92
+34	新規登録	CSV(外部勤怠) 中断:	取込項目	業態登録(saas-brand-check)		btn-group「💾」	B14	s-saas1	localStorage	itemsCompleted=['saas-brand-check'](setup時のみ)	📥 / 📋 業態	?resume=s-saas1#saas-setup	saas-brand-check復元	✅	fe33a92
+35	新規登録	CSV(外部勤怠) 中断:	取込項目	業態登録(saas-brand-check)		ヘッダー「💾」	B9	s-saas1	同上	snapshotSaasState	同上	?resume=s-saas1#saas-setup	同上	✅	fe33a92
+36	新規登録	CSV(外部勤怠) 中断:	取込項目	業態登録(saas-brand-check)		タブ閉じ	B10	s-saas1	同上+autoSaved	snapshotSaasState	同上	(再オープン)	同上+復元	✅	fe33a92
+37	新規登録	CSV(外部勤怠) 中断:	取込項目	業態登録(saas-brand-check)		画面遷移自動	B11	s-saas1→s-saas2	localStorage(attachUp)	itemsCompleted保持	マッピング設定(プリセット適用済) / 📋	?resume=s-saas2#saas-setup	s-saas2	✅	fe33a92
 38	新規登録	CSV(外部勤怠) 中断:	取込項目	店舗登録		(該当なし)	-	-	-	-	-	-	-	⚠	-	SaaSでは店舗マスタは別、テンプレ補完で連携
 39	新規登録	CSV(外部勤怠) 中断:	取込項目	雇用区分登録		(該当なし)	-	-	-	-	-	-	-	⚠	-	SaaSでは雇用区分マスタは別、テンプレ補完
 40	新規登録	CSV(外部勤怠) 中断:	取込項目	従業員登録 (KoT 従業員データ map-kot-emp 必須)		btn-group「💾」	B1, B2, B3	s-saas1	localStorage	itemsCompleted=['map-kot-emp'], allRequiredDone=true(some判定)	✓ 必須項目すべて完了 / 📋 従業員データ	?resume=s-saas1#saas-setup	map-kot-emp checkbox復元	✅	fe33a92
@@ -163,9 +163,9 @@ No	CSV一括インポート種別	一時保存ポイント	一時保存トリガ
 162	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T7. プレビュー確認後・インポート実行ボタン押下直前		(タブ閉じ at 直前)	D11	s-saas-preview	localStorage+autoSaved=true	preview_changed=true	プレビュー修正 変更途中	?resume=s-saas-preview#saas-setup	同上	✅	fe33a92	beforeunloadで保存
 163	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T7. プレビュー確認後・実行直前		btn-group「💾」	D6 (確認のみ-変更なし)	s-saas-preview	localStorage	preview_changed=false (画面到達のみ)	プレビュー(マッピング確認済)	?resume=s-saas-preview#saas-setup	画面到達のみ	✅	fe33a92	確認のみ保存
 164	新規登録	CSV(外部勤怠) 中断:	プレビューマッピング修正	T7. プレビュー確認後・実行直前		ヘッダー「💾」	D7	s-saas-preview	同上	saveImportDraftAndExit	同上	?resume=s-saas-preview#saas-setup	同上	✅	fe33a92
-165	運用更新	設定画面登録 中断:	取込項目	業態・ブランド		モーダル入力 → 「+ 追加」	-	page-brand-ops-settings	(下書き永続化なし)	-	-	-	bShowToast	⚠	-	運用モード下書き仕様未確定 (2026-05-14)
-166	運用更新	設定画面登録 中断:	取込項目	業態・ブランド		登録ボタン押下	-	page-brand-ops-settings	b0Counts[0]+=n	-	-	-	bShowToast	✅	-	ops mode
-167	運用更新	設定画面登録 中断:	取込項目	業態・ブランド		タブ閉じ	-	page-brand-ops-settings	(isSetup=false で保存スキップ)	-	-	-	-	✅	-	beforeunload スキップ
+165	運用更新	設定画面登録 中断:	取込項目	業態		モーダル入力 → 「+ 追加」	-	page-brand-ops-settings	(下書き永続化なし)	-	-	-	bShowToast	⚠	-	運用モード下書き仕様未確定 (2026-05-14)
+166	運用更新	設定画面登録 中断:	取込項目	業態		登録ボタン押下	-	page-brand-ops-settings	b0Counts[0]+=n	-	-	-	bShowToast	✅	-	ops mode
+167	運用更新	設定画面登録 中断:	取込項目	業態		タブ閉じ	-	page-brand-ops-settings	(isSetup=false で保存スキップ)	-	-	-	-	✅	-	beforeunload スキップ
 168	運用更新	設定画面登録 中断:	取込項目	店舗		モーダル入力 → 「+ 追加」	-	page-store-ops-settings	(下書きなし)	-	-	-	bShowToast	⚠	-
 169	運用更新	設定画面登録 中断:	取込項目	店舗		登録ボタン押下	-	page-store-ops-settings	b0Counts[1]+=n	-	-	-	bShowToast	✅	-
 170	運用更新	設定画面登録 中断:	取込項目	店舗		タブ閉じ	-	page-store-ops-settings	(スキップ)	-	-	-	-	✅	-
