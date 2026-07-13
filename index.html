@@ -937,8 +937,8 @@
     <div style="display:flex;flex-direction:column;gap:6px;font-size:10px;background:#fff3e0;border:1px dashed #e67e22;border-radius:8px;padding:6px 10px;">
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
         <span style="color:#e67e22;font-weight:700;">🛠 デモ用 (新規登録専用):</span>
-        <button onclick="bDemoTplModeAndChecks('setup', true)" style="font-size:11px;padding:4px 10px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;">✓ アップ済</button>
-        <button onclick="bDemoTplModeAndChecks('setup', false)" style="font-size:11px;padding:4px 10px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;">✗ 未アップ</button>
+        <button onclick="bDemoTplModeAndChecks('setup', true); if(typeof tplWizSetAll==='function') tplWizSetAll(true);" style="font-size:11px;padding:4px 10px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;">✓ アップ済</button>
+        <button onclick="bDemoTplModeAndChecks('setup', false); if(typeof tplWizSetAll==='function') tplWizSetAll(false);" style="font-size:11px;padding:4px 10px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;">✗ 未アップ</button>
       </div>
       <div style="font-size:10px;color:#1a73e8;">
         ➡️ 運用更新の単一データ取込は設定画面別の専用画面で確認:
@@ -960,6 +960,16 @@
       <div class="fs"><span class="fs-num">3</span><span class="fs-label">完了</span></div>
     </div>
 
+    <!-- 新: スライド式ウィザード (テンプレDL→アップ→次へ を1項目ずつ) -->
+    <div class="wcard">
+      <div class="wcard-title"><span class="num">1</span> テンプレートを順番に取り込み</div>
+      <div style="font-size:11px;color:#888;margin-bottom:12px;">各項目で「テンプレDL → 記入 → アップロード → 次へ」を1つずつ。① → ② → ③ → ④ →（任意）⑤ の順。ステップ1・2の往復は不要です。</div>
+      <div id="tpl-wiz-dots" style="display:flex;align-items:center;gap:2px;flex-wrap:wrap;margin-bottom:16px;"></div>
+      <div id="tpl-wiz-card" style="border:1px solid #e8e8e8;border-radius:10px;padding:16px 18px;background:#fff;"></div>
+    </div>
+
+    <!-- 旧セクション(選択+一括アップロード): 既存JS互換のため残置・非表示 -->
+    <div id="tpl-legacy-sections" style="display:none;">
     <div class="wcard">
       <div class="wcard-title"><span class="num">1</span> テンプレートを選択（複数選択可）</div>
       <div id="tpl-select-caption" style="display:none;"></div>
@@ -1064,6 +1074,8 @@
       <div id="tpl-saved-status" style="display:none;margin-top:14px;padding:8px 12px;background:#e3f2fd;border:1px solid #90caf9;border-radius:6px;font-size:11px;color:#0d47a1;">
         ✓ <strong>一時記憶中</strong>(<span class="saved-status-count">0</span>件): <span class="saved-status-list" style="font-weight:700;"></span>
       </div>
+
+    </div>
 
     </div>
 
@@ -3875,6 +3887,61 @@ function returnToSourceSetting() {
   } catch (e) { console.error('initFromUrl error:', e); }
 })();
 
+/* ============================================================ */
+/* テンプレ取込ウィザード (1項目ずつ: DL→アップ→次へ)          */
+/*   全項目同時表示/ステップ1-2往復をやめ、スライド式に。       */
+/*   旧セクション(#tpl-legacy-sections)は既存JS互換で非表示残置。*/
+/* ============================================================ */
+var TPL_WIZ_ITEMS = [
+  { key:'businesstype', n:'①', name:'業態',     cols:'1列（業態名）',                 dep:'',                       dl:'downloadBusinesstypeTemplate', required:true },
+  { key:'store',        n:'②', name:'店舗',     cols:'6列',                           dep:'① 業態',                 dl:'downloadStoreTemplate',        required:true },
+  { key:'emptype',      n:'③', name:'雇用区分', cols:'6列',                           dep:'',                       dl:'downloadEmptypeTemplate',      required:true },
+  { key:'employee',     n:'④', name:'従業員',   cols:'8列',                           dep:'②③ 店舗・雇用区分',      dl:'downloadEmployeeTemplate',     required:true },
+  { key:'admin',        n:'⑤', name:'管理者',   cols:'4列（任意・テンプレートのみ）', dep:'② 店舗',                 dl:'downloadAdminTemplate',        required:false }
+];
+var tplWiz = { idx:0, uploaded:{} };
+function _twStep(n){ return '<span style="width:22px;height:22px;border-radius:50%;background:#eef2ff;color:#1a73e8;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0;">'+n+'</span>'; }
+function renderTplWizard() {
+  var dots = document.getElementById('tpl-wiz-dots');
+  var card = document.getElementById('tpl-wiz-card');
+  if (!dots || !card) return;
+  dots.innerHTML = TPL_WIZ_ITEMS.map(function(it, i){
+    var done = !!tplWiz.uploaded[it.key], cur = (i === tplWiz.idx);
+    var bg = done ? '#2ec4a0' : (cur ? '#1a73e8' : '#e6e6e6');
+    var fg = (done || cur) ? '#fff' : '#999';
+    var circle = '<span onclick="tplWizGo('+i+')" title="'+it.name+'" style="cursor:pointer;width:24px;height:24px;border-radius:50%;background:'+bg+';color:'+fg+';display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">'+(done?'✓':it.n)+'</span>';
+    var lbl = '<span style="font-size:10px;color:'+(cur?'#1a73e8':'#999')+';font-weight:'+(cur?700:400)+';margin:0 4px;white-space:nowrap;">'+it.name+(it.required?'':'(任意)')+'</span>';
+    var line = (i < TPL_WIZ_ITEMS.length-1) ? '<span style="flex:1;height:1px;background:#e6e6e6;min-width:8px;"></span>' : '';
+    return circle + lbl + line;
+  }).join('');
+  var it = TPL_WIZ_ITEMS[tplWiz.idx];
+  var up = !!tplWiz.uploaded[it.key];
+  var step2 = up
+    ? '<div style="display:flex;align-items:center;gap:8px;padding:12px;border:1px solid #b8e6d6;background:#f0faf6;border-radius:8px;font-size:12px;color:#0e9077;font-weight:700;">✓ '+it.key+'_data.tsv をアップロード済　<a href="#" onclick="event.preventDefault();tplWizReupload();" style="font-size:11px;color:#1a73e8;font-weight:400;">アップし直す</a></div>'
+    : '<div class="upload-box" onclick="tplWizUpload();" style="padding:20px;cursor:pointer;"><div class="ub-icon" style="font-size:24px;">📁</div><div class="ub-text" style="font-size:12px;">ファイルをドラッグ＆ドロップ / クリックで選択</div><div class="ub-hint">TSV / CSV（最大10MB）</div></div>';
+  var primary;
+  if (tplWiz.idx <= 2) primary = '<button class="btn btn-primary" onclick="tplWizNext();"'+(up?'':' style="opacity:.6;"')+'>次へ →</button>';
+  else if (tplWiz.idx === 3) primary = '<button class="btn btn-ghost" onclick="tplWizNext();">⑤ 管理者(任意)へ</button><button class="btn btn-primary" onclick="go(\'s-tpl2\');">確認画面へ →</button>';
+  else primary = '<button class="btn btn-primary" onclick="go(\'s-tpl2\');">確認画面へ →</button>';
+  var skip = (it.required && !up && tplWiz.idx < 3) ? '<button class="btn btn-ghost" onclick="tplWizNext();">後で（スキップ）</button>' : '';
+  card.innerHTML =
+    '<div style="font-size:15px;font-weight:700;">'+it.n+' '+it.name+'</div>'+
+    '<div style="font-size:11px;color:#888;margin:2px 0 14px;">'+it.cols+(it.dep?' ・ 先に '+it.dep+'の登録が必要':'')+'</div>'+
+    '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">'+_twStep('1')+'<span style="font-size:12px;">テンプレートをダウンロード</span><a href="#" class="dl-link" onclick="event.preventDefault();'+it.dl+'();" style="font-size:12px;">⬇ '+it.name+'テンプレDL</a></div>'+
+    '<div style="display:flex;align-items:flex-start;gap:10px;">'+_twStep('2')+'<div style="flex:1;"><div style="font-size:12px;margin-bottom:6px;">記入してアップロード</div>'+step2+'</div></div>'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:18px;gap:8px;flex-wrap:wrap;">'+
+      '<button class="btn btn-ghost" '+(tplWiz.idx===0?'disabled style="opacity:.4;"':'onclick="tplWizBack();"')+'>← 戻る</button>'+
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;">'+skip+primary+'</div>'+
+    '</div>';
+}
+function tplWizGo(i){ tplWiz.idx = Math.max(0, Math.min(TPL_WIZ_ITEMS.length-1, i)); renderTplWizard(); }
+function tplWizNext(){ if (tplWiz.idx < TPL_WIZ_ITEMS.length-1) { tplWiz.idx++; renderTplWizard(); } }
+function tplWizBack(){ if (tplWiz.idx > 0) { tplWiz.idx--; renderTplWizard(); } }
+function tplWizUpload(){ var it=TPL_WIZ_ITEMS[tplWiz.idx]; tplWiz.uploaded[it.key]=true; window._mockTplUploaded=true; renderTplWizard(); }
+function tplWizReupload(){ var it=TPL_WIZ_ITEMS[tplWiz.idx]; tplWiz.uploaded[it.key]=false; renderTplWizard(); }
+// デモ: 全アップ済/全未アップ を切替(上部デモボタンから)
+function tplWizSetAll(v){ TPL_WIZ_ITEMS.forEach(function(it){ tplWiz.uploaded[it.key]=!!v; }); renderTplWizard(); }
+
 function go(id) {
   // フォールバック: per-key single系のプレースホルダーが未レンダリングなら遅延レンダリング
   var lazyEl = document.getElementById(id);
@@ -3888,6 +3955,7 @@ function go(id) {
     if (b.getAttribute('onclick') && b.getAttribute('onclick').includes("'" + id + "'")) b.classList.add('current');
   });
   if (id === 's-saas2') showMappingPanels();
+  if (id === 's-tpl1' && typeof renderTplWizard === 'function') renderTplWizard();
   if (id === 's-saas-settings') updateSettingsScreen();
   // 運用更新 設定画面別の単一データ取込画面 入場時の初期化
   if (/^s-(tpl|saas)-single-/.test(id)) {
