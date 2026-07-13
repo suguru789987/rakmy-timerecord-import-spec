@@ -112,6 +112,7 @@
   .saas-logo.jc { background: #ff6b35; }
   .saas-item h4 { font-size: 14px; }
   .saas-item p { font-size: 11px; color: #999; }
+  @keyframes saasWizIn { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: none; } }
 
   /* Data source pills */
   .source-pills { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -1414,10 +1415,12 @@
       <div class="fs"><span class="fs-num">3</span><span class="fs-label">完了</span></div>
     </div>
 
-    <div class="wcard">
-      <div class="wcard-title"><span class="num" id="saas-num-1">1</span> 連携元サービス</div>
+    <!-- STEP1a: 連携元サービス選択 (選択でウィザードへスライド) -->
+    <div class="wcard" id="saas-picker-card">
+      <div class="wcard-title"><span class="num" id="saas-num-1">1</span> 連携元サービスを選択</div>
+      <div style="font-size:13px;color:#888;margin-bottom:14px;">お使いの勤怠サービスを選ぶと、そのサービス用の取り込みステップへ進みます。</div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:stretch;" id="saas-list">
-        <div class="saas-item selected" onclick="selSaasMain(this,'kot')" data-saas="kot" style="flex:1;min-width:180px;">
+        <div class="saas-item" onclick="selSaasMain(this,'kot')" data-saas="kot" style="flex:1;min-width:180px;">
           <div class="saas-logo kot">KoT</div>
           <div><h4>キングオブタイム</h4></div>
         </div>
@@ -1430,18 +1433,32 @@
           <div><h4 style="color:#888;">その他</h4></div>
         </div>
       </div>
-      <div id="saas-other-form" style="display:none;margin-top:12px;padding:20px;background:#f8f8f8;border-radius:8px;text-align:center;">
+      <!-- selSaasMain 互換用の隠しフォーム(実際の案内は saas-wiz-other に表示) -->
+      <div id="saas-other-form" style="display:none;"></div>
+    </div>
+
+    <!-- STEP1b: サービス別 スライド式ウィザード (選択後に表示) -->
+    <div class="wcard" id="saas-wiz-section" style="display:none;">
+      <!-- 連携元サービス名 (左上) + 変更 -->
+      <div id="saas-wiz-svc-bar" style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid #eee;">
+        <span style="font-size:12px;color:#888;font-weight:700;">連携元サービス</span>
+        <span id="saas-wiz-svc-logo" class="saas-logo kot" style="width:34px;height:34px;font-size:13px;flex-shrink:0;">KoT</span>
+        <span id="saas-wiz-svc-name" style="font-size:17px;font-weight:700;color:#222;">キングオブタイム</span>
+        <button type="button" onclick="saasShowPicker()" style="margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:8px 14px;border:1px solid #ccc;border-radius:7px;background:#fff;color:#555;cursor:pointer;font-weight:600;">↩ 連携元サービスを変更</button>
+      </div>
+      <div id="saas-wiz-main">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+          <div class="wcard-title" style="margin:0;">取り込むデータを順番に</div>
+          <button class="btn btn-outline-g" onclick="go('s-saas-settings')" style="font-size:12px;padding:7px 14px;white-space:nowrap;">⚙ 取り込み設定</button>
+        </div>
+        <div style="font-size:13px;color:#888;margin:6px 0 14px;">選択中のサービスの項目を1つずつ（エクスポート/DL → アップロード → 次へ）。必須は完了まで次へ進めません。</div>
+        <div id="saas-wiz-dots" style="display:flex;align-items:center;gap:2px;flex-wrap:wrap;margin-bottom:16px;"></div>
+        <div id="saas-wiz-card" style="border:1px solid #e8e8e8;border-radius:10px;padding:18px 20px;background:#fff;"></div>
+      </div>
+      <div id="saas-wiz-other" style="display:none;padding:22px;background:#f8f8f8;border-radius:8px;text-align:center;">
         <div style="font-size:14px;font-weight:600;margin-bottom:8px;">別サービスからのインポートをご希望の場合</div>
         <div style="font-size:13px;color:#888;line-height:1.6;">営業またはカスタマーサポートにお問い合わせください。<br>お客様のご利用サービスに合わせたインポート設定を対応いたします。</div>
       </div>
-    </div>
-
-    <!-- 新: サービス別 スライド式ウィザード -->
-    <div class="wcard">
-      <div class="wcard-title">取り込むデータを順番に</div>
-      <div style="font-size:13px;color:#888;margin-bottom:14px;">選択中のサービスの項目を1つずつ（エクスポート/DL → アップロード → 次へ）。必須は完了まで次へ進めません。</div>
-      <div id="saas-wiz-dots" style="display:flex;align-items:center;gap:2px;flex-wrap:wrap;margin-bottom:16px;"></div>
-      <div id="saas-wiz-card" style="border:1px solid #e8e8e8;border-radius:10px;padding:18px 20px;background:#fff;"></div>
     </div>
 
     <!-- 旧セクション(選択+一括アップロード): 後続マッピング(s-saas2)互換のため残置・非表示 -->
@@ -1618,7 +1635,6 @@
 
     <div class="btn-group" id="saas-section-buttons">
       <button class="btn btn-ghost" onclick="go('s-top')">キャンセル</button>
-      <button class="btn btn-outline-g" onclick="go('s-saas-settings')">取り込み設定</button>
       <button id="saas1-save-btn" class="btn btn-ghost setup-only-btn" style="display:none;background:#fff3e0;border:1px solid #e67e22;color:#e67e22;font-weight:700;" onclick="saveImportDraftWithItems('saas')">💾 一時保存</button>
       <button class="btn btn-primary" onclick="go('s-saas-preview')" id="saas-next-btn">次へ: プレビュー →</button>
     </div>
@@ -4129,7 +4145,7 @@ function go(id) {
   });
   if (id === 's-saas2') showMappingPanels();
   if (id === 's-tpl1' && typeof renderTplWizard === 'function') renderTplWizard();
-  if (id === 's-saas1' && typeof renderSaasWizard === 'function') renderSaasWizard();
+  if (id === 's-saas1' && typeof renderSaasWizard === 'function') { renderSaasWizard(); if (typeof saasSyncSlideView === 'function') saasSyncSlideView(); }
   if (id === 's-saas-settings') updateSettingsScreen();
   // 運用更新 設定画面別の単一データ取込画面 入場時の初期化
   if (/^s-(tpl|saas)-single-/.test(id)) {
@@ -4271,8 +4287,60 @@ function selSaasMain(el, type) {
   if (typeof saasWizSetService === 'function') saasWizSetService(type);
   if (typeof refreshSaveButtonsState === 'function') refreshSaveButtonsState();
   setTimeout(updateUploadSteps, 10);
+  // 選択したら取り込みステップ画面へスライド + 連携元サービス名を表示
+  saasPickerConfirmed = true;
+  saasSetWizLabel(type);
+  saasSyncSlideView();
 }
 var currentSaasType = 'kot';
+
+// ===== 連携元サービス選択 → 取り込みステップ のスライド表示制御 =====
+var saasPickerConfirmed = false;
+// 選択中サービスのメタ(名前/ロゴ)
+var SAAS_SVC_META = {
+  kot:   { name: 'キングオブタイム', logo: 'KoT', cls: 'kot' },
+  jc:    { name: 'ジョブカン',        logo: 'JC',  cls: 'jc'  },
+  other: { name: 'その他',            logo: '+',   cls: ''    }
+};
+function saasSetWizLabel(type) {
+  var m = SAAS_SVC_META[type] || { name: type, logo: '?', cls: '' };
+  var logo = document.getElementById('saas-wiz-svc-logo');
+  var name = document.getElementById('saas-wiz-svc-name');
+  if (logo) {
+    logo.className = 'saas-logo ' + m.cls;
+    logo.textContent = m.logo;
+    logo.style.background = m.cls ? '' : '#999';
+    logo.style.fontSize = m.cls ? '' : '20px';
+  }
+  if (name) name.textContent = m.name;
+  // その他 は取り込みステップではなく問い合わせ案内を表示
+  var main = document.getElementById('saas-wiz-main');
+  var other = document.getElementById('saas-wiz-other');
+  var isOther = (type === 'other');
+  if (main)  main.style.display  = isOther ? 'none' : '';
+  if (other) other.style.display = isOther ? '' : 'none';
+}
+function saasSyncSlideView() {
+  var picker = document.getElementById('saas-picker-card');
+  var wiz = document.getElementById('saas-wiz-section');
+  if (!picker || !wiz) return;
+  if (saasPickerConfirmed) {
+    picker.style.display = 'none';
+    wiz.style.display = '';
+    // スライドイン再生 (display 切替時に再適用)
+    wiz.style.animation = 'none'; void wiz.offsetWidth; wiz.style.animation = 'saasWizIn .22s ease';
+  } else {
+    picker.style.display = '';
+    wiz.style.display = 'none';
+  }
+}
+// 「連携元サービスを変更」→ 選択画面へ戻る
+function saasShowPicker() {
+  saasPickerConfirmed = false;
+  saasSyncSlideView();
+  var picker = document.getElementById('saas-picker-card');
+  if (picker) { picker.style.animation = 'none'; void picker.offsetWidth; picker.style.animation = 'saasWizIn .2s ease'; }
+}
 
 function toggleCheck(el) {
   // Toggle checked state based on actual checkbox
