@@ -3921,9 +3921,9 @@ function renderTplWizard() {
   }).join('');
   var it = TPL_WIZ_ITEMS[tplWiz.idx];
   var dl = !!tplWiz.downloaded[it.key], up = !!tplWiz.uploaded[it.key], ready = dl && up;
-  var dlBtn = '<button type="button" onclick="tplWizDL();" style="display:inline-flex;align-items:center;gap:8px;background:'+(dl?'#0e9077':'#1a73e8')+';color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 2px 6px rgba(26,115,232,.28);">⬇ '+it.name+'テンプレートをダウンロード</button>'+(dl?'<span style="margin-left:10px;font-size:11px;color:#0e9077;font-weight:700;">✓ ダウンロード済</span>':'');
+  var dlBtn = '<button type="button" onclick="tplWizDL();" style="display:inline-flex;align-items:center;gap:8px;background:'+(dl?'#5b8def':'#1a73e8')+';color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 2px 6px rgba(26,115,232,.22);">⬇ '+it.name+'テンプレートをダウンロード'+(dl?'（再取得）':'')+'</button>';
   var step2;
-  if (up) step2 = '<div style="display:flex;align-items:center;gap:8px;padding:12px;border:1px solid #b8e6d6;background:#f0faf6;border-radius:8px;font-size:12px;color:#0e9077;font-weight:700;">✓ '+it.key+'_data.tsv をアップロード済　<a href="#" onclick="event.preventDefault();tplWizReupload();" style="font-size:11px;color:#1a73e8;font-weight:400;">アップし直す</a></div>';
+  if (up) step2 = '<div style="display:flex;align-items:center;gap:8px;padding:12px;border:1px solid #b8e6d6;background:#f0faf6;border-radius:8px;font-size:12px;color:#0e9077;font-weight:700;">📄 '+it.key+'_data.tsv　<a href="#" onclick="event.preventDefault();tplWizReupload();" style="font-size:11px;color:#1a73e8;font-weight:400;margin-left:auto;">アップし直す</a></div>';
   else if (!dl) step2 = '<div style="padding:18px;border:1px dashed #ddd;border-radius:8px;text-align:center;font-size:12px;color:#b0b0b0;background:#fafafa;">🔒 先に「テンプレートをダウンロード」してください</div>';
   else step2 = '<div class="upload-box" onclick="tplWizUpload();" style="padding:20px;cursor:pointer;"><div class="ub-icon" style="font-size:24px;">📁</div><div class="ub-text" style="font-size:12px;">ファイルをドラッグ＆ドロップ / クリックで選択</div><div class="ub-hint">TSV / CSV（最大10MB）</div></div>';
   var extra = '', primary;
