@@ -962,8 +962,8 @@
 
     <!-- 新: スライド式ウィザード (テンプレDL→アップ→次へ を1項目ずつ) -->
     <div class="wcard">
-      <div class="wcard-title"><span class="num">1</span> テンプレートを順番に取り込み</div>
-      <div style="font-size:11px;color:#888;margin-bottom:12px;">各項目で「テンプレDL → 記入 → アップロード → 次へ」を1つずつ。① → ② → ③ → ④ →（任意）⑤ の順。ステップ1・2の往復は不要です。</div>
+      <div class="wcard-title">テンプレートを順番に取り込み</div>
+      <div style="font-size:11px;color:#888;margin-bottom:12px;">各項目で「テンプレDL → アップロード → 次へ」を1つずつ進めます。</div>
       <div id="tpl-wiz-dots" style="display:flex;align-items:center;gap:2px;flex-wrap:wrap;margin-bottom:16px;"></div>
       <div id="tpl-wiz-card" style="border:1px solid #e8e8e8;border-radius:10px;padding:16px 18px;background:#fff;"></div>
     </div>
@@ -3937,11 +3937,8 @@ function renderTplWizard() {
   }
   var hint = (it.required && !ready) ? '<div style="font-size:10px;color:#c0392b;margin-top:8px;text-align:right;">※ テンプレをダウンロードしてアップロードすると次へ進めます</div>' : '';
   var reqDoneCnt = TPL_WIZ_ITEMS.filter(function(x){return x.required && _tplItemDone(x);}).length;
-  var nextTodo = !dl ? 'このテンプレートをダウンロード' : (!up ? '記入してアップロード' : (tplWiz.idx<3 ? '「次へ」で次の項目へ' : '「確認画面へ」へ進む'));
-  var summary = '<div style="background:#eef4fb;border:1px solid #cfe0f5;border-radius:8px;padding:9px 12px;margin-bottom:14px;font-size:12px;color:#1a4b8f;line-height:1.7;">📋 必須 <b>'+reqDoneCnt+'/4</b> 完了'+(reqDoneCnt<4?'（残り '+(4-reqDoneCnt)+' 項目）':'（必須すべて完了）')+'<br>👉 いまやること：<b>'+it.n+' '+it.name+'</b> の '+nextTodo+'</div>';
   card.innerHTML =
-    summary+
-    '<div style="font-size:15px;font-weight:700;">'+it.n+' '+it.name+'<span style="font-size:11px;color:'+(it.required?'#0e9077':'#7b1fa2')+';font-weight:700;margin-left:8px;">'+(it.required?'必須':'任意')+'</span></div>'+
+    '<div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap;"><div style="font-size:15px;font-weight:700;">'+it.n+' '+it.name+'<span style="font-size:11px;color:'+(it.required?'#0e9077':'#7b1fa2')+';font-weight:700;margin-left:8px;">'+(it.required?'必須':'任意')+'</span></div><div style="font-size:11px;color:#1a4b8f;font-weight:700;">必須 '+reqDoneCnt+'/4 完了'+(reqDoneCnt>=4?' ✓':'')+'</div></div>'+
     '<div style="font-size:11px;color:#888;margin:2px 0 14px;">'+it.cols+(it.dep?' ・ 先に '+it.dep+'の登録が必要':'')+'</div>'+
     '<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:14px;">'+_twStep('1')+'<div style="flex:1;"><div style="font-size:12px;margin-bottom:6px;">テンプレートをダウンロード'+_twBadge(dl)+'</div>'+dlBtn+'</div></div>'+
     '<div style="display:flex;align-items:flex-start;gap:10px;">'+_twStep('2')+'<div style="flex:1;"><div style="font-size:12px;margin-bottom:6px;">記入してアップロード'+_twBadge(up)+'</div>'+step2+'</div></div>'+
