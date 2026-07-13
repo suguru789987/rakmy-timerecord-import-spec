@@ -1087,6 +1087,20 @@
   </div>
 </div>
 
+<!-- テンプレ取込ウィザード: 必須4項目 完了モーダル -->
+<div id="tpl-done-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:3000;justify-content:center;align-items:center;padding:20px;">
+  <div style="background:#fff;border-radius:14px;max-width:460px;width:100%;padding:28px 30px;box-shadow:0 20px 60px rgba(0,0,0,.25);text-align:center;">
+    <div style="font-size:44px;margin-bottom:8px;">✅</div>
+    <div style="font-size:18px;font-weight:700;margin-bottom:10px;">必須4項目の取り込みが完了しました</div>
+    <div style="font-size:13px;color:#666;line-height:1.8;margin-bottom:24px;">続けて任意の「⑤ 管理者」も取り込みますか？<br>不要ならこのまま確認画面へ進めます（管理者は後からでも追加できます）。</div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <button class="btn btn-primary" style="width:100%;font-size:14px;padding:13px;" onclick="tplDoneGoConfirm();">→ このまま確認画面へ進む</button>
+      <button class="btn btn-ghost" style="width:100%;font-size:14px;padding:13px;border:1px solid #b39ddb;color:#7b1fa2;font-weight:700;" onclick="tplDoneGoAdmin();">⑤ 管理者(任意)も取り込む</button>
+      <button style="background:none;border:none;color:#999;font-size:12px;cursor:pointer;margin-top:2px;" onclick="tplDoneClose();">このまま編集を続ける</button>
+    </div>
+  </div>
+</div>
+
 <!-- ==================== -->
 <!-- TEMPLATE: STEP 2 - 確認（統合） -->
 <!-- ==================== -->
@@ -3954,7 +3968,11 @@ function tplWizDL(){ var it=TPL_WIZ_ITEMS[tplWiz.idx]; tplWiz.downloaded[it.key]
 function tplWizGo(i){ i=Math.max(0, Math.min(i, _tplMaxIdx())); tplWiz.idx=i; renderTplWizard(); }
 function tplWizNext(){ var it=TPL_WIZ_ITEMS[tplWiz.idx]; if (it.required && !_tplItemDone(it)) return; if (tplWiz.idx < TPL_WIZ_ITEMS.length-1) { tplWiz.idx++; renderTplWizard(); } }
 function tplWizBack(){ if (tplWiz.idx > 0) { tplWiz.idx--; renderTplWizard(); } }
-function tplWizUpload(){ var it=TPL_WIZ_ITEMS[tplWiz.idx]; if(!tplWiz.downloaded[it.key]) return; tplWiz.uploaded[it.key]=true; window._mockTplUploaded=true; renderTplWizard(); }
+function tplWizUpload(){ var it=TPL_WIZ_ITEMS[tplWiz.idx]; if(!tplWiz.downloaded[it.key]) return; tplWiz.uploaded[it.key]=true; window._mockTplUploaded=true; renderTplWizard(); if (_tplAllReqDone() && !tplWiz._doneShown){ tplWiz._doneShown=true; showTplDoneModal(); } }
+function showTplDoneModal(){ var m=document.getElementById('tpl-done-modal'); if(m) m.style.display='flex'; }
+function tplDoneClose(){ var m=document.getElementById('tpl-done-modal'); if(m) m.style.display='none'; }
+function tplDoneGoAdmin(){ tplDoneClose(); tplWiz.idx=4; renderTplWizard(); }
+function tplDoneGoConfirm(){ tplDoneClose(); go('s-tpl2'); }
 function tplWizReupload(){ var it=TPL_WIZ_ITEMS[tplWiz.idx]; tplWiz.uploaded[it.key]=false; renderTplWizard(); }
 // デモ: 全アップ済/全未アップ を切替(上部デモボタンから)。DL/アップ両方を設定
 function tplWizSetAll(v){ TPL_WIZ_ITEMS.forEach(function(it){ tplWiz.downloaded[it.key]=!!v; tplWiz.uploaded[it.key]=!!v; }); renderTplWizard(); }
