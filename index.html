@@ -963,7 +963,7 @@
     <!-- 新: スライド式ウィザード (テンプレDL→アップ→次へ を1項目ずつ) -->
     <div class="wcard">
       <div class="wcard-title">テンプレートを順番に取り込み</div>
-      <div style="font-size:11px;color:#888;margin-bottom:12px;">各項目で「テンプレDL → アップロード → 次へ」を1つずつ進めます。</div>
+      <div style="font-size:13px;color:#888;margin-bottom:14px;">各項目で「テンプレDL → アップロード → 次へ」を1つずつ進めます。</div>
       <div id="tpl-wiz-dots" style="display:flex;align-items:center;gap:2px;flex-wrap:wrap;margin-bottom:16px;"></div>
       <div id="tpl-wiz-card" style="border:1px solid #e8e8e8;border-radius:10px;padding:16px 18px;background:#fff;"></div>
     </div>
@@ -3915,17 +3915,17 @@ function renderTplWizard() {
     var bg = done ? '#2ec4a0' : (cur ? '#1a73e8' : '#e6e6e6');
     var fg = (done || cur) ? '#fff' : '#999';
     var circle = '<span onclick="tplWizGo('+i+')" title="'+it.name+'" style="cursor:'+(reachable?'pointer':'not-allowed')+';opacity:'+(reachable?'1':'.5')+';width:32px;height:32px;border-radius:50%;background:'+bg+';color:'+fg+';display:inline-flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0;">'+(done?'✓':it.n)+'</span>';
-    var lbl = '<span style="font-size:13px;color:'+(cur?'#1a73e8':'#666')+';font-weight:'+(cur?700:600)+';margin:0 6px;white-space:nowrap;opacity:'+(reachable?'1':'.5')+';">'+it.name+(it.required?'':'(任意)')+'</span>';
+    var lbl = '<span style="font-size:15px;color:'+(cur?'#1a73e8':'#666')+';font-weight:'+(cur?700:600)+';margin:0 8px;white-space:nowrap;opacity:'+(reachable?'1':'.5')+';">'+it.name+(it.required?'':'(任意)')+'</span>';
     var line = (i < TPL_WIZ_ITEMS.length-1) ? '<span style="flex:1;height:1px;background:#e6e6e6;min-width:8px;"></span>' : '';
     return circle + lbl + line;
   }).join('');
   var it = TPL_WIZ_ITEMS[tplWiz.idx];
   var dl = !!tplWiz.downloaded[it.key], up = !!tplWiz.uploaded[it.key], ready = dl && up;
-  var dlBtn = '<button type="button" onclick="tplWizDL();" style="display:inline-flex;align-items:center;gap:8px;background:'+(dl?'#5b8def':'#1a73e8')+';color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 2px 6px rgba(26,115,232,.22);">⬇ '+it.name+'テンプレートをダウンロード'+(dl?'（再取得）':'')+'</button>';
+  var dlBtn = '<button type="button" onclick="tplWizDL();" style="display:inline-flex;align-items:center;gap:8px;background:'+(dl?'#5b8def':'#1a73e8')+';color:#fff;border:none;border-radius:8px;padding:13px 26px;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 2px 6px rgba(26,115,232,.22);">⬇ '+it.name+'テンプレートをダウンロード'+(dl?'（再取得）':'')+'</button>';
   var step2;
-  if (up) step2 = '<div style="display:flex;align-items:center;gap:8px;padding:12px;border:1px solid #b8e6d6;background:#f0faf6;border-radius:8px;font-size:12px;color:#0e9077;font-weight:700;">📄 '+it.key+'_data.tsv　<a href="#" onclick="event.preventDefault();tplWizReupload();" style="font-size:11px;color:#1a73e8;font-weight:400;margin-left:auto;">アップし直す</a></div>';
+  if (up) step2 = '<div style="display:flex;align-items:center;gap:8px;padding:14px;border:1px solid #b8e6d6;background:#f0faf6;border-radius:8px;font-size:15px;color:#0e9077;font-weight:700;">📄'+it.key+'_data.tsv　<a href="#" onclick="event.preventDefault();tplWizReupload();" style="font-size:11px;color:#1a73e8;font-weight:400;margin-left:auto;">アップし直す</a></div>';
   else if (!dl) step2 = '<div style="padding:18px;border:1px dashed #ddd;border-radius:8px;text-align:center;font-size:12px;color:#b0b0b0;background:#fafafa;">🔒 先に「テンプレートをダウンロード」してください</div>';
-  else step2 = '<div class="upload-box" onclick="tplWizUpload();" style="padding:20px;cursor:pointer;"><div class="ub-icon" style="font-size:24px;">📁</div><div class="ub-text" style="font-size:12px;">ファイルをドラッグ＆ドロップ / クリックで選択</div><div class="ub-hint">TSV / CSV（最大10MB）</div></div>';
+  else step2 = '<div class="upload-box" onclick="tplWizUpload();" style="padding:26px;cursor:pointer;"><div class="ub-icon" style="font-size:30px;">📁</div><div class="ub-text" style="font-size:15px;">ファイルをドラッグ＆ドロップ / クリックで選択</div><div class="ub-hint" style="font-size:12px;">TSV / CSV（最大10MB）</div></div>';
   var extra = '', primary;
   if (tplWiz.idx <= 2) {
     primary = '<button class="btn btn-primary" '+(ready?'onclick="tplWizNext();"':'disabled style="opacity:.45;cursor:not-allowed;"')+'>次へ →</button>';
@@ -3938,10 +3938,10 @@ function renderTplWizard() {
   var hint = (it.required && !ready) ? '<div style="font-size:10px;color:#c0392b;margin-top:8px;text-align:right;">※ テンプレをダウンロードしてアップロードすると次へ進めます</div>' : '';
   var reqDoneCnt = TPL_WIZ_ITEMS.filter(function(x){return x.required && _tplItemDone(x);}).length;
   card.innerHTML =
-    '<div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap;"><div style="font-size:15px;font-weight:700;">'+it.n+' '+it.name+'<span style="font-size:11px;color:'+(it.required?'#0e9077':'#7b1fa2')+';font-weight:700;margin-left:8px;">'+(it.required?'必須':'任意')+'</span></div><div style="font-size:11px;color:#1a4b8f;font-weight:700;">必須 '+reqDoneCnt+'/4 完了'+(reqDoneCnt>=4?' ✓':'')+'</div></div>'+
-    '<div style="font-size:11px;color:#888;margin:2px 0 14px;">'+it.cols+(it.dep?' ・ 先に '+it.dep+'の登録が必要':'')+'</div>'+
-    '<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:14px;">'+_twStep('1')+'<div style="flex:1;"><div style="font-size:14px;font-weight:600;margin-bottom:8px;">テンプレートをダウンロード'+_twBadge(dl)+'</div>'+dlBtn+'</div></div>'+
-    '<div style="display:flex;align-items:flex-start;gap:10px;">'+_twStep('2')+'<div style="flex:1;"><div style="font-size:14px;font-weight:600;margin-bottom:8px;">記入してアップロード'+_twBadge(up)+'</div>'+step2+'</div></div>'+
+    '<div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap;"><div style="font-size:19px;font-weight:700;">'+it.n+' '+it.name+'<span style="font-size:13px;color:'+(it.required?'#0e9077':'#7b1fa2')+';font-weight:700;margin-left:10px;">'+(it.required?'必須':'任意')+'</span></div><div style="font-size:13px;color:#1a4b8f;font-weight:700;">必須 '+reqDoneCnt+'/4 完了'+(reqDoneCnt>=4?' ✓':'')+'</div></div>'+
+    '<div style="font-size:13px;color:#888;margin:4px 0 16px;">'+it.cols+(it.dep?' ・ 先に '+it.dep+'の登録が必要':'')+'</div>'+
+    '<div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:22px;">'+_twStep('1')+'<div style="flex:1;"><div style="font-size:16px;font-weight:700;margin-bottom:16px;">テンプレートをダウンロード'+_twBadge(dl)+'</div>'+dlBtn+'</div></div>'+
+    '<div style="display:flex;align-items:flex-start;gap:12px;">'+_twStep('2')+'<div style="flex:1;"><div style="font-size:16px;font-weight:700;margin-bottom:16px;">記入してアップロード'+_twBadge(up)+'</div>'+step2+'</div></div>'+
     '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:18px;gap:8px;flex-wrap:wrap;">'+
       '<button class="btn btn-ghost" '+(tplWiz.idx===0?'disabled style="opacity:.4;"':'onclick="tplWizBack();"')+'>← 戻る</button>'+
       '<div style="display:flex;gap:8px;flex-wrap:wrap;">'+extra+primary+'</div>'+
