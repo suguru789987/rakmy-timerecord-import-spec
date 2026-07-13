@@ -1082,7 +1082,7 @@
     <div class="btn-group">
       <button class="btn btn-ghost" onclick="go('s-top')">キャンセル</button>
       <button id="tpl1-save-btn" class="btn btn-ghost setup-only-btn" style="display:none;background:#fff3e0;border:1px solid #e67e22;color:#e67e22;font-weight:700;" onclick="saveImportDraftWithItems('template')">💾 一時保存</button>
-      <button class="btn btn-primary" onclick="go('s-tpl2')">確認画面へ →</button>
+      <button id="tpl-footer-confirm" class="btn btn-primary" onclick="go('s-tpl2')">確認画面へ →</button>
     </div>
   </div>
 </div>
@@ -3899,48 +3899,68 @@ var TPL_WIZ_ITEMS = [
   { key:'employee',     n:'④', name:'従業員',   cols:'8列',                           dep:'②③ 店舗・雇用区分',      dl:'downloadEmployeeTemplate',     required:true },
   { key:'admin',        n:'⑤', name:'管理者',   cols:'4列（任意・テンプレートのみ）', dep:'② 店舗',                 dl:'downloadAdminTemplate',        required:false }
 ];
-var tplWiz = { idx:0, uploaded:{} };
+var tplWiz = { idx:0, uploaded:{}, downloaded:{} };
 function _twStep(n){ return '<span style="width:22px;height:22px;border-radius:50%;background:#eef2ff;color:#1a73e8;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0;">'+n+'</span>'; }
+function _twBadge(done){ return done ? '<span style="margin-left:8px;font-size:10px;color:#0e9077;background:#e8f8f3;border:1px solid #b8e6d6;border-radius:10px;padding:1px 8px;font-weight:700;">✓ 完了</span>' : '<span style="margin-left:8px;font-size:10px;color:#c0392b;background:#fdecea;border:1px solid #f5c6cb;border-radius:10px;padding:1px 8px;font-weight:700;">未</span>'; }
+function _tplItemDone(it){ return !!(tplWiz.downloaded[it.key] && tplWiz.uploaded[it.key]); }
+function _tplAllReqDone(){ return TPL_WIZ_ITEMS.filter(function(x){return x.required;}).every(_tplItemDone); }
+function _tplMaxIdx(){ for (var i=0;i<TPL_WIZ_ITEMS.length;i++){ var it=TPL_WIZ_ITEMS[i]; if (it.required && !_tplItemDone(it)) return i; } return TPL_WIZ_ITEMS.length-1; }
 function renderTplWizard() {
   var dots = document.getElementById('tpl-wiz-dots');
   var card = document.getElementById('tpl-wiz-card');
   if (!dots || !card) return;
+  var maxIdx = _tplMaxIdx();
   dots.innerHTML = TPL_WIZ_ITEMS.map(function(it, i){
-    var done = !!tplWiz.uploaded[it.key], cur = (i === tplWiz.idx);
+    var done = _tplItemDone(it), cur = (i === tplWiz.idx), reachable = (i <= maxIdx);
     var bg = done ? '#2ec4a0' : (cur ? '#1a73e8' : '#e6e6e6');
     var fg = (done || cur) ? '#fff' : '#999';
-    var circle = '<span onclick="tplWizGo('+i+')" title="'+it.name+'" style="cursor:pointer;width:24px;height:24px;border-radius:50%;background:'+bg+';color:'+fg+';display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">'+(done?'✓':it.n)+'</span>';
-    var lbl = '<span style="font-size:10px;color:'+(cur?'#1a73e8':'#999')+';font-weight:'+(cur?700:400)+';margin:0 4px;white-space:nowrap;">'+it.name+(it.required?'':'(任意)')+'</span>';
+    var circle = '<span onclick="tplWizGo('+i+')" title="'+it.name+'" style="cursor:'+(reachable?'pointer':'not-allowed')+';opacity:'+(reachable?'1':'.5')+';width:24px;height:24px;border-radius:50%;background:'+bg+';color:'+fg+';display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">'+(done?'✓':it.n)+'</span>';
+    var lbl = '<span style="font-size:10px;color:'+(cur?'#1a73e8':'#999')+';font-weight:'+(cur?700:400)+';margin:0 4px;white-space:nowrap;opacity:'+(reachable?'1':'.5')+';">'+it.name+(it.required?'':'(任意)')+'</span>';
     var line = (i < TPL_WIZ_ITEMS.length-1) ? '<span style="flex:1;height:1px;background:#e6e6e6;min-width:8px;"></span>' : '';
     return circle + lbl + line;
   }).join('');
   var it = TPL_WIZ_ITEMS[tplWiz.idx];
-  var up = !!tplWiz.uploaded[it.key];
-  var step2 = up
-    ? '<div style="display:flex;align-items:center;gap:8px;padding:12px;border:1px solid #b8e6d6;background:#f0faf6;border-radius:8px;font-size:12px;color:#0e9077;font-weight:700;">✓ '+it.key+'_data.tsv をアップロード済　<a href="#" onclick="event.preventDefault();tplWizReupload();" style="font-size:11px;color:#1a73e8;font-weight:400;">アップし直す</a></div>'
-    : '<div class="upload-box" onclick="tplWizUpload();" style="padding:20px;cursor:pointer;"><div class="ub-icon" style="font-size:24px;">📁</div><div class="ub-text" style="font-size:12px;">ファイルをドラッグ＆ドロップ / クリックで選択</div><div class="ub-hint">TSV / CSV（最大10MB）</div></div>';
-  var primary;
-  if (tplWiz.idx <= 2) primary = '<button class="btn btn-primary" onclick="tplWizNext();"'+(up?'':' style="opacity:.6;"')+'>次へ →</button>';
-  else if (tplWiz.idx === 3) primary = '<button class="btn btn-ghost" onclick="tplWizNext();">⑤ 管理者(任意)へ</button><button class="btn btn-primary" onclick="go(\'s-tpl2\');">確認画面へ →</button>';
-  else primary = '<button class="btn btn-primary" onclick="go(\'s-tpl2\');">確認画面へ →</button>';
-  var skip = (it.required && !up && tplWiz.idx < 3) ? '<button class="btn btn-ghost" onclick="tplWizNext();">後で（スキップ）</button>' : '';
+  var dl = !!tplWiz.downloaded[it.key], up = !!tplWiz.uploaded[it.key], ready = dl && up;
+  var dlBtn = '<button type="button" onclick="tplWizDL();" style="display:inline-flex;align-items:center;gap:8px;background:'+(dl?'#0e9077':'#1a73e8')+';color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 2px 6px rgba(26,115,232,.28);">⬇ '+it.name+'テンプレートをダウンロード</button>'+(dl?'<span style="margin-left:10px;font-size:11px;color:#0e9077;font-weight:700;">✓ ダウンロード済</span>':'');
+  var step2;
+  if (up) step2 = '<div style="display:flex;align-items:center;gap:8px;padding:12px;border:1px solid #b8e6d6;background:#f0faf6;border-radius:8px;font-size:12px;color:#0e9077;font-weight:700;">✓ '+it.key+'_data.tsv をアップロード済　<a href="#" onclick="event.preventDefault();tplWizReupload();" style="font-size:11px;color:#1a73e8;font-weight:400;">アップし直す</a></div>';
+  else if (!dl) step2 = '<div style="padding:18px;border:1px dashed #ddd;border-radius:8px;text-align:center;font-size:12px;color:#b0b0b0;background:#fafafa;">🔒 先に「テンプレートをダウンロード」してください</div>';
+  else step2 = '<div class="upload-box" onclick="tplWizUpload();" style="padding:20px;cursor:pointer;"><div class="ub-icon" style="font-size:24px;">📁</div><div class="ub-text" style="font-size:12px;">ファイルをドラッグ＆ドロップ / クリックで選択</div><div class="ub-hint">TSV / CSV（最大10MB）</div></div>';
+  var extra = '', primary;
+  if (tplWiz.idx <= 2) {
+    primary = '<button class="btn btn-primary" '+(ready?'onclick="tplWizNext();"':'disabled style="opacity:.45;cursor:not-allowed;"')+'>次へ →</button>';
+  } else if (tplWiz.idx === 3) {
+    extra = ready ? '<button class="btn btn-ghost" onclick="tplWizNext();">⑤ 管理者(任意)へ</button>' : '';
+    primary = '<button class="btn btn-primary" '+(_tplAllReqDone()?'onclick="go(\'s-tpl2\');"':'disabled style="opacity:.45;cursor:not-allowed;"')+'>確認画面へ →</button>';
+  } else {
+    primary = '<button class="btn btn-primary" onclick="go(\'s-tpl2\');">確認画面へ →</button>';
+  }
+  var hint = (it.required && !ready) ? '<div style="font-size:10px;color:#c0392b;margin-top:8px;text-align:right;">※ テンプレをダウンロードしてアップロードすると次へ進めます</div>' : '';
+  var reqDoneCnt = TPL_WIZ_ITEMS.filter(function(x){return x.required && _tplItemDone(x);}).length;
+  var nextTodo = !dl ? 'このテンプレートをダウンロード' : (!up ? '記入してアップロード' : (tplWiz.idx<3 ? '「次へ」で次の項目へ' : '「確認画面へ」へ進む'));
+  var summary = '<div style="background:#eef4fb;border:1px solid #cfe0f5;border-radius:8px;padding:9px 12px;margin-bottom:14px;font-size:12px;color:#1a4b8f;line-height:1.7;">📋 必須 <b>'+reqDoneCnt+'/4</b> 完了'+(reqDoneCnt<4?'（残り '+(4-reqDoneCnt)+' 項目）':'（必須すべて完了）')+'<br>👉 いまやること：<b>'+it.n+' '+it.name+'</b> の '+nextTodo+'</div>';
   card.innerHTML =
-    '<div style="font-size:15px;font-weight:700;">'+it.n+' '+it.name+'</div>'+
+    summary+
+    '<div style="font-size:15px;font-weight:700;">'+it.n+' '+it.name+'<span style="font-size:11px;color:'+(it.required?'#0e9077':'#7b1fa2')+';font-weight:700;margin-left:8px;">'+(it.required?'必須':'任意')+'</span></div>'+
     '<div style="font-size:11px;color:#888;margin:2px 0 14px;">'+it.cols+(it.dep?' ・ 先に '+it.dep+'の登録が必要':'')+'</div>'+
-    '<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:14px;">'+_twStep('1')+'<div style="flex:1;"><div style="font-size:12px;margin-bottom:6px;">テンプレートをダウンロード</div><button type="button" onclick="'+it.dl+'();" style="display:inline-flex;align-items:center;gap:8px;background:#1a73e8;color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 2px 6px rgba(26,115,232,.28);">⬇ '+it.name+'テンプレートをダウンロード</button></div></div>'+
-    '<div style="display:flex;align-items:flex-start;gap:10px;">'+_twStep('2')+'<div style="flex:1;"><div style="font-size:12px;margin-bottom:6px;">記入してアップロード</div>'+step2+'</div></div>'+
+    '<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:14px;">'+_twStep('1')+'<div style="flex:1;"><div style="font-size:12px;margin-bottom:6px;">テンプレートをダウンロード'+_twBadge(dl)+'</div>'+dlBtn+'</div></div>'+
+    '<div style="display:flex;align-items:flex-start;gap:10px;">'+_twStep('2')+'<div style="flex:1;"><div style="font-size:12px;margin-bottom:6px;">記入してアップロード'+_twBadge(up)+'</div>'+step2+'</div></div>'+
     '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:18px;gap:8px;flex-wrap:wrap;">'+
       '<button class="btn btn-ghost" '+(tplWiz.idx===0?'disabled style="opacity:.4;"':'onclick="tplWizBack();"')+'>← 戻る</button>'+
-      '<div style="display:flex;gap:8px;flex-wrap:wrap;">'+skip+primary+'</div>'+
-    '</div>';
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;">'+extra+primary+'</div>'+
+    '</div>'+hint;
+  // フッター「確認画面へ」も必須完了までは無効化
+  var fc = document.getElementById('tpl-footer-confirm');
+  if (fc){ var ok=_tplAllReqDone(); fc.disabled=!ok; fc.style.opacity=ok?'1':'.45'; fc.style.cursor=ok?'pointer':'not-allowed'; }
 }
-function tplWizGo(i){ tplWiz.idx = Math.max(0, Math.min(TPL_WIZ_ITEMS.length-1, i)); renderTplWizard(); }
-function tplWizNext(){ if (tplWiz.idx < TPL_WIZ_ITEMS.length-1) { tplWiz.idx++; renderTplWizard(); } }
+function tplWizDL(){ var it=TPL_WIZ_ITEMS[tplWiz.idx]; tplWiz.downloaded[it.key]=true; try{ if(typeof window[it.dl]==='function') window[it.dl](); }catch(e){} renderTplWizard(); }
+function tplWizGo(i){ i=Math.max(0, Math.min(i, _tplMaxIdx())); tplWiz.idx=i; renderTplWizard(); }
+function tplWizNext(){ var it=TPL_WIZ_ITEMS[tplWiz.idx]; if (it.required && !_tplItemDone(it)) return; if (tplWiz.idx < TPL_WIZ_ITEMS.length-1) { tplWiz.idx++; renderTplWizard(); } }
 function tplWizBack(){ if (tplWiz.idx > 0) { tplWiz.idx--; renderTplWizard(); } }
-function tplWizUpload(){ var it=TPL_WIZ_ITEMS[tplWiz.idx]; tplWiz.uploaded[it.key]=true; window._mockTplUploaded=true; renderTplWizard(); }
+function tplWizUpload(){ var it=TPL_WIZ_ITEMS[tplWiz.idx]; if(!tplWiz.downloaded[it.key]) return; tplWiz.uploaded[it.key]=true; window._mockTplUploaded=true; renderTplWizard(); }
 function tplWizReupload(){ var it=TPL_WIZ_ITEMS[tplWiz.idx]; tplWiz.uploaded[it.key]=false; renderTplWizard(); }
-// デモ: 全アップ済/全未アップ を切替(上部デモボタンから)
-function tplWizSetAll(v){ TPL_WIZ_ITEMS.forEach(function(it){ tplWiz.uploaded[it.key]=!!v; }); renderTplWizard(); }
+// デモ: 全アップ済/全未アップ を切替(上部デモボタンから)。DL/アップ両方を設定
+function tplWizSetAll(v){ TPL_WIZ_ITEMS.forEach(function(it){ tplWiz.downloaded[it.key]=!!v; tplWiz.uploaded[it.key]=!!v; }); renderTplWizard(); }
 
 function go(id) {
   // フォールバック: per-key single系のプレースホルダーが未レンダリングなら遅延レンダリング
