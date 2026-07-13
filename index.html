@@ -3953,7 +3953,7 @@ function renderTplWizard() {
   var hint = (it.required && !ready) ? '<div style="font-size:10px;color:#c0392b;margin-top:8px;text-align:right;">※ テンプレをダウンロードしてアップロードすると次へ進めます</div>' : '';
   var reqDoneCnt = TPL_WIZ_ITEMS.filter(function(x){return x.required && _tplItemDone(x);}).length;
   card.innerHTML =
-    '<div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap;"><div style="font-size:19px;font-weight:700;">'+it.n+' '+it.name+'<span style="font-size:13px;color:'+(it.required?'#0e9077':'#7b1fa2')+';font-weight:700;margin-left:10px;">'+(it.required?'必須':'任意')+'</span></div><div style="font-size:13px;color:#1a4b8f;font-weight:700;">必須 '+reqDoneCnt+'/4 完了'+(reqDoneCnt>=4?' ✓':'')+'</div></div>'+
+    '<div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap;"><div style="font-size:19px;font-weight:700;">'+it.name+'<span style="font-size:13px;color:'+(it.required?'#0e9077':'#7b1fa2')+';font-weight:700;margin-left:10px;">'+(it.required?'必須':'任意')+'</span></div><div style="font-size:13px;color:#1a4b8f;font-weight:700;">必須 '+reqDoneCnt+'/4 完了'+(reqDoneCnt>=4?' ✓':'')+'</div></div>'+
     '<div style="font-size:13px;color:#888;margin:4px 0 16px;">'+it.cols+(it.dep?' ・ 先に '+it.dep+'の登録が必要':'')+'</div>'+
     '<div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:22px;">'+_twStep('1')+'<div style="flex:1;"><div style="font-size:16px;font-weight:700;margin-bottom:16px;">テンプレートをダウンロード'+_twBadge(dl)+'</div>'+dlBtn+'</div></div>'+
     '<div style="display:flex;align-items:flex-start;gap:12px;">'+_twStep('2')+'<div style="flex:1;"><div style="font-size:16px;font-weight:700;margin-bottom:16px;">記入してアップロード'+_twBadge(up)+'</div>'+step2+'</div></div>'+
