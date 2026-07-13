@@ -3990,6 +3990,7 @@ function renderTplWizard() {
   // フッター「確認画面へ」も必須完了までは無効化
   var fc = document.getElementById('tpl-footer-confirm');
   if (fc){ var ok=_tplAllReqDone(); fc.disabled=!ok; fc.style.opacity=ok?'1':'.45'; fc.style.cursor=ok?'pointer':'not-allowed'; }
+  syncWizSaveButtons('tpl');
 }
 function tplWizDL(){ var it=TPL_WIZ_ITEMS[tplWiz.idx]; tplWiz.downloaded[it.key]=true; try{ if(typeof window[it.dl]==='function') window[it.dl](); }catch(e){} renderTplWizard(); }
 function tplWizGo(i){ i=Math.max(0, Math.min(i, _tplMaxIdx())); tplWiz.idx=i; renderTplWizard(); }
@@ -4072,6 +4073,7 @@ function renderSaasWizard(){
   var hint=(it.required && !ready)?'<div style="font-size:11px;color:#c0392b;margin-top:8px;text-align:right;">※ このデータをアップロードすると次へ進めます</div>':'';
   html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-top:18px;gap:8px;flex-wrap:wrap;"><button class="btn btn-ghost" '+(saasWiz.idx===0?'disabled style="opacity:.4;"':'onclick="saasWizBack();"')+'>← 戻る</button><div style="display:flex;gap:8px;flex-wrap:wrap;">'+primary+'</div></div>'+hint;
   card.innerHTML=html;
+  syncWizSaveButtons('saas');
 }
 function saasWizSyncCheck(it, on){ try{ var sel=it.chk||('[data-map="'+it.key+'"]'); var lbl=document.querySelector('#s-saas1 '+sel); if(lbl){ var cb=lbl.querySelector('input[type=checkbox]'); if(cb) cb.checked=on; lbl.classList.toggle('checked',!!on); } }catch(e){} }
 function saasWizDL(){ var it=_saasItems()[saasWiz.idx]; saasWiz.downloaded[it.key]=true; try{ if(typeof window[it.dl]==='function') window[it.dl](); }catch(e){} renderSaasWizard(); }
@@ -4081,6 +4083,31 @@ function saasWizGo(i){ i=Math.max(0,Math.min(i,_saasMaxIdx())); saasWiz.idx=i; r
 function saasWizNext(){ var it=_saasItems()[saasWiz.idx]; if(it.required && !_saasItemDone(it)) return; if(saasWiz.idx<_saasItems().length-1){saasWiz.idx++;renderSaasWizard();} }
 function saasWizBack(){ if(saasWiz.idx>0){saasWiz.idx--;renderSaasWizard();} }
 function saasWizSetAll(v){ _saasItems().forEach(function(it){ if(it.dl) saasWiz.downloaded[it.key]=!!v; saasWiz.uploaded[it.key]=!!v; saasWizSyncCheck(it,!!v); }); window._mockSaasUploaded=!!v; renderSaasWizard(); }
+
+// 新ウィザードのアップロード有無 (kind: 'tpl' | 'saas')
+function wizHasAnyUpload(kind){
+  var u = (kind==='tpl') ? (typeof tplWiz!=='undefined' && tplWiz.uploaded)
+                         : (typeof saasWiz!=='undefined' && saasWiz.uploaded);
+  if(!u) return false;
+  return Object.keys(u).some(function(k){ return !!u[k]; });
+}
+// 1件もアップロードされていない状態では「一時保存」「一時保存して中断」を押下不可にする
+// (フッターの一時保存ボタン + page-header の中断ボタンの両方を同期)
+function syncWizSaveButtons(kind){
+  var up = wizHasAnyUpload(kind);
+  // _mock*Uploaded をウィザード状態(正本)に同期し、refreshSaveButtonsState と整合
+  if(kind==='tpl') window._mockTplUploaded = up; else window._mockSaasUploaded = up;
+  var screenId = (kind==='tpl') ? 's-tpl1' : 's-saas1';
+  var footId   = (kind==='tpl') ? 'tpl1-save-btn' : 'saas1-save-btn';
+  var btns = [document.getElementById(footId), document.querySelector('#'+screenId+' .save-draft-btn')];
+  btns.forEach(function(b){ if(!b) return;
+    b.disabled = !up;
+    b.style.opacity = up ? '' : '0.4';
+    b.style.cursor  = up ? 'pointer' : 'not-allowed';
+    b.title = up ? '中断地点を保存し、後で「続きから再開」できます'
+                 : 'データを1件以上アップロードすると一時保存できます';
+  });
+}
 function showSaasDoneModal(){ var m=document.getElementById('saas-done-modal'); if(m) m.style.display='flex'; }
 function saasDoneClose(){ var m=document.getElementById('saas-done-modal'); if(m) m.style.display='none'; }
 function saasDoneGoPreview(){ saasDoneClose(); go('s-saas-preview'); }
@@ -4365,10 +4392,10 @@ function refreshSaveButtonsState() {
       if (name) checkedNames.push(name);
     });
     var checked = checkedNames.length;
-    // アップロード済みフラグ(チェックだけではボタン非アクティブ、ファイルアップ完了で有効化)
-    var uploaded = (screenId === 's-tpl1') ? !!window._mockTplUploaded : !!window._mockSaasUploaded;
-    // チェック1件以上 かつ ファイルアップ済み で アクティブ
-    var canSave = (checked > 0) && uploaded;
+    // 新ウィザードでは legacy チェックボックスは非表示のため、判定はウィザードのアップロード有無で行う
+    // (未アップロード=一時保存/中断ボタンを押下不可)
+    var uploaded = wizHasAnyUpload(screenId === 's-tpl1' ? 'tpl' : 'saas');
+    var canSave = uploaded;
     var btnIds = (screenId === 's-tpl1') ? ['tpl1-save-btn'] : ['saas1-save-btn'];
     var headerBtn = document.querySelector('#' + screenId + ' .save-draft-btn');
     var btns = btnIds.map(function(id) { return document.getElementById(id); });
@@ -4386,7 +4413,7 @@ function refreshSaveButtonsState() {
     var statusId = (screenId === 's-tpl1') ? 'tpl-saved-status' : 'saas-saved-status';
     var statusEl = document.getElementById(statusId);
     if (statusEl) {
-      statusEl.style.display = canSave ? '' : 'none';
+      statusEl.style.display = (canSave && checked > 0) ? '' : 'none';
       var countEl = statusEl.querySelector('.saved-status-count');
       if (countEl) countEl.textContent = checked;
       var listEl = statusEl.querySelector('.saved-status-list');

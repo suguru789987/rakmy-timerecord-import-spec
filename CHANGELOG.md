@@ -5,6 +5,15 @@
 
 ---
 
+## 2026-07-13
+
+### Fixed
+- **未アップロード時は「一時保存」「一時保存して中断」を押下不可に**（テンプレ／外部勤怠サービス両ウィザード s-tpl1 / s-saas1）。
+  - 判定を新ウィザードのアップロード有無（`wizHasAnyUpload`）に一本化。`syncWizSaveButtons()` を `renderTplWizard()`/`renderSaasWizard()` 末尾で呼び、フッターの一時保存ボタン＋page-header の中断ボタンを同期。
+  - 旧 `refreshSaveButtonsState` は legacy チェックボックス（ウィザードでは非表示）で判定しており、フッターだけ有効化される不整合があったのを是正。1件でもアップロードすると両ボタン有効化。
+
+---
+
 ## 2026-06-24
 
 ### Changed（owner-mock 決定 #13/#17 に追従）
