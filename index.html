@@ -1084,7 +1084,7 @@
     <div class="btn-group">
       <button class="btn btn-ghost" onclick="go('s-top')">キャンセル</button>
       <button id="tpl1-save-btn" class="btn btn-ghost setup-only-btn" style="display:none;background:#fff3e0;border:1px solid #e67e22;color:#e67e22;font-weight:700;" onclick="saveImportDraftWithItems('template')">💾 一時保存</button>
-      <button id="tpl-footer-confirm" class="btn btn-primary" onclick="go('s-tpl2')">確認画面へ →</button>
+      <!-- 「確認画面へ →」はウィザードカード側(各項目のフッター)に一本化。重複を避けるためフッターからは撤去。 -->
     </div>
   </div>
 </div>
@@ -1099,6 +1099,19 @@
       <button class="btn btn-primary" style="width:100%;font-size:14px;padding:13px;" onclick="tplDoneGoConfirm();">→ このまま確認画面へ進む</button>
       <button class="btn btn-ghost" style="width:100%;font-size:14px;padding:13px;border:1px solid #b39ddb;color:#7b1fa2;font-weight:700;" onclick="tplDoneGoAdmin();">⑤ 管理者(任意)も取り込む</button>
       <button style="background:none;border:none;color:#999;font-size:12px;cursor:pointer;margin-top:2px;" onclick="tplDoneClose();">このまま編集を続ける</button>
+    </div>
+  </div>
+</div>
+
+<!-- 完了モーダル(B): 必須+任意(管理者)まですべてアップロード完了 -->
+<div id="tpl-admin-done-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:3000;justify-content:center;align-items:center;padding:20px;">
+  <div style="background:#fff;border-radius:14px;max-width:460px;width:100%;padding:28px 30px;box-shadow:0 20px 60px rgba(0,0,0,.25);text-align:center;">
+    <div style="font-size:44px;margin-bottom:8px;">✅</div>
+    <div style="font-size:18px;font-weight:700;margin-bottom:10px;">必須＋任意データのアップロードが完了しました</div>
+    <div style="font-size:13px;color:#666;line-height:1.8;margin-bottom:24px;">必須4項目に加え、任意の「⑤ 管理者」もアップロードできました。<br>このまま確認画面へ進んで取り込みを実行してください。<br><span style="font-size:11px;color:#999;">※ 実際の取り込み（登録）は確認画面で実行し、完了画面に結果が表示されます。</span></div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <button class="btn btn-primary" style="width:100%;font-size:14px;padding:13px;" onclick="tplAdminDoneGoConfirm();">→ このまま確認画面へ進む</button>
+      <button style="background:none;border:none;color:#999;font-size:12px;cursor:pointer;margin-top:2px;" onclick="tplAdminDoneClose();">このまま編集を続ける</button>
     </div>
   </div>
 </div>
@@ -4003,20 +4016,31 @@ function renderTplWizard() {
       '<button class="btn btn-ghost" '+(tplWiz.idx===0?'disabled style="opacity:.4;"':'onclick="tplWizBack();"')+'>← 戻る</button>'+
       '<div style="display:flex;gap:8px;flex-wrap:wrap;">'+extra+primary+'</div>'+
     '</div>'+hint;
-  // フッター「確認画面へ」も必須完了までは無効化
-  var fc = document.getElementById('tpl-footer-confirm');
-  if (fc){ var ok=_tplAllReqDone(); fc.disabled=!ok; fc.style.opacity=ok?'1':'.45'; fc.style.cursor=ok?'pointer':'not-allowed'; }
+  // (フッターの「確認画面へ」ボタンは撤去済み。確認導線はカード内 primary + 完了モーダルに一本化)
   syncWizSaveButtons('tpl');
 }
 function tplWizDL(){ var it=TPL_WIZ_ITEMS[tplWiz.idx]; tplWiz.downloaded[it.key]=true; try{ if(typeof window[it.dl]==='function') window[it.dl](); }catch(e){} renderTplWizard(); }
 function tplWizGo(i){ i=Math.max(0, Math.min(i, _tplMaxIdx())); tplWiz.idx=i; renderTplWizard(); }
 function tplWizNext(){ var it=TPL_WIZ_ITEMS[tplWiz.idx]; if (it.required && !_tplItemDone(it)) return; if (tplWiz.idx < TPL_WIZ_ITEMS.length-1) { tplWiz.idx++; renderTplWizard(); } }
 function tplWizBack(){ if (tplWiz.idx > 0) { tplWiz.idx--; renderTplWizard(); } }
-function tplWizUpload(){ var it=TPL_WIZ_ITEMS[tplWiz.idx]; if(!tplWiz.downloaded[it.key]) return; tplWiz.uploaded[it.key]=true; window._mockTplUploaded=true; renderTplWizard(); if (_tplAllReqDone() && !tplWiz._doneShown){ tplWiz._doneShown=true; showTplDoneModal(); } }
+function tplWizUpload(){
+  var it=TPL_WIZ_ITEMS[tplWiz.idx];
+  if(!tplWiz.downloaded[it.key]) return;
+  tplWiz.uploaded[it.key]=true; window._mockTplUploaded=true;
+  renderTplWizard();
+  // ⑤管理者(任意)のアップ完了 → 必須+任意 完了モーダル(B)
+  if (it.key==='admin' && !tplWiz._adminDoneShown){ tplWiz._adminDoneShown=true; showTplAdminDoneModal(); return; }
+  // 必須4項目のアップ完了 → 必須完了モーダル(A)
+  if (_tplAllReqDone() && !tplWiz._doneShown){ tplWiz._doneShown=true; showTplDoneModal(); }
+}
 function showTplDoneModal(){ var m=document.getElementById('tpl-done-modal'); if(m) m.style.display='flex'; }
 function tplDoneClose(){ var m=document.getElementById('tpl-done-modal'); if(m) m.style.display='none'; }
 function tplDoneGoAdmin(){ tplDoneClose(); tplWiz.idx=4; renderTplWizard(); }
 function tplDoneGoConfirm(){ tplDoneClose(); go('s-tpl2'); }
+// 必須+任意(管理者) 完了モーダル(B)
+function showTplAdminDoneModal(){ var m=document.getElementById('tpl-admin-done-modal'); if(m) m.style.display='flex'; }
+function tplAdminDoneClose(){ var m=document.getElementById('tpl-admin-done-modal'); if(m) m.style.display='none'; }
+function tplAdminDoneGoConfirm(){ tplAdminDoneClose(); go('s-tpl2'); }
 
 /* ============================================================ */
 /* 外部勤怠サービス取込ウィザード (サービス別・1項目ずつ)       */
