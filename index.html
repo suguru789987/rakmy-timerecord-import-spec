@@ -4103,19 +4103,32 @@ function renderSaasWizard(){
   else step2='<div class="upload-box" onclick="saasWizUpload();" style="padding:26px;cursor:pointer;"><div class="ub-icon" style="font-size:30px;">📁</div><div class="ub-text" style="font-size:15px;">ファイルをドラッグ＆ドロップ / クリックで選択</div><div class="ub-hint" style="font-size:12px;">CSV / TSV（最大10MB）</div></div>';
   html+='<div style="display:flex;align-items:flex-start;gap:12px;">'+_twStep(''+stepNum)+'<div style="flex:1;"><div style="font-size:16px;font-weight:700;margin-bottom:16px;">アップロード'+_twBadge(up)+'</div>'+step2+'</div></div>';
   // 取り込み中データ一覧: 何がアップ済みかを明示(SaaSは必須/任意が混在するため、完了モーダルの代わりに常時表示)
-  var upCnt=items.filter(function(x){return !!saasWiz.uploaded[x.key];}).length;
-  var rows=items.map(function(x,xi){
-    var d=!!saasWiz.uploaded[x.key];
-    var fn=x.key.replace(/^map-/,'').replace(/-/g,'_')+(x.dl?'_data.tsv':'_export.csv');
-    var right=d?('📄 '+fn):(x.required?'未アップ（必須）':'未アップ（任意）');
-    return '<div style="display:flex;align-items:center;gap:10px;padding:9px 14px;border-top:1px solid #f0f0f0;font-size:12px;background:'+(xi===saasWiz.idx?'#f7fbff':'#fff')+';">'
-      +'<span style="width:16px;text-align:center;color:'+(d?'#2ec4a0':'#ccc')+';font-weight:700;">'+(d?'✓':'○')+'</span>'
-      +'<span style="flex:1;color:'+(d?'#222':'#888')+';">'+x.name+' <span style="font-size:10px;color:'+x.bc+';font-weight:700;">'+x.badge+'</span></span>'
-      +'<span style="font-size:11px;color:'+(d?'#0e9077':'#bbb')+';font-weight:'+(d?600:400)+';white-space:nowrap;">'+right+'</span></div>';
-  }).join('');
+  // 取り込むデータ一覧: 全項目を常時並べるのではなく「アップ済み(=取り込み対象)」を育てて明示。
+  // 未アップの必須だけは見落とし防止に警告表示、残りの任意は件数のみ案内。
+  var uploadedItems=items.filter(function(x){return !!saasWiz.uploaded[x.key];});
+  var missingReq=items.filter(function(x){return x.required && !saasWiz.uploaded[x.key];});
+  var remainingOpt=items.filter(function(x){return !x.required && !saasWiz.uploaded[x.key];}).length;
+  var listHtml;
+  if(uploadedItems.length){
+    listHtml=uploadedItems.map(function(x){
+      var fn=x.key.replace(/^map-/,'').replace(/-/g,'_')+(x.dl?'_data.tsv':'_export.csv');
+      return '<div style="display:flex;align-items:center;gap:10px;padding:11px 14px;border-top:1px solid #eef4f0;font-size:13px;">'
+        +'<span style="color:#2ec4a0;font-weight:700;">✓</span>'
+        +'<span style="flex:1;color:#222;font-weight:600;">'+x.name+' <span style="font-size:10px;color:'+x.bc+';font-weight:700;">'+x.badge+'</span></span>'
+        +'<span style="font-size:12px;color:#0e9077;font-weight:600;white-space:nowrap;">📄 '+fn+'</span></div>';
+    }).join('');
+  } else {
+    listHtml='<div style="padding:18px 14px;font-size:12px;color:#aaa;text-align:center;">まだアップロードされていません。<br>アップロードした項目がここに「取り込み対象」として表示されます。</div>';
+  }
+  var noteHtml='';
+  if(missingReq.length){
+    noteHtml='<div style="padding:10px 14px;background:#fff8e1;border-top:1px solid #ffe0a3;font-size:11px;color:#b26a00;font-weight:600;">⚠ 未アップの必須データ: '+missingReq.map(function(x){return x.name;}).join('、')+'（アップすると取り込み対象になります）</div>';
+  } else if(remainingOpt>0){
+    noteHtml='<div style="padding:10px 14px;border-top:1px solid #eef;font-size:11px;color:#999;">＋ 任意データを追加で '+remainingOpt+' 件アップロードできます（未アップでも次へ進めます）</div>';
+  }
   html+='<div style="border:1px solid #e0e0e0;border-radius:8px;margin-top:20px;overflow:hidden;">'
-    +'<div style="padding:9px 14px;background:#f8f9fa;font-size:12px;font-weight:700;color:#555;">📋 取り込み中のデータ一覧 <span style="color:#0e9077;">（アップ済 '+upCnt+' / 全 '+items.length+'）</span><span style="font-size:10px;color:#999;font-weight:400;margin-left:8px;">※ アップ済みのデータが取り込み対象です</span></div>'
-    +rows+'</div>';
+    +'<div style="padding:10px 14px;background:#f0faf6;font-size:12px;font-weight:700;color:#0e9077;">✅ 取り込むデータ（アップ済 '+uploadedItems.length+' 件）<span style="font-size:10px;color:#888;font-weight:400;margin-left:8px;">※ アップ済みのデータが取り込み対象です</span></div>'
+    +listHtml+noteHtml+'</div>';
   var lastIdx=items.length-1;
   var allDone=items.every(_saasItemDone);
   // カードの「次へ」は "次のアップロード項目へ進む" 用途に限定(未完了かつ最終でないときのみ表示)。
