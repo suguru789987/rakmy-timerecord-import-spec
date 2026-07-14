@@ -172,12 +172,12 @@
   .alert-err { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
 
   /* Result */
-  .result-center { text-align: center; padding: 40px 20px; }
-  .result-center .r-icon { font-size: 56px; margin-bottom: 12px; }
-  .result-center h2 { font-size: 18px; margin-bottom: 6px; }
-  .result-center p { font-size: 13px; color: #888; margin-bottom: 20px; }
-  .result-detail { background: #f8f8f8; border-radius: 10px; padding: 16px 20px; max-width: 360px; margin: 0 auto 20px; text-align: left; }
-  .rd-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; }
+  .result-center { text-align: center; padding: 48px 24px; max-width: 680px; margin: 0 auto; }
+  .result-center .r-icon { font-size: 64px; margin-bottom: 14px; }
+  .result-center h2 { font-size: 24px; margin-bottom: 8px; }
+  .result-center p { font-size: 15px; color: #888; margin-bottom: 26px; }
+  .result-detail { background: #f8f8f8; border-radius: 10px; padding: 20px 26px; max-width: none; margin: 0 auto 22px; text-align: left; }
+  .rd-row { display: flex; justify-content: space-between; padding: 9px 0; font-size: 14px; }
   .rd-row + .rd-row { border-top: 1px solid #eee; }
   .rd-val { font-weight: 600; }
   .rd-green { color: #2ec4a0; }
@@ -1093,8 +1093,8 @@
 <div id="tpl-done-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:3000;justify-content:center;align-items:center;padding:20px;">
   <div style="background:#fff;border-radius:14px;max-width:460px;width:100%;padding:28px 30px;box-shadow:0 20px 60px rgba(0,0,0,.25);text-align:center;">
     <div style="font-size:44px;margin-bottom:8px;">✅</div>
-    <div style="font-size:18px;font-weight:700;margin-bottom:10px;">必須4項目の取り込みが完了しました</div>
-    <div style="font-size:13px;color:#666;line-height:1.8;margin-bottom:24px;">続けて任意の「⑤ 管理者」も取り込みますか？<br>不要ならこのまま確認画面へ進めます（管理者は後からでも追加できます）。</div>
+    <div style="font-size:18px;font-weight:700;margin-bottom:10px;">必須4項目のアップロードが完了しました</div>
+    <div style="font-size:13px;color:#666;line-height:1.8;margin-bottom:24px;">続けて任意の「⑤ 管理者」もアップロードしますか？<br>不要ならこのまま確認画面へ進めます（管理者は後からでも追加できます）。<br><span style="font-size:11px;color:#999;">※ 実際の取り込み（登録）は確認画面で実行し、完了画面に結果が表示されます。</span></div>
     <div style="display:flex;flex-direction:column;gap:10px;">
       <button class="btn btn-primary" style="width:100%;font-size:14px;padding:13px;" onclick="tplDoneGoConfirm();">→ このまま確認画面へ進む</button>
       <button class="btn btn-ghost" style="width:100%;font-size:14px;padding:13px;border:1px solid #b39ddb;color:#7b1fa2;font-weight:700;" onclick="tplDoneGoAdmin();">⑤ 管理者(任意)も取り込む</button>
@@ -1648,8 +1648,8 @@
 <div id="saas-done-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:3000;justify-content:center;align-items:center;padding:20px;">
   <div style="background:#fff;border-radius:14px;max-width:460px;width:100%;padding:28px 30px;box-shadow:0 20px 60px rgba(0,0,0,.25);text-align:center;">
     <div style="font-size:44px;margin-bottom:8px;">✅</div>
-    <div style="font-size:18px;font-weight:700;margin-bottom:10px;">必須データの取り込みが完了しました</div>
-    <div style="font-size:13px;color:#666;line-height:1.8;margin-bottom:24px;">続けて任意データも取り込めます。<br>不要ならこのままプレビュー・確認へ進めます（任意データは後からでも追加できます）。</div>
+    <div style="font-size:18px;font-weight:700;margin-bottom:10px;">必須データのアップロードが完了しました</div>
+    <div style="font-size:13px;color:#666;line-height:1.8;margin-bottom:24px;">続けて任意データもアップロードできます。<br>不要ならこのままプレビュー・確認へ進めます（任意データは後からでも追加できます）。<br><span style="font-size:11px;color:#999;">※ 実際の取り込み（登録）はプレビュー・確認画面で実行し、完了画面に結果が表示されます。</span></div>
     <div style="display:flex;flex-direction:column;gap:10px;">
       <button class="btn btn-primary" style="width:100%;font-size:14px;padding:13px;" onclick="saasDoneGoPreview();">→ このままプレビュー・確認へ</button>
       <button class="btn btn-ghost" style="width:100%;font-size:14px;padding:13px;border:1px solid #e67e22;color:#e67e22;font-weight:700;" onclick="saasDoneClose();">任意データも続けて取り込む</button>
