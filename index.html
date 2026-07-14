@@ -1085,7 +1085,8 @@
     <div class="btn-group">
       <button class="btn btn-ghost" onclick="go('s-top')">キャンセル</button>
       <button id="tpl1-save-btn" class="btn btn-ghost setup-only-btn" style="display:none;background:#fff3e0;border:1px solid #e67e22;color:#e67e22;font-weight:700;" onclick="saveImportDraftWithItems('template')">💾 一時保存</button>
-      <!-- 「確認画面へ →」はウィザードカード側(各項目のフッター)に一本化。重複を避けるためフッターからは撤去。 -->
+      <!-- 確認画面への遷移はこのフッターの「確認画面へ →」に一本化(カード内の確認ボタンは撤去)。必須4項目アップ完了で活性化。 -->
+      <button id="tpl-footer-confirm" class="btn btn-primary" onclick="go('s-tpl2')">確認画面へ →</button>
     </div>
   </div>
 </div>
@@ -3987,16 +3988,21 @@ function renderTplWizard() {
   if (up) step2 = '<div style="display:flex;align-items:center;gap:8px;padding:14px;border:1px solid #b8e6d6;background:#f0faf6;border-radius:8px;font-size:15px;color:#0e9077;font-weight:700;">📄 '+it.key+'_data.tsv<button type="button" onclick="tplWizReupload();" style="margin-left:auto;display:inline-flex;align-items:center;gap:5px;font-size:12px;padding:6px 14px;border:1px solid #bbb;border-radius:6px;background:#fff;color:#444;cursor:pointer;font-weight:600;">🔄 アップし直す</button></div>';
   else if (!dl) step2 = '<div style="padding:18px;border:1px dashed #ddd;border-radius:8px;text-align:center;font-size:12px;color:#b0b0b0;background:#fafafa;">🔒 先に「テンプレートをダウンロード」してください</div>';
   else step2 = '<div class="upload-box" onclick="tplWizUpload();" style="padding:26px;cursor:pointer;"><div class="ub-icon" style="font-size:30px;">📁</div><div class="ub-text" style="font-size:15px;">ファイルをドラッグ＆ドロップ / クリックで選択</div><div class="ub-hint" style="font-size:12px;">TSV / CSV（最大10MB）</div></div>';
-  var extra = '', primary;
-  if (tplWiz.idx <= 2) {
+  // カードの「次へ」は "次のアップロード項目へ進む" 用途のみ(未完了かつ最終項目でないとき)。
+  // 確認画面への遷移は枠外(フッター)の「確認画面へ →」に一本化。全アップロード完了時はカードの次へは出さない
+  // (戻る・ステップ項目直接クリックは可能)。
+  var lastIdx = TPL_WIZ_ITEMS.length-1;
+  var allDone = TPL_WIZ_ITEMS.every(_tplItemDone);
+  var extra = '', primary = '';
+  if (!allDone && tplWiz.idx < lastIdx) {
     primary = '<button class="btn btn-primary" '+(ready?'onclick="tplWizNext();"':'disabled style="opacity:.45;cursor:not-allowed;"')+'>次へ →</button>';
-  } else if (tplWiz.idx === 3) {
-    extra = ready ? '<button class="btn btn-ghost" onclick="tplWizNext();">⑤ 管理者(任意)へ</button>' : '';
-    primary = '<button class="btn btn-primary" '+(_tplAllReqDone()?'onclick="go(\'s-tpl2\');"':'disabled style="opacity:.45;cursor:not-allowed;"')+'>確認画面へ →</button>';
-  } else {
-    primary = '<button class="btn btn-primary" onclick="go(\'s-tpl2\');">確認画面へ →</button>';
   }
-  var hint = (it.required && !ready) ? '<div style="font-size:10px;color:#c0392b;margin-top:8px;text-align:right;">※ テンプレをダウンロードしてアップロードすると次へ進めます</div>' : '';
+  var hint;
+  if (allDone) {
+    hint = '<div style="font-size:12px;color:#0e9077;margin-top:8px;text-align:right;font-weight:600;">✓ すべてアップロード済み — 下部の「確認画面へ →」で進めます</div>';
+  } else {
+    hint = (it.required && !ready) ? '<div style="font-size:10px;color:#c0392b;margin-top:8px;text-align:right;">※ テンプレをダウンロードしてアップロードすると次へ進めます</div>' : '';
+  }
   var reqDoneCnt = TPL_WIZ_ITEMS.filter(function(x){return x.required && _tplItemDone(x);}).length;
   card.innerHTML =
     '<div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap;"><div style="font-size:19px;font-weight:700;">'+it.name+'<span style="font-size:13px;color:'+(it.required?'#0e9077':'#7b1fa2')+';font-weight:700;margin-left:10px;">'+(it.required?'必須':'任意')+'</span></div><div style="font-size:13px;color:#1a4b8f;font-weight:700;">必須 '+reqDoneCnt+'/4 完了'+(reqDoneCnt>=4?' ✓':'')+'</div></div>'+
@@ -4007,7 +4013,9 @@ function renderTplWizard() {
       '<button class="btn btn-ghost" '+(tplWiz.idx===0?'disabled style="opacity:.4;"':'onclick="tplWizBack();"')+'>← 戻る</button>'+
       '<div style="display:flex;gap:8px;flex-wrap:wrap;">'+extra+primary+'</div>'+
     '</div>'+hint;
-  // (フッターの「確認画面へ」ボタンは撤去済み。確認導線はカード内 primary + 完了モーダルに一本化)
+  // 確認画面への遷移は枠外(フッター)の「確認画面へ →」に一本化。必須4項目アップ完了で活性化。
+  var fc = document.getElementById('tpl-footer-confirm');
+  if (fc){ var okc=_tplAllReqDone(); fc.disabled=!okc; fc.style.opacity=okc?'1':'.5'; fc.style.cursor=okc?'pointer':'not-allowed'; fc.title=okc?'':'必須4項目をアップロードすると確認画面へ進めます'; }
   syncWizSaveButtons('tpl');
 }
 function tplWizDL(){ var it=TPL_WIZ_ITEMS[tplWiz.idx]; tplWiz.downloaded[it.key]=true; try{ if(typeof window[it.dl]==='function') window[it.dl](); }catch(e){} renderTplWizard(); }
@@ -4108,16 +4116,26 @@ function renderSaasWizard(){
   html+='<div style="border:1px solid #e0e0e0;border-radius:8px;margin-top:20px;overflow:hidden;">'
     +'<div style="padding:9px 14px;background:#f8f9fa;font-size:12px;font-weight:700;color:#555;">📋 取り込み中のデータ一覧 <span style="color:#0e9077;">（アップ済 '+upCnt+' / 全 '+items.length+'）</span><span style="font-size:10px;color:#999;font-weight:400;margin-left:8px;">※ アップ済みのデータが取り込み対象です</span></div>'
     +rows+'</div>';
-  var last=(saasWiz.idx===items.length-1);
-  var primary;
-  if (!last){
+  var lastIdx=items.length-1;
+  var allDone=items.every(_saasItemDone);
+  // カードの「次へ」は "次のアップロード項目へ進む" 用途に限定(未完了かつ最終でないときのみ表示)。
+  // 確認画面への遷移は枠外(フッター)の「次へ: プレビュー →」に一本化。
+  // 全アップロード完了時はカードの次へは出さない(戻る/ステップ直接クリックは可能)。
+  var primary='';
+  if (!allDone && saasWiz.idx<lastIdx){
     primary='<button class="btn btn-primary" '+((it.required && !ready)?'disabled style="opacity:.45;cursor:not-allowed;"':'onclick="saasWizNext();"')+'>次へ →</button>';
-  } else {
-    primary='<button class="btn btn-primary" '+(_saasAllReqDone()?'onclick="go(\'s-saas-preview\');"':'disabled style="opacity:.45;cursor:not-allowed;"')+'>次へ: プレビュー →</button>';
   }
-  var hint=(it.required && !ready)?'<div style="font-size:11px;color:#c0392b;margin-top:8px;text-align:right;">※ このデータをアップロードすると次へ進めます</div>':'';
+  var hint;
+  if (allDone){
+    hint='<div style="font-size:12px;color:#0e9077;margin-top:8px;text-align:right;font-weight:600;">✓ すべてアップロード済み — 下部の「次へ: プレビュー →」で確認画面へ進めます</div>';
+  } else {
+    hint=(it.required && !ready)?'<div style="font-size:11px;color:#c0392b;margin-top:8px;text-align:right;">※ このデータをアップロードすると次へ進めます</div>':'';
+  }
   html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-top:18px;gap:8px;flex-wrap:wrap;"><button class="btn btn-ghost" '+(saasWiz.idx===0?'disabled style="opacity:.4;"':'onclick="saasWizBack();"')+'>← 戻る</button><div style="display:flex;gap:8px;flex-wrap:wrap;">'+primary+'</div></div>'+hint;
   card.innerHTML=html;
+  // フッター「次へ: プレビュー →」を必須完了で活性化(確認画面への遷移はこのボタンに一本化)
+  var nb=document.getElementById('saas-next-btn');
+  if(nb){ var okp=_saasAllReqDone(); nb.disabled=!okp; nb.style.opacity=okp?'':'.5'; nb.style.cursor=okp?'':'not-allowed'; nb.title=okp?'':'必須データをアップロードすると確認画面へ進めます'; }
   syncWizSaveButtons('saas');
 }
 function saasWizSyncCheck(it, on){ try{ var sel=it.chk||('[data-map="'+it.key+'"]'); var lbl=document.querySelector('#s-saas1 '+sel); if(lbl){ var cb=lbl.querySelector('input[type=checkbox]'); if(cb) cb.checked=on; lbl.classList.toggle('checked',!!on); } }catch(e){} }
