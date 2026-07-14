@@ -2555,7 +2555,7 @@ function snapshotTplState() {
   var requiredKeys = ['businesstype','store','emptype','employee'];
   var allReq = requiredKeys.every(function(k) { return itemsCompleted.indexOf(k) >= 0; });
   var label = allReq
-    ? '✓ 必須項目すべて完了(登録前準備完了)'
+    ? '必須ファイルをすべてアップ済み（本取り込み前）'
     : '① 取り込みデータ選択(' + itemsCompleted.length + '項目完了)';
   return {
     type: 'template',
@@ -2592,7 +2592,7 @@ function snapshotSaasState() {
   var requiredKeys = ['map-kot-emp','map-jc-staff','map-other'];
   var allReq = requiredKeys.some(function(k) { return itemsCompleted.indexOf(k) >= 0; });
   var label = allReq
-    ? '✓ 必須項目すべて完了(登録前準備完了)'
+    ? '必須ファイルをすべてアップ済み（本取り込み前）'
     : '① 取り込みデータ選択(' + itemsCompleted.length + '項目完了)';
   return {
     type: 'saas',
@@ -5678,12 +5678,20 @@ function showFromSetupBanner(kind) {
 // 初期セットアップに戻る: タブクローズ or 初期セットアップURLへ
 function bGoBackToSetupGuide() {
   var guideUrl = 'https://suguru789987.github.io/rakmy-owner-registration-mock/#b0';
-  try { window.close(); } catch (e) {}
-  setTimeout(function() {
-    if (!window.closed) {
-      window.location.href = guideUrl;
+  // 初期セットアップ(親タブ)から window.open で開かれている場合:
+  // 親タブを初期セットアップ(#b0)へ切り替えて前面化し、この取り込みタブを閉じる。
+  // (owner-mock と import-spec は同一オリジンのため opener 経由で操作可能)
+  try {
+    if (window.opener && !window.opener.closed) {
+      try { window.opener.location.href = guideUrl; }
+      catch (e) { try { window.opener.location.hash = '#b0'; } catch (_e) {} }
+      try { window.opener.focus(); } catch (e) {}
+      window.close();
+      return;
     }
-  }, 100);
+  } catch (e) {}
+  // 単独タブ(直接URLアクセス/デモ)で開いている場合: この画面を初期セットアップへ遷移。
+  window.location.href = guideUrl;
 }
 
 /* ============================================================
@@ -6012,7 +6020,7 @@ function saveImportDraftWithItems(type) {
     return;
   }
   var total = (type === 'template') ? 4 : 5;
-  // 必須項目すべて完了かを判定 → 「登録前準備完了」表記
+  // 必須ファイルのアップ有無を判定 →「アップ済み（本取り込み前）」表記(完了とは書かない)
   var requiredKeys;
   if (type === 'template') {
     requiredKeys = ['businesstype', 'store', 'emptype', 'employee'];
@@ -6024,7 +6032,7 @@ function saveImportDraftWithItems(type) {
     ? requiredKeys.every(function(k) { return itemsCompleted.indexOf(k) >= 0; })
     : requiredKeys.some(function(k) { return itemsCompleted.indexOf(k) >= 0; });
   var labelText = allRequiredDone
-    ? '✓ 必須項目すべて完了(登録前準備完了)'
+    ? '必須ファイルをすべてアップ済み（本取り込み前）'
     : '取り込みデータ選択(' + itemsCompleted.length + '項目完了)';
   var info = {
     type: type,
