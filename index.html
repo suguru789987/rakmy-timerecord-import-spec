@@ -4089,19 +4089,27 @@ function renderSaasWizard(){
   var reqCnt=items.filter(function(x){return x.required;}).length;
   var reqDone=items.filter(function(x){return x.required && _saasItemDone(x);}).length;
   var html='<div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap;"><div style="font-size:19px;font-weight:700;">'+it.name+'<span style="font-size:13px;color:'+it.bc+';font-weight:700;margin-left:10px;">'+it.badge+'</span></div>'+(reqCnt?'<div style="font-size:13px;color:#1a4b8f;font-weight:700;">必須 '+reqDone+'/'+reqCnt+' 完了</div>':'')+'</div>';
-  if (it.hint) html+='<div style="font-size:13px;color:#888;margin:4px 0 16px;">'+it.hint+'</div>';
-  var stepNum=1;
-  if (hasDl){
-    var dlBtn='<button type="button" onclick="saasWizDL();" style="display:inline-flex;align-items:center;gap:8px;background:'+(dl?'#5b8def':'#1a73e8')+';color:#fff;border:none;border-radius:8px;padding:13px 26px;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 2px 6px rgba(26,115,232,.22);">⬇ '+it.name+'テンプレートをダウンロード'+(dl?'（再取得）':'')+'</button>';
-    html+='<div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:22px;">'+_twStep('1')+'<div style="flex:1;"><div style="font-size:16px;font-weight:700;margin-bottom:16px;">テンプレートをダウンロード'+_twBadge(dl)+'</div>'+dlBtn+'</div></div>';
-    stepNum=2;
+  var allDone=items.every(_saasItemDone);
+  var lastIdx=items.length-1;
+  if (allDone){
+    // 全アップロード完了 → このスライドは「完了」表示に畳む(個別のDL/アップUIは出さない)。
+    // 確認画面への遷移は下部フッターの「確認画面へ →」のみ(スライド内には置かない)。
+    html+='<div style="display:flex;align-items:center;gap:14px;padding:18px 22px;border:1px solid #b8e6d6;background:#f0faf6;border-radius:10px;"><div style="font-size:30px;">✅</div><div style="font-size:16px;font-weight:700;color:#0e9077;">すべてのデータをアップロード完了</div></div>';
+  } else {
+    if (it.hint) html+='<div style="font-size:13px;color:#888;margin:4px 0 16px;">'+it.hint+'</div>';
+    var stepNum=1;
+    if (hasDl){
+      var dlBtn='<button type="button" onclick="saasWizDL();" style="display:inline-flex;align-items:center;gap:8px;background:'+(dl?'#5b8def':'#1a73e8')+';color:#fff;border:none;border-radius:8px;padding:13px 26px;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 2px 6px rgba(26,115,232,.22);">⬇ '+it.name+'テンプレートをダウンロード'+(dl?'（再取得）':'')+'</button>';
+      html+='<div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:22px;">'+_twStep('1')+'<div style="flex:1;"><div style="font-size:16px;font-weight:700;margin-bottom:16px;">テンプレートをダウンロード'+_twBadge(dl)+'</div>'+dlBtn+'</div></div>';
+      stepNum=2;
+    }
+    var lockUpload = hasDl && !dl;
+    var step2;
+    if (up) step2='<div style="display:flex;align-items:center;gap:8px;padding:14px;border:1px solid #b8e6d6;background:#f0faf6;border-radius:8px;font-size:15px;color:#0e9077;font-weight:700;">📄 '+it.key.replace(/^map-/,'').replace(/-/g,'_')+'_export.csv<button type="button" onclick="saasWizReupload();" style="margin-left:auto;display:inline-flex;align-items:center;gap:5px;font-size:12px;padding:6px 14px;border:1px solid #bbb;border-radius:6px;background:#fff;color:#444;cursor:pointer;font-weight:600;">🔄 アップし直す</button></div>';
+    else if (lockUpload) step2='<div style="padding:18px;border:1px dashed #ddd;border-radius:8px;text-align:center;font-size:14px;color:#b0b0b0;background:#fafafa;">🔒 先に「テンプレートをダウンロード」してください</div>';
+    else step2='<div class="upload-box" onclick="saasWizUpload();" style="padding:26px;cursor:pointer;"><div class="ub-icon" style="font-size:30px;">📁</div><div class="ub-text" style="font-size:15px;">ファイルをドラッグ＆ドロップ / クリックで選択</div><div class="ub-hint" style="font-size:12px;">CSV / TSV（最大10MB）</div></div>';
+    html+='<div style="display:flex;align-items:flex-start;gap:12px;">'+_twStep(''+stepNum)+'<div style="flex:1;"><div style="font-size:16px;font-weight:700;margin-bottom:16px;">アップロード'+_twBadge(up)+'</div>'+step2+'</div></div>';
   }
-  var lockUpload = hasDl && !dl;
-  var step2;
-  if (up) step2='<div style="display:flex;align-items:center;gap:8px;padding:14px;border:1px solid #b8e6d6;background:#f0faf6;border-radius:8px;font-size:15px;color:#0e9077;font-weight:700;">📄 '+it.key.replace(/^map-/,'').replace(/-/g,'_')+'_export.csv<button type="button" onclick="saasWizReupload();" style="margin-left:auto;display:inline-flex;align-items:center;gap:5px;font-size:12px;padding:6px 14px;border:1px solid #bbb;border-radius:6px;background:#fff;color:#444;cursor:pointer;font-weight:600;">🔄 アップし直す</button></div>';
-  else if (lockUpload) step2='<div style="padding:18px;border:1px dashed #ddd;border-radius:8px;text-align:center;font-size:14px;color:#b0b0b0;background:#fafafa;">🔒 先に「テンプレートをダウンロード」してください</div>';
-  else step2='<div class="upload-box" onclick="saasWizUpload();" style="padding:26px;cursor:pointer;"><div class="ub-icon" style="font-size:30px;">📁</div><div class="ub-text" style="font-size:15px;">ファイルをドラッグ＆ドロップ / クリックで選択</div><div class="ub-hint" style="font-size:12px;">CSV / TSV（最大10MB）</div></div>';
-  html+='<div style="display:flex;align-items:flex-start;gap:12px;">'+_twStep(''+stepNum)+'<div style="flex:1;"><div style="font-size:16px;font-weight:700;margin-bottom:16px;">アップロード'+_twBadge(up)+'</div>'+step2+'</div></div>';
   // 取り込み中データ一覧: 何がアップ済みかを明示(SaaSは必須/任意が混在するため、完了モーダルの代わりに常時表示)
   // 取り込み対象サマリ(=アップ済み)。当ステップの「アップロード」操作より控えめな“従”の見た目にし、競合させない。
   // 0件時は1行に圧縮。未アップの必須のみ小さく赤字で注意。
@@ -4129,21 +4137,14 @@ function renderSaasWizard(){
       +(missingReq.length?'　<span style="color:#c0392b;">必須「'+missNames+'」が未アップ</span>':'')
       +'</div>';
   }
-  var lastIdx=items.length-1;
-  var allDone=items.every(_saasItemDone);
   // カードの「次へ」は "次のアップロード項目へ進む" 用途に限定(未完了かつ最終でないときのみ表示)。
-  // 確認画面への遷移は枠外(フッター)の「確認画面へ →」に一本化。
-  // 全アップロード完了時はカードの次へは出さない(戻る/ステップ直接クリックは可能)。
+  // 確認画面への遷移は枠外(フッター)の「確認画面へ →」に一本化(全完了時もスライド内には置かない)。
   var primary='';
   if (!allDone && saasWiz.idx<lastIdx){
     primary='<button class="btn btn-primary" '+((it.required && !ready)?'disabled style="opacity:.45;cursor:not-allowed;"':'onclick="saasWizNext();"')+'>次へ →</button>';
   }
-  var hint;
-  if (allDone){
-    hint='<div style="font-size:12px;color:#0e9077;margin-top:8px;text-align:right;font-weight:600;">✓ すべてアップロード済み</div>';
-  } else {
-    hint=(it.required && !ready)?'<div style="font-size:11px;color:#c0392b;margin-top:8px;text-align:right;">※ このデータをアップロードすると次へ進めます</div>':'';
-  }
+  // allDone 時は上部の完了バナーが状態を示すため、下部の重複ヒントは出さない。
+  var hint = (!allDone && it.required && !ready) ? '<div style="font-size:11px;color:#c0392b;margin-top:8px;text-align:right;">※ このデータをアップロードすると次へ進めます</div>' : '';
   html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-top:18px;gap:8px;flex-wrap:wrap;"><button class="btn btn-ghost" '+(saasWiz.idx===0?'disabled style="opacity:.4;"':'onclick="saasWizBack();"')+'>← 戻る</button><div style="display:flex;gap:8px;flex-wrap:wrap;">'+primary+'</div></div>'+hint;
   card.innerHTML=html;
   // フッター「確認画面へ →」を必須完了で活性化(確認画面への遷移はこのボタンに一本化)
