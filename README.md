@@ -380,6 +380,8 @@ Step 3: 完了
 ### 5.1 サイドバー
 
 「エクスポート」の下に「インポート」メニューを追加。**左ナビ「インポート」＝運用インポートのハブ**（`s-top`）に遷移。
+- owner-mock（本アプリ）側の全運用サイドバーにも「⬆ インポート」を追加し、import-spec の運用ハブ（`s-top`）へ遷移。
+- import-spec のサイドバー設定リンク（従業員/店舗情報/…）は owner-mock の該当運用設定画面（`#*-ops-settings` 等）へ配線。
 
 ### 5.2 インポートトップ画面（＝運用インポートのハブ）※2026-07-16 刷新
 
@@ -402,7 +404,26 @@ Step 3: 完了
 | フロー | 入口 | URLシグナル | 実画面 |
 |---|---|---|---|
 | 初期（一括） | b0「CSVで一括インポート」 | ハッシュ `#tpl-setup`/`#saas-setup` | `s-tpl1`/`s-saas1` |
-| 運用（単体） | 左ナビ「インポート」→TOPの種別カード ／ 各運用設定画面の「📥 CSVインポート」 | クエリ `?type=X&mode=tpl\|saas`（設定画面起点）／ TOPは `go('s-*-single-X')` | `s-tpl-single-X`/`s-saas-single-X` |
+| 運用（単体） | 左ナビ「インポート」→TOPの種別カード ／ 各運用設定画面の「📥 CSVインポート」 | クエリ `?type=X&mode=tpl\|saas(&src=kot\|jobcan\|other)`（設定画面起点）／ TOPは `go('s-*-single-X')` | `s-tpl-single-X`/`s-saas-single-X` |
+
+### 5.3 設定画面起点のインポート（📥 CSVインポート）と 戻り先の出し分け ※2026-07-16
+
+**設定画面の「📥 CSVインポート」モーダル**（owner-mock 側）
+- **既定ビュー**：初期設定のインポート方式（`localStorage` `hub_import_method`/`hub_saas_service` を同一オリジンで共有）を1行表示「インポート方式：📄 テンプレート／🔄 外部勤怠サービス: {サービス名}」＋**「次へ」**で該当画面へ。毎回は選ばせない。
+- **右上「⚙ インポート方式を再設定」**：テンプレ/外部勤怠の2カードで選び直し（初期設定を上書き）。
+- 「次へ」→ import-spec を `?type=X&mode=Y`（外部勤怠は `&src=kot|jobcan|other` で連携元を引き継ぎ）で開く。
+
+**単体取込画面（`s-{tpl|saas}-single-X`）の整理**
+- 連携元サービスは**再選択させず**、素の1行「**設定済み：{サービス名}**」で表示（TOP/初期設定で選択済み）。
+- 番号付き作業ステップ（連携元→アップロード→…のプログレスバー・各カードの連番）は撤去。実作業は**アップロードのみ**。
+
+**戻り先の出し分け（`_singleEntryFrom`）**
+| 入場経路 | アップロード画面「閉じる」 | 完了画面の戻る |
+|---|---|---|
+| TOPインポート（運用ハブ）＝`hub` | TOP（`s-top`）へ | 「← インポートTOPに戻る」→ `s-top` |
+| 設定画面の📥＝`settings`（`?type=&mode=`） | 元の設定画面へ（`returnToSourceSettingByKey`） | 「← 設定画面に戻る」→ 設定画面（`returnToSourceSetting`） |
+
+- 実装：`singleClose` / `singleCompleteReturn` / `updateSingleCompleteReturn`。`_singleEntryFrom` は hub 入場（`hubGoEntity`）で `hub`、`?type=&mode=` 入場（`initFromUrl`）で `settings`。
 
 ---
 
