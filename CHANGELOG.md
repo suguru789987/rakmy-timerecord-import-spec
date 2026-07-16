@@ -7,8 +7,11 @@
 
 ## 2026-07-16
 
-### Fixed（単体取込画面の「閉じる」戻り先を入場経路で出し分け）
-- **入場経路で戻り先を分岐**（`singleClose`/`_singleEntryFrom`）：インポートTOP（運用ハブ）経由なら**TOP（`s-top`）へ戻る**、設定画面の「📥 CSVインポート」経由（`?type=&mode=`）なら**元の設定画面へ戻る**（`returnToSourceSettingByKey`）。従来は常に owner-mock 設定画面へ飛び、ハブ経由でも違う画面へ遷移していた不具合を是正。
+### Fixed（単体取込フローの戻り先を入場経路で全面出し分け）
+- **入場経路で戻り先を分岐**（`_singleEntryFrom`＝`hub`/`settings`）：
+  - アップロード画面の**「閉じる」**（`singleClose`）：ハブ経由→**TOP（`s-top`）**、設定画面の📥経由（`?type=&mode=`）→**元の設定画面**（`returnToSourceSettingByKey`）。
+  - **完了画面の戻る**（`singleCompleteReturn`＋`updateSingleCompleteReturn`）：ハブ経由→ボタン「**← インポートTOPに戻る**」で `s-top`、設定画面経由→「**← 設定画面に戻る**」で `returnToSourceSetting`。ガイド文も経路で出し分け。
+  - 従来は常に owner-mock 設定画面へ飛び、ハブ経由でも違う画面へ遷移していた不具合を是正。
 
 ### Changed（単体取込画面の作業ステップ表記を撤去＝旧仕様の整理）
 - **番号付きプログレスバー（連携元→アップロード→プレビュー→完了）を撤去**：運用の単体取込は連携元・取込対象が確定済みで実作業はアップロードのみのため、連番の作業ステップ表示をやめた。
