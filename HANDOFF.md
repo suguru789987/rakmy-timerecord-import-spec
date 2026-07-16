@@ -1,6 +1,7 @@
 # エンジニア共有ノート（タイムレコード import-spec）
 
-> 2026-07-13 更新。本リポは **CSV 取込フローの仕様／モック**。全体の入口・正本は owner-mock 側。
+> 2026-07-16 更新。本リポは **CSV 取込フローの仕様／モック**。全体の入口・正本は owner-mock 側。
+> 最新の要点＝運用インポートの入口分離（初期=b0一括／運用=左ナビ「インポート」ハブ）、方式のグローバル設定＋再設定、戻り先の入場経路出し分け。詳細は §1（2026-07-16）と README §5。
 
 ## 0. まず読む順番
 1. **owner-mock / HANDOFF.md**（全体の入口）… タイムレコード全体の最新状態
@@ -12,6 +13,14 @@
 > 矛盾時の優先：UI/挙動は **コード(index.html) を正**、データ項目（CSV列・型・必須）は **本リポのテンプレTSV を正**。
 
 ## 1. 直近の主要変更
+
+### 2026-07-16（運用インポートの入口・方式・戻り先を整理）※最新
+- **初期(一括)と運用(単体)の入口分離**：初期一括(`s-tpl1`/`s-saas1`)は b0 の `#tpl-setup`/`#saas-setup` 専用。**左ナビ「インポート」=運用ハブ(`s-top`)**。owner-mock 全運用サイドバーにも「インポート」追加。
+- **運用ハブ(`s-top`)**：種別カード×5 →「取り込み →」で単体取込。インポート方式は**初期設定で決めるグローバル設定**（`localStorage` `hub_import_method`/`hub_saas_service`）で毎回選ばせず、**右上「⚙ インポート方式を再設定」**でのみ変更。外部勤怠は**連携元サービス選択スライド**（KoT/JC/その他）を追加し「外部勤怠サービス: ○○」と明示。関数：`hubReconfig`/`hubSetMethod`/`hubSetService`/`hubGoEntity`/`updateHubMethodStatus`。
+- **設定画面起点モーダル(owner-mock)**：初期設定方式を既定表示＋「次へ」、右上「再設定」。外部勤怠は `?src=` で連携元を引き継ぎ（import-spec `initFromUrl` が読取り→`_activeSaasSource`）。
+- **単体画面の整理**：連携元は読み取り1行「設定済み：○○」、番号付き作業ステップ撤去（プレビュー/完了/マッピングの進捗バーからも連携元ステップ削除）。
+- **戻り先の出し分け**：`_singleEntryFrom`（hub/settings）で `singleClose`/`singleCompleteReturn` が分岐。hub→TOP、settings→設定画面。回帰済み。
+- 反映：README §5.1/§5.2/§5.3、詳細は `CHANGELOG.md` / `JUDGMENT_LOG.md`（2026-07-16 #21〜#24）。
 
 ### 2026-07-13（外部勤怠サービス取込 s-saas1 UI 刷新）
 - **連携元サービス選択でスライド**：ピッカー（KoT/JC/その他）を選ぶと退場し、サービス別ウィザードへスライド（`saasSyncSlideView` / `saasPickerConfirmed` / `saasSetWizLabel`）。「連携元サービスを変更」で戻る。
