@@ -411,7 +411,7 @@
       </div>
     </div>
 
-    <div class="history-section">
+    <div class="history-section" id="hub-history">
       <div class="history-title">最近のインポート</div>
       <div class="history-list">
         <div class="history-row">
@@ -4280,6 +4280,7 @@ function _hubShow(view){
   if(status) status.style.display=(view==='list')?'':'none';
   if(method) method.style.display=(view==='method')?'block':'none';
   if(service) service.style.display=(view==='service')?'block':'none';
+  var hist=document.getElementById('hub-history'); if(hist) hist.style.display=(view==='list')?'':'none'; // 最近のインポートは一覧のみ
   var anim=(view==='service')?service:((view==='method')?method:null);
   if(anim){ anim.style.animation='none'; void anim.offsetWidth; anim.style.animation='saasWizIn .22s ease'; }
 }
