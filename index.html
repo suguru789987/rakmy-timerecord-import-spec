@@ -2739,7 +2739,7 @@ var _activeSingleSaasKey = null;
 // SaaS 連携元サービス (キングオブタイム=kot / ジョブカン=jobcan)
 // upload画面 / マッピング画面 / 保存一覧画面 で連動
 var _activeSaasSource = 'kot';
-var SAAS_SOURCE_LABEL = { kot: 'キングオブタイム', jobcan: 'ジョブカン' };
+var SAAS_SOURCE_LABEL = { kot: 'キングオブタイム', jobcan: 'ジョブカン', other: 'その他' };
 
 // 連携元サービスを選択 (3画面連動)
 function selectSaasSource(key, src) {
@@ -2890,8 +2890,11 @@ futureBanner +
 '    <div class="fs-line"></div>' +
 '    <div class="fs"><span class="fs-num">4</span><span class="fs-label">完了</span></div>' +
 '  </div>' +
-'  <div class="wcard">' +
-'    <div class="wcard-title"><span class="num">1</span> 連携元サービスを選択</div>' +
+'  <div class="wcard" id="saas-src-wcard-' + k + '">' +
+'    <div class="wcard-title"><span class="num">1</span> <span id="saas-src-title-' + k + '">連携元サービスを選択</span></div>' +
+'    <div id="saas-src-ro-' + k + '" style="display:none;align-items:center;gap:12px;padding:14px 16px;background:#f0faf6;border:1px solid #b8e6d6;border-radius:8px;">' +
+'      <span style="font-size:20px;">🔄</span><div><div style="font-size:10px;color:#888;">インポートTOPで選択済み（変更はTOPの「インポート方式を再設定」から）</div><div id="saas-src-ro-name-' + k + '" style="font-size:15px;font-weight:700;color:#0e9077;margin-top:2px;">キングオブタイム</div></div>' +
+'    </div>' +
 '    <div style="display:flex;gap:10px;flex-wrap:wrap;" id="saas-src-cards-' + k + '">' +
 '      <div class="saas-src-card" data-src="kot" onclick="selectSaasSource(\'' + k + '\',\'kot\')" style="flex:1;min-width:160px;padding:14px;border:2px solid #2ec4a0;border-radius:8px;cursor:pointer;text-align:center;background:#f0faf6;">' +
 '        <div style="font-size:24px;">⏰</div><div style="font-size:13px;font-weight:700;color:#0e9077;">キングオブタイム</div>' +
@@ -3326,6 +3329,15 @@ function applyToSingleScreen(screenId) {
     var multi2  = document.getElementById('single-saas-' + key + '-mode-multi');
     if (simple2) simple2.style.display = '';
     if (multi2)  multi2.style.display  = 'none';
+    // 連携元サービスはインポートTOPで選択済み → ここでは再選択させず読み取り専用表示にする
+    var srcCards = document.getElementById('saas-src-cards-' + key);
+    var srcRo    = document.getElementById('saas-src-ro-' + key);
+    var srcRoNm  = document.getElementById('saas-src-ro-name-' + key);
+    var srcTitle = document.getElementById('saas-src-title-' + key);
+    if (srcCards) srcCards.style.display = 'none';
+    if (srcRo)    srcRo.style.display = 'flex';
+    if (srcRoNm)  srcRoNm.textContent = (SAAS_SOURCE_LABEL[_activeSaasSource] || _activeSaasSource || 'キングオブタイム');
+    if (srcTitle) srcTitle.textContent = '連携元サービス（設定済み）';
     var originMap = getSaasMapKey(key);
     document.querySelectorAll('#s-saas-single-' + key + ' .single-check[data-map]').forEach(function(lbl) {
       var cb = lbl.querySelector('input[type=checkbox]');
@@ -4269,8 +4281,11 @@ function updateHubMethodStatus(){
 }
 // 種別クリック → 現在方式の単体取込画面へ(方式は選ばせない)
 function hubGoEntity(key){
-  if(_hubMethod==='saas'){ try{ if(typeof _activeSaasSource!=='undefined') _activeSaasSource=_hubSaasService; }catch(e){} go('s-saas-single-'+key); }
-  else go('s-tpl-single-'+key);
+  if(_hubMethod==='saas'){
+    // ハブの連携元(kot/jc/other) → 単体画面の src 表記(kot/jobcan/other)へマッピング
+    try{ _activeSaasSource = (_hubSaasService==='jc'?'jobcan':(_hubSaasService==='other'?'other':'kot')); }catch(e){}
+    go('s-saas-single-'+key);
+  } else go('s-tpl-single-'+key);
 }
 // ビュー切替(list / method / service)
 function _hubShow(view){
