@@ -2892,9 +2892,7 @@ futureBanner +
 '  </div>' +
 '  <div class="wcard" id="saas-src-wcard-' + k + '">' +
 '    <div class="wcard-title"><span class="num">1</span> <span id="saas-src-title-' + k + '">連携元サービスを選択</span></div>' +
-'    <div id="saas-src-ro-' + k + '" style="display:none;align-items:center;gap:12px;padding:14px 16px;background:#f0faf6;border:1px solid #b8e6d6;border-radius:8px;">' +
-'      <span style="font-size:20px;">🔄</span><div><div style="font-size:10px;color:#888;">インポートTOPで選択済み（変更はTOPの「インポート方式を再設定」から）</div><div id="saas-src-ro-name-' + k + '" style="font-size:15px;font-weight:700;color:#0e9077;margin-top:2px;">キングオブタイム</div></div>' +
-'    </div>' +
+'    <div id="saas-src-ro-' + k + '" style="display:none;font-size:13px;color:#555;">設定済み：<strong id="saas-src-ro-name-' + k + '" style="color:#0e9077;font-size:14px;">キングオブタイム</strong><span style="font-size:11px;color:#aaa;margin-left:8px;">（変更はTOPの「インポート方式を再設定」から）</span></div>' +
 '    <div style="display:flex;gap:10px;flex-wrap:wrap;" id="saas-src-cards-' + k + '">' +
 '      <div class="saas-src-card" data-src="kot" onclick="selectSaasSource(\'' + k + '\',\'kot\')" style="flex:1;min-width:160px;padding:14px;border:2px solid #2ec4a0;border-radius:8px;cursor:pointer;text-align:center;background:#f0faf6;">' +
 '        <div style="font-size:24px;">⏰</div><div style="font-size:13px;font-weight:700;color:#0e9077;">キングオブタイム</div>' +
@@ -3329,15 +3327,23 @@ function applyToSingleScreen(screenId) {
     var multi2  = document.getElementById('single-saas-' + key + '-mode-multi');
     if (simple2) simple2.style.display = '';
     if (multi2)  multi2.style.display  = 'none';
-    // 連携元サービスはインポートTOPで選択済み → ここでは再選択させず読み取り専用表示にする
+    // 連携元サービスはインポートTOPで選択済み → 再選択させず、番号・ステップ枠なしの素の1行で表示
     var srcCards = document.getElementById('saas-src-cards-' + key);
     var srcRo    = document.getElementById('saas-src-ro-' + key);
     var srcRoNm  = document.getElementById('saas-src-ro-name-' + key);
-    var srcTitle = document.getElementById('saas-src-title-' + key);
+    var srcWcard = document.getElementById('saas-src-wcard-' + key);
     if (srcCards) srcCards.style.display = 'none';
-    if (srcRo)    srcRo.style.display = 'flex';
+    if (srcRo)    srcRo.style.display = '';
     if (srcRoNm)  srcRoNm.textContent = (SAAS_SOURCE_LABEL[_activeSaasSource] || _activeSaasSource || 'キングオブタイム');
-    if (srcTitle) srcTitle.textContent = '連携元サービス（設定済み）';
+    if (srcWcard) {
+      // 「作業ステップ風」のカード枠と番号タイトルをやめて素の行にする
+      srcWcard.style.background = 'transparent';
+      srcWcard.style.border = 'none';
+      srcWcard.style.padding = '0';
+      srcWcard.style.marginBottom = '10px';
+      var t = srcWcard.querySelector('.wcard-title');
+      if (t) t.style.display = 'none';
+    }
     var originMap = getSaasMapKey(key);
     document.querySelectorAll('#s-saas-single-' + key + ' .single-check[data-map]').forEach(function(lbl) {
       var cb = lbl.querySelector('input[type=checkbox]');
