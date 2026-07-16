@@ -382,6 +382,35 @@
       </div>
     </div>
 
+    <!-- 方式=外部勤怠 のとき: 連携元サービス選択スライド(初期セットアップと同方式) -->
+    <div id="hub-service-view" style="display:none;margin-bottom:24px;">
+      <div style="font-size:16px;font-weight:700;margin-bottom:6px;">🔄 連携元サービスを選択</div>
+      <div style="font-size:12px;color:#888;margin-bottom:14px;">外部勤怠サービスから取り込む際の連携元を選びます。</div>
+      <div class="import-cards">
+        <div class="import-card" id="hub-scard-kot" onclick="hubSetService('kot')">
+          <div class="saas-logo kot" style="width:44px;height:44px;font-size:13px;">KoT</div>
+          <h3>キングオブタイム</h3>
+          <p>KoT のエクスポートCSVを列マッピングして取り込み。</p>
+          <div class="ic-arrow">→</div>
+        </div>
+        <div class="import-card" id="hub-scard-jc" onclick="hubSetService('jc')">
+          <div class="saas-logo jc" style="width:44px;height:44px;font-size:13px;">JC</div>
+          <h3>ジョブカン</h3>
+          <p>ジョブカン のエクスポートCSVを列マッピングして取り込み。</p>
+          <div class="ic-arrow">→</div>
+        </div>
+        <div class="import-card" id="hub-scard-other" onclick="hubSetService('other')">
+          <div class="saas-logo" style="width:44px;height:44px;font-size:22px;background:#999;">+</div>
+          <h3>その他</h3>
+          <p>別サービスは営業／カスタマーサポートへお問い合わせください。</p>
+          <div class="ic-arrow">→</div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:flex-start;margin-top:16px;">
+        <button class="btn btn-ghost" onclick="hubBackToMethod()">← 方式選択へ戻る</button>
+      </div>
+    </div>
+
     <div class="history-section">
       <div class="history-title">最近のインポート</div>
       <div class="history-list">
@@ -4217,47 +4246,61 @@ function tplWizSetAll(v){ TPL_WIZ_ITEMS.forEach(function(it){ tplWiz.downloaded[
 // ===== 運用インポートハブ =====
 // インポート方式(テンプレ/外部勤怠)は「初期設定で決定済み」のグローバル設定。毎回は選ばせない。
 // 変更したいときだけ右上「インポート方式を再設定」で選び直す。
-var _hubMethod = 'tpl'; // 'tpl' | 'saas' (初期設定で決定済みの想定・既定=テンプレ)
-try { var _hm=localStorage.getItem('hub_import_method'); if(_hm==='tpl'||_hm==='saas') _hubMethod=_hm; } catch(e){}
-var HUB_METHOD_META = {
-  tpl:  { icon:'📄', name:'テンプレートで取り込み', short:'テンプレート' },
-  saas: { icon:'🔄', name:'外部勤怠サービスから取り込み', short:'外部勤怠サービス' }
-};
-// 現在方式の表示 + 種別ボタンのラベルを更新
+var _hubMethod = 'tpl';      // 'tpl' | 'saas' (初期設定で決定済みの想定・既定=テンプレ)
+var _hubSaasService = 'kot'; // 'kot' | 'jc' | 'other' (外部勤怠時の連携元)
+try {
+  var _hm=localStorage.getItem('hub_import_method'); if(_hm==='tpl'||_hm==='saas') _hubMethod=_hm;
+  var _hs=localStorage.getItem('hub_saas_service'); if(_hs==='kot'||_hs==='jc'||_hs==='other') _hubSaasService=_hs;
+} catch(e){}
+var HUB_SAAS_META = { kot:{name:'キングオブタイム'}, jc:{name:'ジョブカン'}, other:{name:'その他'} };
+// 現在方式の表示 + 種別ボタンのラベル + 各スライドの選択中ハイライトを更新
 function updateHubMethodStatus(){
-  var m=HUB_METHOD_META[_hubMethod]||HUB_METHOD_META.tpl;
-  var cur=document.getElementById('hub-cur-method'); if(cur) cur.textContent=m.icon+' '+m.short;
-  document.querySelectorAll('#hub-list-view .hub-go-label').forEach(function(el){ el.textContent=m.icon+' 取り込み →'; });
-  // 再設定スライドの選択中ハイライト
+  var cur=document.getElementById('hub-cur-method');
+  if(cur){
+    cur.textContent = (_hubMethod==='saas')
+      ? '🔄 外部勤怠サービス: '+((HUB_SAAS_META[_hubSaasService]||{}).name||'')
+      : '📄 テンプレート';
+  }
+  document.querySelectorAll('#hub-list-view .hub-go-label').forEach(function(el){ el.textContent=(_hubMethod==='saas'?'🔄':'📄')+' 取り込み →'; });
   var ct=document.getElementById('hub-mcard-tpl'), cs=document.getElementById('hub-mcard-saas');
   if(ct) ct.classList.toggle('sel', _hubMethod==='tpl');
   if(cs) cs.classList.toggle('sel', _hubMethod==='saas');
+  ['kot','jc','other'].forEach(function(s){ var el=document.getElementById('hub-scard-'+s); if(el) el.classList.toggle('sel', _hubSaasService===s); });
 }
 // 種別クリック → 現在方式の単体取込画面へ(方式は選ばせない)
-function hubGoEntity(key){ go('s-'+(_hubMethod==='saas'?'saas':'tpl')+'-single-'+key); }
+function hubGoEntity(key){
+  if(_hubMethod==='saas'){ try{ if(typeof _activeSaasSource!=='undefined') _activeSaasSource=_hubSaasService; }catch(e){} go('s-saas-single-'+key); }
+  else go('s-tpl-single-'+key);
+}
+// ビュー切替(list / method / service)
+function _hubShow(view){
+  var list=document.getElementById('hub-list-view'), status=document.getElementById('hub-method-status'),
+      method=document.getElementById('hub-method-view'), service=document.getElementById('hub-service-view');
+  if(list) list.style.display=(view==='list')?'grid':'none';
+  if(status) status.style.display=(view==='list')?'':'none';
+  if(method) method.style.display=(view==='method')?'block':'none';
+  if(service) service.style.display=(view==='service')?'block':'none';
+  var anim=(view==='service')?service:((view==='method')?method:null);
+  if(anim){ anim.style.animation='none'; void anim.offsetWidth; anim.style.animation='saasWizIn .22s ease'; }
+}
 // 右上「インポート方式を再設定」→ 方式選択スライドへ
-function hubReconfig(){
-  updateHubMethodStatus();
-  var list=document.getElementById('hub-list-view'), method=document.getElementById('hub-method-view'), status=document.getElementById('hub-method-status');
-  if(list) list.style.display='none';
-  if(status) status.style.display='none';
-  if(method){ method.style.display='block'; method.style.animation='none'; void method.offsetWidth; method.style.animation='saasWizIn .22s ease'; }
-}
-// 方式を確定 → グローバル設定を更新し、種別一覧へ戻る
+function hubReconfig(){ updateHubMethodStatus(); _hubShow('method'); }
+// 方式選択: テンプレ=確定して一覧へ / 外部勤怠=連携元サービス選択スライドへ(1枚増やす)
 function hubSetMethod(m){
-  _hubMethod=(m==='saas')?'saas':'tpl';
-  try{ localStorage.setItem('hub_import_method', _hubMethod); }catch(e){}
-  updateHubMethodStatus();
-  hubBack();
+  if(m==='saas'){ updateHubMethodStatus(); _hubShow('service'); return; }
+  _hubMethod='tpl'; try{ localStorage.setItem('hub_import_method','tpl'); }catch(e){}
+  updateHubMethodStatus(); hubBack();
 }
+// 連携元サービス確定 → 外部勤怠方式として確定し一覧へ
+function hubSetService(svc){
+  _hubMethod='saas'; _hubSaasService=(svc==='jc'?'jc':(svc==='other'?'other':'kot'));
+  try{ localStorage.setItem('hub_import_method','saas'); localStorage.setItem('hub_saas_service',_hubSaasService); }catch(e){}
+  updateHubMethodStatus(); hubBack();
+}
+// サービス選択から方式選択へ戻る
+function hubBackToMethod(){ _hubShow('method'); }
 // 種別一覧に戻る
-function hubBack(){
-  var list=document.getElementById('hub-list-view'), method=document.getElementById('hub-method-view'), status=document.getElementById('hub-method-status');
-  if(method) method.style.display='none';
-  if(status) status.style.display='';
-  if(list) list.style.display='grid';
-  updateHubMethodStatus();
-}
+function hubBack(){ _hubShow('list'); updateHubMethodStatus(); }
 
 function go(id) {
   // フォールバック: per-key single系のプレースホルダーが未レンダリングなら遅延レンダリング
