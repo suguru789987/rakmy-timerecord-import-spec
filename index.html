@@ -3994,6 +3994,9 @@ function returnToSourceSetting() {
         var tplKeys  = ['businesstype','store','emptype','employee','admin'];
         var saasKeys = ['businesstype','store','emptype','employee','admin'];
         var goto_    = params.get('goto');
+        // 設定画面経由でも初期設定の連携元サービスを引き継ぐ (?src=kot|jobcan|other)
+        var srcParam = params.get('src');
+        if (srcParam && (srcParam==='kot'||srcParam==='jobcan'||srcParam==='other')) { try{ _activeSaasSource = srcParam; }catch(e){} }
         // ?goto=mapping&mode=saas → 直接 マッピング設定画面 へ (one-shot: 直後に URL から goto を消す)
         if (goto_ === 'mapping' && mode === 'saas' && saasKeys.indexOf(type) !== -1) {
           if (typeof go === 'function') go('s-saas-mapping-single-' + type);
