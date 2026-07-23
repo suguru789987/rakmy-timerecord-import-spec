@@ -663,21 +663,22 @@
     <div id="tpl2single-sec-admin" class="tpl2single-sec" style="display:none;">
       <div class="pv-summary">
         <div class="pv-box pv-total"><div class="num">3</div><div class="lbl">データ行数</div></div>
-        <div class="pv-box" style="background:#e8f8f5;border:1px solid #b8e6d6;color:#0e9077;border-radius:6px;padding:8px 12px;text-align:center;min-width:80px;"><div class="num" style="font-size:18px;font-weight:700;">2</div><div class="lbl" style="font-size:10px;">🆕 新規</div></div>
-        <div class="pv-box" style="background:#ede7f6;border:1px solid #c5b6e1;color:#5c4dac;border-radius:6px;padding:8px 12px;text-align:center;min-width:80px;"><div class="num" style="font-size:18px;font-weight:700;">1</div><div class="lbl" style="font-size:10px;">👥 既存</div></div>
-        <div class="pv-box pv-err"><div class="num">0</div><div class="lbl">エラー</div></div>
+        <div class="pv-box" style="background:#e8f8f5;border:1px solid #b8e6d6;color:#0e9077;border-radius:6px;padding:8px 12px;text-align:center;min-width:80px;"><div class="num" style="font-size:18px;font-weight:700;">2</div><div class="lbl" style="font-size:10px;">🆕 新規登録</div></div>
+        <div class="pv-box" style="background:#ede7f6;border:1px solid #c5b6e1;color:#5c4dac;border-radius:6px;padding:8px 12px;text-align:center;min-width:80px;"><div class="num" style="font-size:18px;font-weight:700;">1</div><div class="lbl" style="font-size:10px;">👥 権限付与</div></div>
+        <div class="pv-box" style="background:#f5f5f5;border:1px solid #e0e0e0;color:#888888;border-radius:6px;padding:8px 12px;text-align:center;min-width:80px;"><div class="num" style="font-size:18px;font-weight:700;">0</div><div class="lbl" style="font-size:10px;">⏭ スキップ</div></div>
+        <div class="pv-box pv-err"><div class="num">0</div><div class="lbl">❌ エラー</div></div>
       </div>
       <div class="wcard" style="padding:0;overflow-x:auto;">
         <table class="pv-table">
-          <thead><tr><th>行</th><th>判定</th><th>名前</th><th>メール</th><th>店舗</th><th>送信メール</th></tr></thead>
+          <thead><tr><th>行</th><th>判定</th><th>名前</th><th>メール</th><th>店舗</th><th>送信メール</th><th>状況詳細</th></tr></thead>
           <tbody>
-            <tr><td>2</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#0e9077;background:#e8f8f5;border:1px solid #b8e6d6;">🆕 新規登録</span></td><td>山本 健一</td><td>yamamoto@example.jp</td><td>渋谷店</td><td style="font-size:11px;color:#555;">招待メール(新規版)</td></tr>
-            <tr><td>3</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#0e9077;background:#e8f8f5;border:1px solid #b8e6d6;">🆕 新規登録</span></td><td>佐藤 一郎</td><td>sato@example.jp</td><td>新宿店</td><td style="font-size:11px;color:#555;">招待メール(新規版)</td></tr>
-            <tr><td>4</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#5c4dac;background:#ede7f6;border:1px solid #c5b6e1;">👥 既存登録</span></td><td>test</td><td>test@example.com</td><td>渋谷店</td><td style="font-size:11px;color:#555;">通知メール(既存登録版)</td></tr>
+            <tr><td>2</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#0e9077;background:#e8f8f5;border:1px solid #b8e6d6;">🆕 新規登録</span></td><td>山本 健一</td><td>yamamoto@example.jp</td><td>渋谷店</td><td style="font-size:11px;color:#555;">招待メール(新規版)</td><td style="font-size:11px;color:#0e9077;">会社内に未登録のため新規作成し、管理者権限を付与</td></tr>
+            <tr><td>3</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#0e9077;background:#e8f8f5;border:1px solid #b8e6d6;">🆕 新規登録</span></td><td>佐藤 一郎</td><td>sato@example.jp</td><td>新宿店</td><td style="font-size:11px;color:#555;">招待メール(新規版)</td><td style="font-size:11px;color:#0e9077;">会社内に未登録のため新規作成し、管理者権限を付与</td></tr>
+            <tr><td>4</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#5c4dac;background:#ede7f6;border:1px solid #c5b6e1;">👥 権限付与</span></td><td>test</td><td>test@example.com</td><td>渋谷店</td><td style="font-size:11px;color:#555;">管理者権限付与のお知らせ</td><td style="font-size:11px;color:#5c4dac;">既存従業員 (招待承諾済み) に管理者権限を追加</td></tr>
           </tbody>
         </table>
       </div>
-      <div style="margin-top:6px;font-size:10px;color:#888;padding:0 4px;">※ 管理者データは <code style="background:#f5f5f5;padding:1px 4px;border-radius:3px;">resolveAdminRegistrationType()</code> で 4分岐自動判定。</div>
+      <div style="margin-top:6px;font-size:10px;color:#888;padding:0 4px;">※ 管理者データには「重複時の処理」設定は適用されません (メールアドレスの登録状況に応じて自動判定します)。</div>
     </div>
 
     <div class="wcard" style="margin-top:14px;">
@@ -899,9 +900,11 @@
     <div id="saas3single-sec-admin" class="saas3single-sec" style="display:none;">
       <div class="pv-summary">
         <div class="pv-box pv-total"><div class="num">6</div><div class="lbl">データ行数</div></div>
-        <div class="pv-box pv-new"><div class="num">2</div><div class="lbl">新規</div></div>
-        <div class="pv-box pv-upd"><div class="num">3</div><div class="lbl">既存</div></div>
-        <div class="pv-box pv-err"><div class="num">1</div><div class="lbl">エラー</div></div>
+        <div class="pv-box" style="background:#e8f8f5;border:1px solid #b8e6d6;color:#0e9077;border-radius:6px;padding:8px 12px;text-align:center;min-width:80px;"><div class="num" style="font-size:18px;font-weight:700;">2</div><div class="lbl" style="font-size:10px;">🆕 新規登録</div></div>
+        <div class="pv-box" style="background:#ede7f6;border:1px solid #c5b6e1;color:#5c4dac;border-radius:6px;padding:8px 12px;text-align:center;min-width:80px;"><div class="num" style="font-size:18px;font-weight:700;">1</div><div class="lbl" style="font-size:10px;">👥 権限付与</div></div>
+        <div class="pv-box" style="background:#fff8e1;border:1px solid #ffe0a3;color:#f0960a;border-radius:6px;padding:8px 12px;text-align:center;min-width:80px;"><div class="num" style="font-size:18px;font-weight:700;">1</div><div class="lbl" style="font-size:10px;">🔄 差し替え</div></div>
+        <div class="pv-box" style="background:#f5f5f5;border:1px solid #e0e0e0;color:#888888;border-radius:6px;padding:8px 12px;text-align:center;min-width:80px;"><div class="num" style="font-size:18px;font-weight:700;">1</div><div class="lbl" style="font-size:10px;">⏭ スキップ</div></div>
+        <div class="pv-box pv-err"><div class="num">1</div><div class="lbl">❌ エラー</div></div>
       </div>
       <div style="background:#ffebee;border:1px solid #ffcdd2;border-radius:8px;padding:10px 16px;margin-bottom:14px;display:flex;align-items:center;gap:10px;">
         <span style="font-size:16px;">❌</span>
@@ -911,12 +914,12 @@
         <table class="pv-table">
           <thead><tr><th>行</th><th>判定</th><th>名前</th><th>メール</th><th>店舗</th><th>送信メール</th><th>状況詳細</th><th>操作</th></tr></thead>
           <tbody>
-            <tr><td>2</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#0e9077;background:#e8f8f5;border:1px solid #b8e6d6;">🆕 新規</span></td><td>山本 健一</td><td>yamamoto@example.jp</td><td>渋谷店</td><td style="font-size:11px;color:#555;">招待メール(新規版)</td><td style="font-size:11px;color:#0e9077;">新規登録</td><td></td></tr>
-            <tr><td>3</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#0e9077;background:#e8f8f5;border:1px solid #b8e6d6;">🆕 新規</span></td><td>佐藤 一郎</td><td>sato@example.jp</td><td>新宿店</td><td style="font-size:11px;color:#555;">招待メール(新規版)</td><td style="font-size:11px;color:#0e9077;">新規登録</td><td></td></tr>
-            <tr><td>4</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#5c4dac;background:#ede7f6;border:1px solid #c5b6e1;">👥 既存</span></td><td>test</td><td>test@example.com</td><td>渋谷店</td><td style="font-size:11px;color:#555;">通知メール(既存登録版)</td><td style="font-size:11px;color:#5c4dac;">既存従業員 (権限付与のみ)</td><td></td></tr>
-            <tr><td>5</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#5c4dac;background:#ede7f6;border:1px solid #c5b6e1;">👥 既存</span></td><td>林 健太郎</td><td>hayashi.k@example.jp</td><td>新宿店</td><td style="font-size:11px;color:#f0960a;">差し替え版招待メール (旧無効化)</td><td style="font-size:11px;color:#f0960a;">招待差し替え (旧無効化)</td><td></td></tr>
-            <tr><td>6</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#5c4dac;background:#ede7f6;border:1px solid #c5b6e1;">👥 既存</span></td><td>鈴木 花子</td><td>suzuki@example.jp</td><td>渋谷店</td><td style="font-size:11px;color:#888;">スキップ (重複)</td><td style="font-size:11px;color:#888;">既管理者 (重複スキップ)</td><td></td></tr>
-            <tr style="background:#fffafa;"><td>7</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#c62828;background:#ffebee;border:1px solid #ffcdd2;">❌ エラー</span></td><td>林 健次郎</td><td>hayashi[at]example.jp</td><td>新宿店</td><td style="font-size:11px;color:#c62828;">送信不可</td><td style="font-size:11px;color:#c62828;">メール形式不正</td><td style="white-space:nowrap;font-size:0;"><button onclick="openMasterAddRedirect('admin','林 健次郎');" style="font-size:10px;padding:4px 8px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;margin-right:4px;">➕ マスタに追加</button><button onclick="openRowEditModal('メール','hayashi[at]example.jp','hayashi@example.jp');" style="font-size:10px;padding:4px 8px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;margin-right:4px;">✏️ 行編集</button><button onclick="markRowSkipped(this);" style="font-size:10px;padding:4px 8px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;">⊘ スキップ</button></td></tr>
+            <tr><td>2</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#0e9077;background:#e8f8f5;border:1px solid #b8e6d6;">🆕 新規登録</span></td><td>山本 健一</td><td>yamamoto@example.jp</td><td>渋谷店</td><td style="font-size:11px;color:#555;">招待メール(新規版)</td><td style="font-size:11px;color:#0e9077;">会社内に未登録のため新規作成し、管理者権限を付与</td><td></td></tr>
+            <tr><td>3</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#0e9077;background:#e8f8f5;border:1px solid #b8e6d6;">🆕 新規登録</span></td><td>佐藤 一郎</td><td>sato@example.jp</td><td>新宿店</td><td style="font-size:11px;color:#555;">招待メール(新規版)</td><td style="font-size:11px;color:#0e9077;">会社内に未登録のため新規作成し、管理者権限を付与</td><td></td></tr>
+            <tr><td>4</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#5c4dac;background:#ede7f6;border:1px solid #c5b6e1;">👥 権限付与</span></td><td>test</td><td>test@example.com</td><td>渋谷店</td><td style="font-size:11px;color:#555;">管理者権限付与のお知らせ</td><td style="font-size:11px;color:#5c4dac;">既存従業員 (招待承諾済み) に管理者権限を追加</td><td></td></tr>
+            <tr style="background:#fffaf0;"><td>5</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#f0960a;background:#fff8e1;border:1px solid #ffe0a3;">🔄 差し替え</span></td><td>林 健太郎</td><td>hayashi.k@example.jp</td><td>新宿店</td><td style="font-size:11px;color:#f0960a;">【再送・差し替え】招待メール</td><td style="font-size:11px;color:#f0960a;">招待済み・未承諾のため旧招待を無効化して再発行</td><td></td></tr>
+            <tr style="background:#fafafa;"><td>6</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#888888;background:#f5f5f5;border:1px solid #e0e0e0;">⏭ スキップ</span></td><td>鈴木 花子</td><td>suzuki@example.jp</td><td>渋谷店</td><td style="font-size:11px;color:#888888;">送信なし</td><td style="font-size:11px;color:#888888;">すでに管理者権限を持っているため何もしません</td><td></td></tr>
+            <tr style="background:#fffafa;"><td>7</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#c62828;background:#ffebee;border:1px solid #ffcdd2;">❌ エラー</span></td><td>林 健次郎</td><td>hayashi[at]example.jp</td><td>新宿店</td><td style="font-size:11px;color:#c62828;">送信なし</td><td style="font-size:11px;color:#c62828;">メールアドレスの形式が不正のため取り込めません</td><td style="white-space:nowrap;font-size:0;"><button onclick="openMasterAddRedirect('admin','林 健次郎');" style="font-size:10px;padding:4px 8px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;margin-right:4px;">➕ マスタに追加</button><button onclick="openRowEditModal('メール','hayashi[at]example.jp','hayashi@example.jp');" style="font-size:10px;padding:4px 8px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;margin-right:4px;">✏️ 行編集</button><button onclick="markRowSkipped(this);" style="font-size:10px;padding:4px 8px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;">⊘ スキップ</button></td></tr>
           </tbody>
         </table>
       </div>
@@ -1111,7 +1114,7 @@
         <div class="ub-icon" style="font-size:28px;">📁</div>
         <div class="ub-text" style="font-size:13px;">ファイルをドラッグ＆ドロップ</div>
         <div class="ub-btn" style="font-size:12px;padding:6px 16px;" onclick="demoTplUpload()">ファイルを選択</div>
-        <div class="ub-hint">TSV / CSV（最大10MB）</div>
+        <div class="ub-hint">TSV / CSV（1ファイルあたり 最大500行・5MB）</div>
       </div>
 
       <!-- アップロード済みファイル一覧(JSで動的に行を追加。tpl-up-file1/file2は旧仕様残骸で非使用) -->
@@ -1183,9 +1186,9 @@
     <!-- ★ 取り込みデータ種別タブ (2026-05-18 追加・大タブ) -->
     <div class="wcard" style="padding:0;margin-bottom:16px;background:#f5f7f9;border:1px solid #e0e0e0;">
       <div style="display:flex;align-items:stretch;gap:0;">
-        <button onclick="switchTplDataTypeTab('master')" id="tpl-typetab-master" style="flex:1;padding:14px 16px;border:none;background:#fff;border-bottom:3px solid #2ec4a0;cursor:pointer;font-size:13px;font-weight:700;color:#0e9077;">①〜③ 設定マスタ系 <span style="font-size:10px;color:#888;font-weight:400;">(業態2/店舗2/雇用区分3)</span></button>
-        <button onclick="switchTplDataTypeTab('employee')" id="tpl-typetab-employee" style="flex:1;padding:14px 16px;border:none;background:#f5f7f9;border-bottom:3px solid transparent;cursor:pointer;font-size:13px;font-weight:600;color:#555;">② 従業員 <span style="font-size:10px;color:#888;font-weight:400;">(8件 / エラー1)</span></button>
-        <button onclick="switchTplDataTypeTab('admin')" id="tpl-typetab-admin" style="flex:1;padding:14px 16px;border:none;background:#f5f7f9;border-bottom:3px solid transparent;cursor:pointer;font-size:13px;font-weight:600;color:#555;">③ 管理者 <span style="font-size:10px;color:#888;font-weight:400;">(任意・5件)</span></button>
+        <button onclick="switchTplDataTypeTab('master')" id="tpl-typetab-master" style="flex:1;padding:14px 16px;border:none;background:#fff;border-bottom:3px solid #2ec4a0;cursor:pointer;font-size:13px;font-weight:700;color:#0e9077;">①〜③ 設定マスタ <span style="font-size:10px;color:#888;font-weight:400;">(業態2/店舗2/雇用区分3)</span></button>
+        <button onclick="switchTplDataTypeTab('employee')" id="tpl-typetab-employee" style="flex:1;padding:14px 16px;border:none;background:#f5f7f9;border-bottom:3px solid transparent;cursor:pointer;font-size:13px;font-weight:600;color:#555;">④ 従業員 <span style="font-size:10px;color:#888;font-weight:400;">(8件 / エラー1)</span></button>
+        <button onclick="switchTplDataTypeTab('admin')" id="tpl-typetab-admin" style="flex:1;padding:14px 16px;border:none;background:#f5f7f9;border-bottom:3px solid transparent;cursor:pointer;font-size:13px;font-weight:600;color:#555;">⑤ 管理者 <span style="font-size:10px;color:#888;font-weight:400;">(任意・6件)</span></button>
       </div>
     </div>
 
@@ -1270,28 +1273,30 @@
     </div>
     </div>
 
-    <!-- ★ 管理者データ確認セクション (2026-05-18 追加 / 5分岐自動判定) -->
+    <!-- ★ 管理者データ確認セクション (2026-05-18 追加 / 2026-07-23 判定ラベル確定) -->
     <div id="tpl-confirm-admin">
-    <div class="map-section-header" style="margin-top:24px;"><span style="background:#2ec4a0;color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;">③</span> 管理者データ <span style="font-size:10px;color:#888;font-weight:400;margin-left:6px;">(任意・5分岐自動判定)</span></div>
-    <div class="alert alert-info">⑤ 管理者: <strong>5件</strong>のデータを検出し、メアド突合で 5分岐自動判定しました。</div>
+    <div class="map-section-header" style="margin-top:24px;"><span style="background:#2ec4a0;color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;">⑤</span> 管理者 <span style="font-size:10px;color:#888;font-weight:400;margin-left:6px;">(任意)</span></div>
+    <div class="alert alert-info">⑤ 管理者: <strong>6件</strong>を検出し、メールアドレスの突合で登録方法を自動判定しました。</div>
 
     <div class="pv-summary">
-      <div class="pv-box pv-total"><div class="num">5</div><div class="lbl">データ行数</div></div>
+      <div class="pv-box pv-total"><div class="num">6</div><div class="lbl">データ行数</div></div>
       <div class="pv-box" style="background:#e8f8f5;border:1px solid #b8e6d6;color:#0e9077;border-radius:6px;padding:8px 12px;text-align:center;min-width:80px;"><div class="num" style="font-size:18px;font-weight:700;">2</div><div class="lbl" style="font-size:10px;">🆕 新規登録</div></div>
-      <div class="pv-box" style="background:#ede7f6;border:1px solid #c5b6e1;color:#5c4dac;border-radius:6px;padding:8px 12px;text-align:center;min-width:80px;"><div class="num" style="font-size:18px;font-weight:700;">1</div><div class="lbl" style="font-size:10px;">👥 既存登録</div></div>
+      <div class="pv-box" style="background:#ede7f6;border:1px solid #c5b6e1;color:#5c4dac;border-radius:6px;padding:8px 12px;text-align:center;min-width:80px;"><div class="num" style="font-size:18px;font-weight:700;">1</div><div class="lbl" style="font-size:10px;">👥 権限付与</div></div>
       <div class="pv-box" style="background:#fff8e1;border:1px solid #ffe0a3;color:#f0960a;border-radius:6px;padding:8px 12px;text-align:center;min-width:80px;"><div class="num" style="font-size:18px;font-weight:700;">1</div><div class="lbl" style="font-size:10px;">🔄 差し替え</div></div>
+      <div class="pv-box" style="background:#f5f5f5;border:1px solid #e0e0e0;color:#888888;border-radius:6px;padding:8px 12px;text-align:center;min-width:80px;"><div class="num" style="font-size:18px;font-weight:700;">1</div><div class="lbl" style="font-size:10px;">⏭ スキップ</div></div>
       <div class="pv-box pv-err"><div class="num">1</div><div class="lbl">❌ エラー</div></div>
     </div>
 
     <div class="wcard" style="padding:0;overflow-x:auto;">
       <div class="stabs" style="padding:0 14px;">
-        <div class="stab active">すべて (5)</div>
+        <div class="stab active">すべて (6)</div>
         <div class="stab" style="color:#f0960a;">🔄 差し替え対象 (1)</div>
+        <div class="stab" style="color:#888888;">⏭ スキップ (1)</div>
         <div class="stab" style="color:#e74c3c">❌ エラー (1)</div>
       </div>
       <table class="pv-table">
         <thead>
-          <tr><th>行</th><th>判定</th><th>名前</th><th>メール</th><th>店舗</th><th>送信メール</th></tr>
+          <tr><th>行</th><th>判定</th><th>名前</th><th>メール</th><th>店舗</th><th>送信メール</th><th>状況詳細</th></tr>
         </thead>
         <tbody>
           <tr>
@@ -1299,35 +1304,47 @@
             <td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#0e9077;background:#e8f8f5;border:1px solid #b8e6d6;">🆕 新規登録</span></td>
             <td>山本 健一</td><td>yamamoto@example.jp</td><td>渋谷店</td>
             <td style="font-size:11px;color:#555;">招待メール(新規版)</td>
+            <td style="font-size:11px;color:#0e9077;">会社内に未登録のため新規作成し、管理者権限を付与</td>
           </tr>
           <tr>
             <td>3</td>
             <td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#0e9077;background:#e8f8f5;border:1px solid #b8e6d6;">🆕 新規登録</span></td>
             <td>佐藤 一郎</td><td>sato@example.jp</td><td>新宿店</td>
             <td style="font-size:11px;color:#555;">招待メール(新規版)</td>
+            <td style="font-size:11px;color:#0e9077;">会社内に未登録のため新規作成し、管理者権限を付与</td>
           </tr>
           <tr>
             <td>4</td>
-            <td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#5c4dac;background:#ede7f6;border:1px solid #c5b6e1;">👥 既存登録</span></td>
+            <td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#5c4dac;background:#ede7f6;border:1px solid #c5b6e1;">👥 権限付与</span></td>
             <td>test</td><td>test@example.com</td><td>渋谷店</td>
-            <td style="font-size:11px;color:#555;">通知メール(既存登録版)</td>
+            <td style="font-size:11px;color:#555;">管理者権限付与のお知らせ</td>
+            <td style="font-size:11px;color:#5c4dac;">既存従業員 (招待承諾済み) に管理者権限を追加</td>
           </tr>
           <tr style="background:#fffaf0;">
             <td>5</td>
-            <td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#f0960a;background:#fff8e1;border:1px solid #ffe0a3;">🔄 既存・差し替え</span></td>
+            <td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#f0960a;background:#fff8e1;border:1px solid #ffe0a3;">🔄 差し替え</span></td>
             <td>林 健次郎</td><td>hayashi@example.jp</td><td>新宿店</td>
-            <td style="font-size:11px;color:#f0960a;">差し替え版招待メール (旧無効化)</td>
+            <td style="font-size:11px;color:#f0960a;">【再送・差し替え】招待メール</td>
+            <td style="font-size:11px;color:#f0960a;">招待済み・未承諾のため旧招待を無効化して再発行</td>
+          </tr>
+          <tr style="background:#fafafa;">
+            <td>6</td>
+            <td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#888888;background:#f5f5f5;border:1px solid #e0e0e0;">⏭ スキップ</span></td>
+            <td>鈴木 花子</td><td>suzuki@example.jp</td><td>渋谷店</td>
+            <td style="font-size:11px;color:#888888;">送信なし</td>
+            <td style="font-size:11px;color:#888888;">すでに管理者権限を持っているため何もしません</td>
           </tr>
           <tr style="background:#fffafa;">
-            <td>6</td>
-            <td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#c62828;background:#ffebee;border:1px solid #ffcdd2;">❌ 既管理者</span></td>
-            <td>鈴木 花子</td><td>suzuki@example.jp</td><td>渋谷店</td>
-            <td style="font-size:11px;color:#c62828;">スキップ (重複)</td>
+            <td>7</td>
+            <td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#c62828;background:#ffebee;border:1px solid #ffcdd2;">❌ エラー</span></td>
+            <td>高橋 太郎</td><td>takahashi@example.jp</td><td style="color:#c62828;">原宿店</td>
+            <td style="font-size:11px;color:#c62828;">送信なし</td>
+            <td style="font-size:11px;color:#c62828;">担当店舗「原宿店」が未登録のため取り込めません</td>
           </tr>
         </tbody>
       </table>
     </div>
-    <div style="margin-top:8px;font-size:10px;color:#888;padding:0 14px;">※ 管理者データは <code style="background:#f5f5f5;padding:1px 4px;border-radius:3px;">resolveAdminRegistrationType()</code> で 5分岐自動判定。「重複時の処理」設定は管理者データには適用されません (常に 5分岐ロジック)。</div>
+    <div style="margin-top:8px;font-size:10px;color:#888;padding:0 14px;">※ 管理者データには「重複時の処理」設定は適用されません (メールアドレスの登録状況に応じて自動判定します)。</div>
     </div>
 
     <div class="wcard">
@@ -1376,7 +1393,7 @@
         <div class="ub-icon" style="font-size:28px;">📁</div>
         <div class="ub-text" style="font-size:13px;">ファイルをドラッグ&ドロップ</div>
         <div class="ub-btn" style="font-size:12px;padding:6px 16px;" onclick="demoTplCompleteUpload()">ファイルを選択</div>
-        <div class="ub-hint">TSV / CSV (最大10MB)</div>
+        <div class="ub-hint">TSV / CSV（1ファイルあたり 最大500行・5MB）</div>
       </div>
       <div id="tpl-complete-files" style="display:none;margin-top:10px;"></div>
     </div>
@@ -1409,17 +1426,20 @@
         <h2>インポート完了</h2>
         <p>設定マスタ・従業員データが正常に登録されました</p>
         <div class="result-detail">
-          <div style="font-size:11px;font-weight:600;color:#888;padding-bottom:4px;">①〜③ 設定マスタ系</div>
+          <div style="font-size:11px;font-weight:600;color:#888;padding-bottom:4px;">①〜③ 設定マスタ</div>
           <div class="rd-row"><span>業態</span><span class="rd-val rd-green">2件 登録</span></div>
           <div class="rd-row"><span>店舗情報</span><span class="rd-val rd-green">2件 登録</span></div>
           <div class="rd-row"><span>雇用区分</span><span class="rd-val rd-green">3件 登録</span></div>
           <div style="font-size:11px;font-weight:600;color:#888;padding:8px 0 4px;border-top:2px solid #e0e0e0;margin-top:8px;">④ 従業員</div>
           <div class="rd-row"><span>新規登録</span><span class="rd-val rd-green">6件</span></div>
           <div class="rd-row"><span>更新</span><span class="rd-val rd-yellow">1件</span></div>
-          <div class="rd-row"><span>エラー（スキップ）</span><span class="rd-val rd-red">1件</span></div>
+          <div class="rd-row"><span>エラー（取り込まず）</span><span class="rd-val rd-red">1件</span></div>
           <div style="font-size:11px;font-weight:600;color:#888;padding:8px 0 4px;border-top:2px solid #e0e0e0;margin-top:8px;">⑤ 管理者(任意)</div>
-          <div class="rd-row"><span>新規アカウント</span><span class="rd-val rd-green">2件</span></div>
-          <div class="rd-row"><span>既存従業員に管理者ロール追加</span><span class="rd-val rd-yellow">1件</span></div>
+          <div class="rd-row"><span>新規登録</span><span class="rd-val rd-green">2件</span></div>
+          <div class="rd-row"><span>権限付与（既存従業員）</span><span class="rd-val rd-yellow">1件</span></div>
+          <div class="rd-row"><span>差し替え</span><span class="rd-val rd-yellow">1件</span></div>
+          <div class="rd-row"><span>スキップ（既に管理者）</span><span class="rd-val" style="color:#888;">1件</span></div>
+          <div class="rd-row"><span>エラー（取り込まず）</span><span class="rd-val rd-red">1件</span></div>
         </div>
 
         <!-- 招待メール一括送信ブロック -->
@@ -1427,11 +1447,12 @@
           <div style="font-size:12px;font-weight:700;color:#1565c0;margin-bottom:8px;">✉️ 招待メールの一括送信</div>
           <div style="font-size:11px;color:#1565c0;line-height:1.7;margin-bottom:10px;">
             ・<strong>従業員 新規登録 6件</strong> → 従業員招待メール(72h)<br>
-            ・<strong>管理者 新規アカウント 2件</strong> → 管理者招待メール(72h)<br>
-            ・<strong>既存従業員に管理者ロール追加 1件</strong> → 昇格通知メール(PW不要)<br>
-            <span style="color:#666;font-size:10px;">※ 同一メアドが従業員/管理者双方に存在する場合は<strong>1アカウントに統合(ロール累積)</strong>され、招待メールは1通に統合されます。</span>
+            ・<strong>管理者 新規登録 2件</strong> → 管理者招待メール(72h)<br>
+            ・<strong>管理者 権限付与（既存従業員）1件</strong> → 管理者権限付与のお知らせ(PW不要)<br>
+            ・<strong>管理者 差し替え 1件</strong> → 【再送・差し替え】招待メール(旧招待は無効化)<br>
+            <span style="color:#666;font-size:10px;">※ 同一メールアドレスが従業員/管理者双方に存在する場合は<strong>1アカウントに統合(ロール累積)</strong>され、招待メールは1通に統合されます。スキップ・エラーの行にはメールを送信しません。</span>
           </div>
-          <button class="btn btn-primary" style="width:100%;padding:12px;font-size:13px;" onclick="showInviteSentModal(9)">✉️ 全員に招待メールを一括送信 (合計 9 通)</button>
+          <button class="btn btn-primary" style="width:100%;padding:12px;font-size:13px;" onclick="showInviteSentModal(10)">✉️ 全員に招待メールを一括送信 (合計 10 通)</button>
         </div>
 
         <div style="display:flex;gap:8px;justify-content:center;">
@@ -1651,7 +1672,7 @@
           <div class="ub-icon" style="font-size:28px;">📁</div>
           <div class="ub-text" style="font-size:13px;">ファイルをドラッグ＆ドロップ</div>
           <div class="ub-btn" style="font-size:12px;padding:6px 16px;" onclick="demoUploadFile()">ファイルを選択</div>
-          <div class="ub-hint">CSV / TSV（最大10MB）</div>
+          <div class="ub-hint">CSV / TSV（1ファイルあたり 最大500行・5MB）</div>
         </div>
 
         <!-- アップロード済みファイル一覧 -->
@@ -2109,13 +2130,13 @@
     <!-- ★ 取り込みデータ種別タブ (2026-05-18 追加・大タブ・テンプレ取込と統一) -->
     <div class="wcard" style="padding:0;margin-bottom:16px;background:#f5f7f9;border:1px solid #e0e0e0;">
       <div style="display:flex;align-items:stretch;gap:0;">
-        <button onclick="switchSaasDataTypeTab('master')" id="saas-typetab-master" style="flex:1;padding:14px 16px;border:none;background:#f5f7f9;border-bottom:3px solid transparent;cursor:pointer;font-size:13px;font-weight:600;color:#555;">①〜③ 設定マスタ系 <span style="font-size:10px;color:#888;font-weight:400;">(取得不可)</span></button>
-        <button onclick="switchSaasDataTypeTab('employee')" id="saas-typetab-employee" style="flex:1;padding:14px 16px;border:none;background:#fff;border-bottom:3px solid #2ec4a0;cursor:pointer;font-size:13px;font-weight:700;color:#0e9077;">② 従業員 <span style="font-size:10px;color:#888;font-weight:400;">(15件 / エラー1)</span></button>
-        <button onclick="switchSaasDataTypeTab('admin')" id="saas-typetab-admin" style="flex:1;padding:14px 16px;border:none;background:#f5f7f9;border-bottom:3px solid transparent;cursor:pointer;font-size:13px;font-weight:600;color:#555;">③ 管理者 <span style="font-size:10px;color:#888;font-weight:400;">(任意・5件)</span></button>
+        <button onclick="switchSaasDataTypeTab('master')" id="saas-typetab-master" style="flex:1;padding:14px 16px;border:none;background:#f5f7f9;border-bottom:3px solid transparent;cursor:pointer;font-size:13px;font-weight:600;color:#555;">①〜③ 設定マスタ <span style="font-size:10px;color:#888;font-weight:400;">(取得不可)</span></button>
+        <button onclick="switchSaasDataTypeTab('employee')" id="saas-typetab-employee" style="flex:1;padding:14px 16px;border:none;background:#fff;border-bottom:3px solid #2ec4a0;cursor:pointer;font-size:13px;font-weight:700;color:#0e9077;">④ 従業員 <span style="font-size:10px;color:#888;font-weight:400;">(15件 / エラー1)</span></button>
+        <button onclick="switchSaasDataTypeTab('admin')" id="saas-typetab-admin" style="flex:1;padding:14px 16px;border:none;background:#f5f7f9;border-bottom:3px solid transparent;cursor:pointer;font-size:13px;font-weight:600;color:#555;">⑤ 管理者 <span style="font-size:10px;color:#888;font-weight:400;">(任意・6件)</span></button>
       </div>
     </div>
 
-    <!-- ①〜③ 設定マスタ系セクション (業態/店舗/雇用区分の派生取込結果プレビュー) -->
+    <!-- ①〜③ 設定マスタセクション (業態/店舗/雇用区分の派生取込結果プレビュー) -->
     <div id="saas-confirm-master" style="display:none;">
       <div class="map-section-header"><span style="background:#2ec4a0;color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;">①</span> 設定マスタ <span style="font-size:10px;color:#888;font-weight:400;margin-left:6px;">(業態・店舗・雇用区分)</span></div>
       <div class="wcard" style="padding:30px 40px;text-align:center;">
@@ -2256,39 +2277,42 @@
 
     </div><!-- /#saas-confirm-employee -->
 
-    <!-- ★ 管理者データ確認セクション (2026-05-18 追加 / 5分岐自動判定) -->
+    <!-- ★ 管理者データ確認セクション (2026-05-18 追加 / 2026-07-23 判定ラベル確定) -->
     <div id="saas-confirm-admin" style="display:none;margin-top:24px;">
-      <div class="map-section-header"><span style="background:#2ec4a0;color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;">③</span> 管理者データ <span style="font-size:10px;color:#888;font-weight:400;margin-left:6px;">(任意・5分岐自動判定)</span></div>
-      <div class="alert alert-info">⑤ 管理者: <strong>5件</strong>のデータを検出し、メアド突合で 5分岐自動判定しました。</div>
+      <div class="map-section-header"><span style="background:#2ec4a0;color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;">⑤</span> 管理者 <span style="font-size:10px;color:#888;font-weight:400;margin-left:6px;">(任意)</span></div>
+      <div class="alert alert-info">⑤ 管理者: <strong>6件</strong>を検出し、メールアドレスの突合で登録方法を自動判定しました。</div>
 
       <div class="pv-summary">
-        <div class="pv-box pv-total"><div class="num">5</div><div class="lbl">データ行数</div></div>
+        <div class="pv-box pv-total"><div class="num">6</div><div class="lbl">データ行数</div></div>
         <div class="pv-box" style="background:#e8f8f5;border:1px solid #b8e6d6;color:#0e9077;border-radius:6px;padding:8px 12px;text-align:center;min-width:80px;"><div class="num" style="font-size:18px;font-weight:700;">2</div><div class="lbl" style="font-size:10px;">🆕 新規登録</div></div>
-        <div class="pv-box" style="background:#ede7f6;border:1px solid #c5b6e1;color:#5c4dac;border-radius:6px;padding:8px 12px;text-align:center;min-width:80px;"><div class="num" style="font-size:18px;font-weight:700;">1</div><div class="lbl" style="font-size:10px;">👥 既存登録</div></div>
+        <div class="pv-box" style="background:#ede7f6;border:1px solid #c5b6e1;color:#5c4dac;border-radius:6px;padding:8px 12px;text-align:center;min-width:80px;"><div class="num" style="font-size:18px;font-weight:700;">1</div><div class="lbl" style="font-size:10px;">👥 権限付与</div></div>
         <div class="pv-box" style="background:#fff8e1;border:1px solid #ffe0a3;color:#f0960a;border-radius:6px;padding:8px 12px;text-align:center;min-width:80px;"><div class="num" style="font-size:18px;font-weight:700;">1</div><div class="lbl" style="font-size:10px;">🔄 差し替え</div></div>
+        <div class="pv-box" style="background:#f5f5f5;border:1px solid #e0e0e0;color:#888888;border-radius:6px;padding:8px 12px;text-align:center;min-width:80px;"><div class="num" style="font-size:18px;font-weight:700;">1</div><div class="lbl" style="font-size:10px;">⏭ スキップ</div></div>
         <div class="pv-box pv-err"><div class="num">1</div><div class="lbl">❌ エラー</div></div>
       </div>
 
       <div class="wcard" style="padding:0;overflow-x:auto;">
         <div class="stabs" style="padding:0 14px;">
-          <div class="stab active">すべて (5)</div>
+          <div class="stab active">すべて (6)</div>
           <div class="stab" style="color:#f0960a;">🔄 差し替え対象 (1)</div>
+          <div class="stab" style="color:#888888;">⏭ スキップ (1)</div>
           <div class="stab" style="color:#e74c3c">❌ エラー (1)</div>
         </div>
         <table class="pv-table">
           <thead>
-            <tr><th>行</th><th>判定</th><th>名前</th><th>メール</th><th>店舗</th><th>送信メール</th></tr>
+            <tr><th>行</th><th>判定</th><th>名前</th><th>メール</th><th>店舗</th><th>送信メール</th><th>状況詳細</th></tr>
           </thead>
           <tbody>
-            <tr><td>2</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#0e9077;background:#e8f8f5;border:1px solid #b8e6d6;">🆕 新規登録</span></td><td>山本 健一</td><td>yamamoto@example.jp</td><td>渋谷店</td><td style="font-size:11px;color:#555;">招待メール(新規版)</td></tr>
-            <tr><td>3</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#0e9077;background:#e8f8f5;border:1px solid #b8e6d6;">🆕 新規登録</span></td><td>佐藤 一郎</td><td>sato@example.jp</td><td>新宿店</td><td style="font-size:11px;color:#555;">招待メール(新規版)</td></tr>
-            <tr><td>4</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#5c4dac;background:#ede7f6;border:1px solid #c5b6e1;">👥 既存登録</span></td><td>test</td><td>test@example.com</td><td>渋谷店</td><td style="font-size:11px;color:#555;">通知メール(既存登録版)</td></tr>
-            <tr style="background:#fffaf0;"><td>5</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#f0960a;background:#fff8e1;border:1px solid #ffe0a3;">🔄 既存・差し替え</span></td><td>林 健次郎</td><td>hayashi@example.jp</td><td>新宿店</td><td style="font-size:11px;color:#f0960a;">差し替え版招待メール (旧無効化)</td></tr>
-            <tr style="background:#fffafa;"><td>6</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#c62828;background:#ffebee;border:1px solid #ffcdd2;">❌ 既管理者</span></td><td>鈴木 花子</td><td>suzuki@example.jp</td><td>渋谷店</td><td style="font-size:11px;color:#c62828;">スキップ (重複)</td></tr>
+            <tr><td>2</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#0e9077;background:#e8f8f5;border:1px solid #b8e6d6;">🆕 新規登録</span></td><td>山本 健一</td><td>yamamoto@example.jp</td><td>渋谷店</td><td style="font-size:11px;color:#555;">招待メール(新規版)</td><td style="font-size:11px;color:#0e9077;">会社内に未登録のため新規作成し、管理者権限を付与</td></tr>
+            <tr><td>3</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#0e9077;background:#e8f8f5;border:1px solid #b8e6d6;">🆕 新規登録</span></td><td>佐藤 一郎</td><td>sato@example.jp</td><td>新宿店</td><td style="font-size:11px;color:#555;">招待メール(新規版)</td><td style="font-size:11px;color:#0e9077;">会社内に未登録のため新規作成し、管理者権限を付与</td></tr>
+            <tr><td>4</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#5c4dac;background:#ede7f6;border:1px solid #c5b6e1;">👥 権限付与</span></td><td>test</td><td>test@example.com</td><td>渋谷店</td><td style="font-size:11px;color:#555;">管理者権限付与のお知らせ</td><td style="font-size:11px;color:#5c4dac;">既存従業員 (招待承諾済み) に管理者権限を追加</td></tr>
+            <tr style="background:#fffaf0;"><td>5</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#f0960a;background:#fff8e1;border:1px solid #ffe0a3;">🔄 差し替え</span></td><td>林 健次郎</td><td>hayashi@example.jp</td><td>新宿店</td><td style="font-size:11px;color:#f0960a;">【再送・差し替え】招待メール</td><td style="font-size:11px;color:#f0960a;">招待済み・未承諾のため旧招待を無効化して再発行</td></tr>
+            <tr style="background:#fafafa;"><td>6</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#888888;background:#f5f5f5;border:1px solid #e0e0e0;">⏭ スキップ</span></td><td>鈴木 花子</td><td>suzuki@example.jp</td><td>渋谷店</td><td style="font-size:11px;color:#888888;">送信なし</td><td style="font-size:11px;color:#888888;">すでに管理者権限を持っているため何もしません</td></tr>
+            <tr style="background:#fffafa;"><td>7</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#c62828;background:#ffebee;border:1px solid #ffcdd2;">❌ エラー</span></td><td>高橋 太郎</td><td>takahashi@example.jp</td><td style="color:#c62828;">原宿店</td><td style="font-size:11px;color:#c62828;">送信なし</td><td style="font-size:11px;color:#c62828;">担当店舗「原宿店」が未登録のため取り込めません</td></tr>
           </tbody>
         </table>
       </div>
-      <div style="margin-top:8px;font-size:10px;color:#888;padding:0 14px;">※ 管理者データは <code style="background:#f5f5f5;padding:1px 4px;border-radius:3px;">resolveAdminRegistrationType()</code> で 5分岐自動判定。「重複時の処理」設定は管理者データには適用されません (常に 5分岐ロジック)。</div>
+      <div style="margin-top:8px;font-size:10px;color:#888;padding:0 14px;">※ 管理者データには「重複時の処理」設定は適用されません (メールアドレスの登録状況に応じて自動判定します)。</div>
     </div>
 
     <div class="wcard">
@@ -2811,7 +2835,7 @@ headerSwitchLink +
 '      <div style="font-size:32px;margin-bottom:8px;">📎</div>' +
 '      <div style="font-size:13px;">ファイルをドラッグ&ドロップ または</div>' +
 '      <div style="margin-top:10px;"><button class="btn btn-primary" style="font-size:12px;" onclick="singleTplFileSelected(\'' + k + '\')">ファイルを選択</button></div>' +
-'      <div style="margin-top:8px;font-size:10px;color:#aaa;">CSV / TSV (最大10MB)</div>' +
+'      <div style="margin-top:8px;font-size:10px;color:#aaa;">CSV / TSV（1ファイルあたり 最大500行・5MB）</div>' +
 '    </div>' +
 '    <div id="single-tpl-' + k + '-upload-log" style="margin-top:10px;font-size:11px;color:#888;line-height:1.7;text-align:left;"></div>' +
 '  </div>' +
@@ -2903,7 +2927,7 @@ futureBanner +
 '      <div style="font-size:32px;margin-bottom:8px;">📎</div>' +
 '      <div style="font-size:13px;">ファイルをドラッグ&ドロップ または</div>' +
 '      <div style="margin-top:10px;"><button class="btn btn-primary" style="font-size:12px;" onclick="singleSaasFileSelected(\'' + k + '\')">ファイルを選択</button></div>' +
-'      <div style="margin-top:8px;font-size:10px;color:#aaa;">CSV / TSV (最大10MB)</div>' +
+'      <div style="margin-top:8px;font-size:10px;color:#aaa;">CSV / TSV（1ファイルあたり 最大500行・5MB）</div>' +
 '    </div>' +
 '    <div id="single-saas-' + k + '-upload-log" style="margin-top:10px;font-size:11px;color:#888;line-height:1.7;text-align:left;"></div>' +
 '  </div>' +
@@ -4062,7 +4086,7 @@ function renderTplWizard() {
   var step2;
   if (up) step2 = '<div style="display:flex;align-items:center;gap:8px;padding:14px;border:1px solid #b8e6d6;background:#f0faf6;border-radius:8px;font-size:15px;color:#0e9077;font-weight:700;">📄 '+it.key+'_data.tsv<button type="button" onclick="tplWizReupload();" style="margin-left:auto;display:inline-flex;align-items:center;gap:5px;font-size:12px;padding:6px 14px;border:1px solid #bbb;border-radius:6px;background:#fff;color:#444;cursor:pointer;font-weight:600;">🔄 アップし直す</button></div>';
   else if (!dl) step2 = '<div style="padding:18px;border:1px dashed #ddd;border-radius:8px;text-align:center;font-size:12px;color:#b0b0b0;background:#fafafa;">🔒 先に「テンプレートをダウンロード」してください</div>';
-  else step2 = '<div class="upload-box" onclick="tplWizUpload();" style="padding:26px;cursor:pointer;"><div class="ub-icon" style="font-size:30px;">📁</div><div class="ub-text" style="font-size:15px;">ファイルをドラッグ＆ドロップ / クリックで選択</div><div class="ub-hint" style="font-size:12px;">TSV / CSV（最大10MB）</div></div>';
+  else step2 = '<div class="upload-box" onclick="tplWizUpload();" style="padding:26px;cursor:pointer;"><div class="ub-icon" style="font-size:30px;">📁</div><div class="ub-text" style="font-size:15px;">ファイルをドラッグ＆ドロップ / クリックで選択</div><div class="ub-hint" style="font-size:12px;">TSV / CSV（1ファイルあたり 最大500行・5MB）</div></div>';
   // カードの「次へ」は "次のアップロード項目へ進む" 用途のみ(未完了かつ最終項目でないとき)。
   // 確認画面への遷移は枠外(フッター)の「確認画面へ →」に一本化。全アップロード完了時はカードの次へは出さない
   // (戻る・ステップ項目直接クリックは可能)。
@@ -4129,7 +4153,7 @@ var SAAS_WIZ_DEFS = {
     { key:'map-kot-hr',    name:'従業員一覧',       badge:'任意', bc:'#e67e22', required:false, hint:'KoT「従業員一覧エクスポート(hr_)」給与補完用' },
     { key:'map-kot-group', name:'所属グループデータ', badge:'任意', bc:'#e67e22', required:false, hint:'KoTの所属グループ(店舗マッピング用)' },
     { key:'map-kot-rate',  name:'単価データ',       badge:'任意', bc:'#e67e22', required:false, hint:'KoTの単価(給与補完用)' },
-    { key:'map-kot-admin', name:'管理者データ',     badge:'任意', bc:'#e67e22', required:false, hint:'管理者(取込時に5分岐自動判定)' }
+    { key:'map-kot-admin', name:'管理者データ',     badge:'任意', bc:'#e67e22', required:false, hint:'管理者(メールアドレスの突合で登録方法を自動判定)' }
   ],
   jc: [
     { key:'businesstype', name:'業態', badge:'テンプレ', bc:'#7b1fa2', dl:'downloadBusinesstypeTemplate', required:false, hint:'ラクミーの業態テンプレートに記入してアップロード', chk:'[data-saas-extra="businesstype"]' },
@@ -4182,7 +4206,7 @@ function renderSaasWizard(){
     var step2;
     if (up) step2='<div style="display:flex;align-items:center;gap:8px;padding:14px;border:1px solid #b8e6d6;background:#f0faf6;border-radius:8px;font-size:15px;color:#0e9077;font-weight:700;">📄 '+it.key.replace(/^map-/,'').replace(/-/g,'_')+'_export.csv<button type="button" onclick="saasWizReupload();" style="margin-left:auto;display:inline-flex;align-items:center;gap:5px;font-size:12px;padding:6px 14px;border:1px solid #bbb;border-radius:6px;background:#fff;color:#444;cursor:pointer;font-weight:600;">🔄 アップし直す</button></div>';
     else if (lockUpload) step2='<div style="padding:18px;border:1px dashed #ddd;border-radius:8px;text-align:center;font-size:14px;color:#b0b0b0;background:#fafafa;">🔒 先に「テンプレートをダウンロード」してください</div>';
-    else step2='<div class="upload-box" onclick="saasWizUpload();" style="padding:26px;cursor:pointer;"><div class="ub-icon" style="font-size:30px;">📁</div><div class="ub-text" style="font-size:15px;">ファイルをドラッグ＆ドロップ / クリックで選択</div><div class="ub-hint" style="font-size:12px;">CSV / TSV（最大10MB）</div></div>';
+    else step2='<div class="upload-box" onclick="saasWizUpload();" style="padding:26px;cursor:pointer;"><div class="ub-icon" style="font-size:30px;">📁</div><div class="ub-text" style="font-size:15px;">ファイルをドラッグ＆ドロップ / クリックで選択</div><div class="ub-hint" style="font-size:12px;">CSV / TSV（1ファイルあたり 最大500行・5MB）</div></div>';
     html+='<div style="display:flex;align-items:flex-start;gap:12px;">'+_twStep(''+stepNum)+'<div style="flex:1;"><div style="font-size:16px;font-weight:700;margin-bottom:16px;">アップロード'+_twBadge(up)+'</div>'+step2+'</div></div>';
   }
   // 取り込み中データ一覧: 何がアップ済みかを明示(SaaSは必須/任意が混在するため、完了モーダルの代わりに常時表示)
@@ -4380,7 +4404,7 @@ function go(id) {
   }
   if (id === 's-tpl2') {
     updateTplConfirmSections();
-    // 大タブ初期表示: ①〜③ 設定マスタ系 (s-tpl2 は常に複数選択モード)
+    // 大タブ初期表示: ①〜③ 設定マスタ (s-tpl2 は常に複数選択モード)
     if (typeof switchTplDataTypeTab === 'function') switchTplDataTypeTab('master');
   }
   if (id === 's-saas-preview') {
@@ -5534,10 +5558,10 @@ function downloadBusinesstypeTemplate() {
 // ② 店舗 テンプレート
 function downloadStoreTemplate() {
   var rows = [
-    '店舗名\t所属業態\t郵便番号\t住所\t開店時間\t閉店時間',
-    '渋谷店\t飲食店\t150-0002\t東京都渋谷区渋谷1-1-1\t11:00\t23:00',
-    '新宿店\tカフェ\t160-0022\t東京都新宿区新宿3-3-3\t08:00\t22:00',
-    '池袋店\t居酒屋・バー\t171-0021\t東京都豊島区西池袋1-1-1\t10:00\t22:00'
+    '店舗名\t所属業態\t郵便番号\t住所\t営業時間',
+    '渋谷店\t飲食店\t150-0002\t東京都渋谷区渋谷1-1-1\t11:00〜23:00',
+    '新宿店\tカフェ\t160-0022\t東京都新宿区新宿3-3-3\t08:00〜22:00',
+    '池袋店\t居酒屋・バー\t171-0021\t東京都豊島区西池袋1-1-1\t10:00〜22:00'
   ];
   var blob = new Blob([rows.join('\n')], {type:'text/tab-separated-values'});
   var a = document.createElement('a');
@@ -5564,10 +5588,10 @@ function downloadEmptypeTemplate() {
 // ⑤ 管理者 テンプレート(外部連携対象外、テンプレのみ)
 function downloadAdminTemplate() {
   var rows = [
-    '管理者名\tメールアドレス\t担当店舗\t権限',
-    '佐藤花子\tsato-mgr@example.com\t渋谷店\t管理者',
-    '田中一郎\ttanaka-mgr@example.com\t新宿店\t管理者',
-    '高橋次郎\ttakahashi-mgr@example.com\t渋谷店,新宿店,池袋店\t管理者'
+    '管理者名\tメールアドレス\t担当店舗',
+    '佐藤花子\tsato-mgr@example.com\t渋谷店',
+    '田中一郎\ttanaka-mgr@example.com\t新宿店',
+    '高橋次郎\ttakahashi-mgr@example.com\t渋谷店,新宿店,池袋店'
   ];
   var blob = new Blob([rows.join('\n')], {type:'text/tab-separated-values'});
   var a = document.createElement('a');
