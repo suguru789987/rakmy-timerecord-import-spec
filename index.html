@@ -1124,6 +1124,16 @@
         <div class="ub-hint">TSV / CSV（1ファイルあたり 最大500行・5MB）</div>
       </div>
 
+      <!-- 取込上限の仕様メモ (2026-07-23 確定) -->
+      <div style="margin-top:12px;padding:10px 12px;background:#fafafa;border:1px solid #e8e8e8;border-radius:6px;font-size:11px;line-height:1.7;color:#555;">
+        <div style="font-weight:700;color:#444;margin-bottom:4px;">取込上限</div>
+        1回に取り込めるのは <strong>500行</strong>（ヘッダー行を除いたデータ行数）まで、ファイルサイズは <strong>5MB</strong> までです。<br>
+        上限を超えたファイルは、アップロード直後（プレビュー生成前）に受付を拒否します。<br>
+        <div style="margin-top:6px;padding:8px 10px;background:#ffebee;border:1px solid #ffcdd2;border-radius:4px;color:#c62828;">
+          1回に取り込めるのは500行までです。ファイルを分割してから、もう一度アップロードしてください。（アップロードされたファイル: 1,240行）
+        </div>
+      </div>
+
       <!-- アップロード済みファイル一覧(JSで動的に行を追加。tpl-up-file1/file2は旧仕様残骸で非使用) -->
       <div id="tpl-up-files" style="display:none;margin-top:10px;">
         <div id="tpl-up-file1" style="display:none;"></div>
