@@ -2997,16 +2997,24 @@ function renderSaasMappingSingleScreen(cfg) {
       ['氏名','name',true,'山本 健一'],
       ['メール','email',true,'yamamoto@example.jp'],
       ['店舗','store',false,'渋谷店'],
-      ['権限','role',false,'店舗管理者']
+      ['権限','__NA__',false,'店舗管理者']   // ラクミー側に対応項目なし (権限は常に「管理者」固定)
     ]
   };
   var defs = sampleRowsByKey[k] || [];
   // ① 4列テーブル (列名 / → / ラクミー項目 / サンプル値)
   // ラクミー項目 dropdown には同データ種別の全フィールドを選択肢として並べる
-  var allRkmFields = defs.map(function(r){ return r[1]; });
+  var allRkmFields = defs.map(function(r){ return r[1]; }).filter(function(f){ return f !== '__NA__'; });
   var rows = defs.map(function(r){
     var srcCol = r[0], rkmField = r[1], required = r[2], sample = r[3];
     var reqBadge = required ? ' <span style="font-size:9px;padding:1px 6px;background:#ffebee;color:#c62828;border-radius:8px;font-weight:700;">必須</span>' : '';
+    if (rkmField === '__NA__') {
+      // ラクミー側に対応する項目が存在しない列。マッピング不可として非活性表示にする。
+      return '<tr data-rkm-field="__NA__" style="background:#fafafa;"><td style="padding:8px 12px;border-bottom:1px solid #eee;font-size:12px;color:#888;">' + srcCol + '</td>' +
+             '<td style="padding:8px 12px;border-bottom:1px solid #eee;text-align:center;color:#ccc;">→</td>' +
+             '<td style="padding:8px 12px;border-bottom:1px solid #eee;"><select disabled style="width:100%;padding:4px 8px;border:1px solid #e0e0e0;border-radius:4px;font-size:12px;color:#888;background:#f5f5f5;"><option>(取り込みません)</option></select>' +
+             ' <span style="font-size:9px;padding:1px 6px;background:#f5f5f5;color:#888;border:1px solid #e0e0e0;border-radius:8px;font-weight:700;">対応項目なし</span></td>' +
+             '<td style="padding:8px 12px;border-bottom:1px solid #eee;font-size:12px;color:#aaa;font-family:monospace;background:#fafafa;">' + sample + '</td></tr>';
+    }
     var options = allRkmFields.map(function(f){
       var sel = (f === rkmField) ? ' selected' : '';
       var label = (f === rkmField) ? f + ' (自動推定)' : f;
@@ -3025,7 +3033,7 @@ function renderSaasMappingSingleScreen(cfg) {
       '<div style="background:#fff8ed;border:1px solid #fde68a;border-radius:8px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:flex-start;gap:10px;">' +
       '  <span style="font-size:18px;">⚠️</span>' +
       '  <div style="flex:1;font-size:12px;line-height:1.7;color:#9c4d12;">' +
-      '    <strong>マッピング検証 (デモ):</strong> ' + (k === 'admin' ? '<strong>メール</strong>列が未マッピングの場合、招待メールを送信できません。' : '<strong>メール</strong>列を未マッピングにすると、登録後に招待メールを送信できません。') + '<br>' +
+      '    <strong>マッピング検証 (デモ):</strong> ' + (k === 'admin' ? '<strong>メール</strong>列が未マッピングの場合、招待メールを送信できません。また<strong>権限</strong>列はラクミー側に対応する項目がないため取り込みません (登録される権限は常に「管理者」です)。' : '<strong>メール</strong>列を未マッピングにすると、登録後に招待メールを送信できません。') + '<br>' +
       '    必須マッピングの過不足は実行時に自動チェックされ、不足があるとプレビュー画面でエラー行として可視化されます。' +
       '  </div>' +
       '</div>';
