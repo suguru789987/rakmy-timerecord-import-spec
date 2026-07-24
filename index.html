@@ -306,13 +306,11 @@
     <button onclick="go('s-saas-single-store')"    style="color:#1a73e8;font-size:11px;">└ 店舗</button>
     <button onclick="go('s-saas-single-emptype')"  style="color:#1a73e8;font-size:11px;">└ 雇用区分</button>
     <button onclick="go('s-saas-single-employee')" style="color:#1a73e8;font-size:11px;">└ 従業員</button>
-    <button onclick="go('s-saas-single-admin')"    style="color:#1a73e8;font-size:11px;">└ 管理者</button>
     <div style="font-size:10px;color:#1a73e8;font-weight:700;padding:6px 8px 2px;">★ 運用更新: マッピング設定 (設定画面別)</div>
     <button onclick="go('s-saas-mapping-single-businesstype')"    style="color:#1a73e8;font-size:11px;">└ 業態</button>
     <button onclick="go('s-saas-mapping-single-store')"    style="color:#1a73e8;font-size:11px;">└ 店舗</button>
     <button onclick="go('s-saas-mapping-single-emptype')"  style="color:#1a73e8;font-size:11px;">└ 雇用区分</button>
     <button onclick="go('s-saas-mapping-single-employee')" style="color:#1a73e8;font-size:11px;">└ 従業員</button>
-    <button onclick="go('s-saas-mapping-single-admin')"    style="color:#1a73e8;font-size:11px;">└ 管理者</button>
     <button onclick="go('s-saas-preview-single')" style="color:#1a73e8;font-size:11px;">→ プレビュー (共通)</button>
     <button onclick="go('s-saas-done-single')" style="color:#1a73e8;font-size:11px;">→ 完了 (共通)</button>
     <div class="dn-sep"></div>
@@ -555,14 +553,12 @@
 <div class="screen" id="s-saas-single-store"    data-single-saas-key="store"></div>
 <div class="screen" id="s-saas-single-emptype"  data-single-saas-key="emptype"></div>
 <div class="screen" id="s-saas-single-employee" data-single-saas-key="employee"></div>
-<div class="screen" id="s-saas-single-admin"    data-single-saas-key="admin"></div>
 
 <!-- ★ 運用更新専用 マッピング設定画面 (設定画面別・物理分離) -->
 <div class="screen" id="s-saas-mapping-single-businesstype"    data-saas-mapping-key="businesstype"></div>
 <div class="screen" id="s-saas-mapping-single-store"    data-saas-mapping-key="store"></div>
 <div class="screen" id="s-saas-mapping-single-emptype"  data-saas-mapping-key="emptype"></div>
 <div class="screen" id="s-saas-mapping-single-employee" data-saas-mapping-key="employee"></div>
-<div class="screen" id="s-saas-mapping-single-admin"    data-saas-mapping-key="admin"></div>
 
 <!-- ==================== -->
 <!-- ★ 運用更新専用: 確認・実行 / 完了 画面 (s-tpl2-single, s-tpl3-single 等) -->
@@ -816,7 +812,6 @@
         <button data-key="map-kot-store"   onclick="switchSaasPreviewSingleTab('map-kot-store')"   class="saas3single-tab" style="flex:1;min-width:120px;padding:12px 14px;border:none;background:#f5f7f9;border-bottom:3px solid transparent;cursor:pointer;font-size:12px;font-weight:600;color:#555;">店舗</button>
         <button data-key="map-kot-emptype" onclick="switchSaasPreviewSingleTab('map-kot-emptype')" class="saas3single-tab" style="flex:1;min-width:120px;padding:12px 14px;border:none;background:#f5f7f9;border-bottom:3px solid transparent;cursor:pointer;font-size:12px;font-weight:600;color:#555;">雇用区分</button>
         <button data-key="map-kot-emp"     onclick="switchSaasPreviewSingleTab('map-kot-emp')"     class="saas3single-tab" style="flex:1;min-width:120px;padding:12px 14px;border:none;background:#f5f7f9;border-bottom:3px solid transparent;cursor:pointer;font-size:12px;font-weight:600;color:#555;">従業員</button>
-        <button data-key="map-kot-admin"   onclick="switchSaasPreviewSingleTab('map-kot-admin')"   class="saas3single-tab" style="flex:1;min-width:120px;padding:12px 14px;border:none;background:#f5f7f9;border-bottom:3px solid transparent;cursor:pointer;font-size:12px;font-weight:600;color:#555;">管理者</button>
       </div>
     </div>
 
@@ -940,35 +935,6 @@
             <tr data-err-val="業務委託契約A" data-err-type="master-missing" style="background:#fffafa;"><td class="st-err">✗ エラー</td><td>中村真理</td><td>nakamura@example.com</td><td>池袋店</td><td style="color:#c62828;">業務委託契約A</td><td style="white-space:nowrap;font-size:0;"><button onclick="openMasterAddRedirect('emptype','業務委託契約A');" style="font-size:10px;padding:5px 10px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;margin-right:4px;">➕ マスタに追加</button><button onclick="openRowEditModal('雇用区分','業務委託契約A','');" style="font-size:10px;padding:5px 10px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;margin-right:4px;">✏️ 行編集</button><button onclick="markRowSkipped(this);" style="font-size:10px;padding:5px 10px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;">⊘ スキップ</button></td></tr>
             <tr data-err-val="正社員 A" data-err-type="master-naming" style="background:#fffafa;"><td class="st-err">✗ エラー</td><td>西村あい</td><td>nishimura@example.com</td><td>渋谷店</td><td style="color:#c62828;">正社員 A <span style="font-size:10px;color:#888;">(候補: 正社員A)</span></td><td style="white-space:nowrap;font-size:0;"><button onclick="openMasterAddRedirect('emptype','正社員 A');" style="font-size:10px;padding:5px 10px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;margin-right:4px;">➕ マスタに追加</button><button onclick="openRowEditModal('雇用区分','正社員 A','正社員A');" style="font-size:10px;padding:5px 10px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;margin-right:4px;">✏️ 行編集</button><button onclick="markRowSkipped(this);" style="font-size:10px;padding:5px 10px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;">⊘ スキップ</button></td></tr>
             <tr><td class="st-upd">● 更新</td><td>高橋美咲</td><td>takahashi@example.com</td><td>新宿店</td><td>日給スタッフC</td><td></td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- 管理者セクション -->
-    <div id="saas3single-sec-admin" class="saas3single-sec" style="display:none;">
-      <div class="pv-summary">
-        <div class="pv-box pv-total"><div class="num">6</div><div class="lbl">データ行数</div></div>
-        <div class="pv-box pv-new"><div class="num">2</div><div class="lbl">新規登録</div></div>
-        <div class="pv-box pv-upd"><div class="num">1</div><div class="lbl">権限付与</div></div>
-        <div class="pv-box pv-rep"><div class="num">1</div><div class="lbl">差し替え</div></div>
-        <div class="pv-box pv-skip"><div class="num">1</div><div class="lbl">スキップ</div></div>
-        <div class="pv-box pv-err"><div class="num">1</div><div class="lbl">エラー</div></div>
-      </div>
-      <div style="background:#ffebee;border:1px solid #ffcdd2;border-radius:8px;padding:10px 16px;margin-bottom:14px;display:flex;align-items:center;gap:10px;">
-        <span style="font-size:16px;">❌</span>
-        <div style="flex:1;font-size:12px;color:#c62828;font-weight:700;">1件のエラー — 各行で1つ選択: ➕マスタに追加 / ✏️行編集 / ⊘スキップ</div>
-      </div>
-      <div class="wcard" style="padding:0;overflow-x:auto;">
-        <table class="pv-table">
-          <thead><tr><th>行</th><th>判定</th><th>名前</th><th>メール</th><th>店舗</th><th>送信メール</th><th>状況詳細</th><th>操作</th></tr></thead>
-          <tbody>
-            <tr><td>2</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#0e9077;background:#e8f8f5;border:1px solid #b8e6d6;">🆕 新規登録</span></td><td>山本 健一</td><td>yamamoto@example.jp</td><td>渋谷店</td><td style="font-size:11px;color:#555;">招待メール(新規版)</td><td style="font-size:11px;color:#0e9077;">会社内に未登録のため新規作成し、管理者権限を付与</td><td></td></tr>
-            <tr><td>3</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#0e9077;background:#e8f8f5;border:1px solid #b8e6d6;">🆕 新規登録</span></td><td>佐藤 一郎</td><td>sato@example.jp</td><td>新宿店</td><td style="font-size:11px;color:#555;">招待メール(新規版)</td><td style="font-size:11px;color:#0e9077;">会社内に未登録のため新規作成し、管理者権限を付与</td><td></td></tr>
-            <tr><td>4</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#5c4dac;background:#ede7f6;border:1px solid #c5b6e1;">👥 権限付与</span></td><td>test</td><td>test@example.com</td><td>渋谷店</td><td style="font-size:11px;color:#555;">管理者権限付与のお知らせ</td><td style="font-size:11px;color:#5c4dac;">既存従業員 (招待承諾済み) に管理者権限を追加</td><td></td></tr>
-            <tr style="background:#fffaf0;"><td>5</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#f0960a;background:#fff8e1;border:1px solid #ffe0a3;">🔄 差し替え</span></td><td>林 健太郎</td><td>hayashi.k@example.jp</td><td>新宿店</td><td style="font-size:11px;color:#f0960a;">【再送・差し替え】招待メール</td><td style="font-size:11px;color:#f0960a;">招待済み・未承諾のため旧招待を無効化して再発行</td><td></td></tr>
-            <tr style="background:#fafafa;"><td>6</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#888888;background:#f5f5f5;border:1px solid #e0e0e0;">⏭ スキップ</span></td><td>鈴木 花子</td><td>suzuki@example.jp</td><td>渋谷店</td><td style="font-size:11px;color:#888888;">送信なし</td><td style="font-size:11px;color:#888888;">すでに管理者権限を持っているため何もしません</td><td></td></tr>
-            <tr style="background:#fffafa;"><td>7</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#c62828;background:#ffebee;border:1px solid #ffcdd2;">❌ エラー</span></td><td>林 健次郎</td><td>hayashi[at]example.jp</td><td>新宿店</td><td style="font-size:11px;color:#c62828;">送信なし</td><td style="font-size:11px;color:#c62828;">メールアドレスの形式が不正のため取り込めません</td><td style="white-space:nowrap;font-size:0;"><button onclick="openMasterAddRedirect('admin','林 健次郎');" style="font-size:10px;padding:4px 8px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;margin-right:4px;">➕ マスタに追加</button><button onclick="openRowEditModal('メール','hayashi[at]example.jp','hayashi@example.jp');" style="font-size:10px;padding:4px 8px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;margin-right:4px;">✏️ 行編集</button><button onclick="markRowSkipped(this);" style="font-size:10px;padding:4px 8px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;">⊘ スキップ</button></td></tr>
           </tbody>
         </table>
       </div>
@@ -1617,8 +1583,7 @@
         <a href="#" onclick="event.preventDefault();go('s-saas-single-businesstype');"    style="color:#1a73e8;font-weight:700;">業態</a> /
         <a href="#" onclick="event.preventDefault();go('s-saas-single-store');"    style="color:#1a73e8;font-weight:700;">店舗</a> /
         <a href="#" onclick="event.preventDefault();go('s-saas-single-emptype');"  style="color:#1a73e8;font-weight:700;">雇用区分</a> /
-        <a href="#" onclick="event.preventDefault();go('s-saas-single-employee');" style="color:#1a73e8;font-weight:700;">従業員</a> /
-        <a href="#" onclick="event.preventDefault();go('s-saas-single-admin');"    style="color:#1a73e8;font-weight:700;">管理者</a>
+        <a href="#" onclick="event.preventDefault();go('s-saas-single-employee');" style="color:#1a73e8;font-weight:700;">従業員</a>
       </div>
     </div>
   </div>
@@ -1720,12 +1685,10 @@
               <div style="font-size:13px;font-weight:600;">単価データ <span style="font-size:9px;padding:1px 7px;background:#fef3e2;color:#e67e22;border-radius:10px;font-weight:600;margin-left:6px;">任意</span></div>
             </div>
           </label>
-          <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #e8e8e8;border-radius:8px;cursor:pointer;" class="source-check" data-map="map-kot-admin" onclick="toggleCheck(this)">
-            <input type="checkbox" style="accent-color:#2ec4a0;width:16px;height:16px;">
-            <div style="flex:1;">
-              <div style="font-size:13px;font-weight:600;">管理者データ <span style="font-size:9px;padding:1px 7px;background:#fef3e2;color:#e67e22;border-radius:10px;font-weight:600;margin-left:6px;">任意</span></div>
-            </div>
-          </label>
+        </div>
+        <!-- 管理者は外部サービスに該当列がないため、外部連携では取り込まない (テンプレート⑤で登録) -->
+        <div style="margin-top:8px;padding:8px 12px;background:#fafafa;border:1px solid #e8e8e8;border-radius:6px;font-size:10px;color:#888;line-height:1.6;">
+          ※ 管理者は外部サービスに該当する列がないため、外部連携では取り込みません。管理者は<strong>⑤管理者テンプレート</strong>、または従業員を取り込んだ後に一覧から選択して登録してください。
         </div>
       </div>
 
@@ -1740,6 +1703,10 @@
             <input type="checkbox" style="accent-color:#2ec4a0;width:16px;height:16px;">
             <div style="flex:1;font-size:13px;font-weight:600;">従業員データ <span style="font-size:9px;padding:1px 7px;background:#fef3e2;color:#e67e22;border-radius:10px;font-weight:600;margin-left:6px;">任意</span></div>
           </label>
+        </div>
+        <!-- 管理者は外部サービスに該当列がないため、外部連携では取り込まない (テンプレート⑤で登録) -->
+        <div style="margin-top:8px;padding:8px 12px;background:#fafafa;border:1px solid #e8e8e8;border-radius:6px;font-size:10px;color:#888;line-height:1.6;">
+          ※ 管理者は外部サービスに該当する列がないため、外部連携では取り込みません。管理者は<strong>⑤管理者テンプレート</strong>、または従業員を取り込んだ後に一覧から選択して登録してください。
         </div>
       </div>
 
@@ -2266,7 +2233,6 @@
       <div style="display:flex;align-items:stretch;gap:0;">
         <button onclick="switchSaasDataTypeTab('master')" id="saas-typetab-master" style="flex:1;padding:14px 16px;border:none;background:#f5f7f9;border-bottom:3px solid transparent;cursor:pointer;font-size:13px;font-weight:600;color:#555;">①〜③ 設定マスタ <span style="font-size:10px;color:#888;font-weight:400;">(取得不可)</span></button>
         <button onclick="switchSaasDataTypeTab('employee')" id="saas-typetab-employee" style="flex:1;padding:14px 16px;border:none;background:#fff;border-bottom:3px solid #2ec4a0;cursor:pointer;font-size:13px;font-weight:700;color:#0e9077;">④ 従業員 <span style="font-size:10px;color:#888;font-weight:400;">(15件 / エラー1)</span></button>
-        <button onclick="switchSaasDataTypeTab('admin')" id="saas-typetab-admin" style="flex:1;padding:14px 16px;border:none;background:#f5f7f9;border-bottom:3px solid transparent;cursor:pointer;font-size:13px;font-weight:600;color:#555;">⑤ 管理者 <span style="font-size:10px;color:#888;font-weight:400;">(任意・6件)</span></button>
       </div>
     </div>
 
@@ -2410,44 +2376,6 @@
     </div>
 
     </div><!-- /#saas-confirm-employee -->
-
-    <!-- ★ 管理者データ確認セクション (2026-05-18 追加 / 2026-07-23 判定ラベル確定) -->
-    <div id="saas-confirm-admin" style="display:none;margin-top:24px;">
-      <div class="map-section-header"><span style="background:#2ec4a0;color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;">⑤</span> 管理者 <span style="font-size:10px;color:#888;font-weight:400;margin-left:6px;">(任意)</span></div>
-      <div class="alert alert-info">⑤ 管理者: <strong>6件</strong>を検出し、メールアドレスの突合で登録方法を自動判定しました。</div>
-
-      <div class="pv-summary">
-        <div class="pv-box pv-total"><div class="num">6</div><div class="lbl">データ行数</div></div>
-        <div class="pv-box pv-new"><div class="num">2</div><div class="lbl">新規登録</div></div>
-        <div class="pv-box pv-upd"><div class="num">1</div><div class="lbl">権限付与</div></div>
-        <div class="pv-box pv-rep"><div class="num">1</div><div class="lbl">差し替え</div></div>
-        <div class="pv-box pv-skip"><div class="num">1</div><div class="lbl">スキップ</div></div>
-        <div class="pv-box pv-err"><div class="num">1</div><div class="lbl">エラー</div></div>
-      </div>
-
-      <div class="wcard" style="padding:0;overflow-x:auto;">
-        <div class="stabs" style="padding:0 14px;">
-          <div class="stab active">すべて (6)</div>
-          <div class="stab" style="color:#f0960a;">🔄 差し替え対象 (1)</div>
-          <div class="stab" style="color:#888888;">⏭ スキップ (1)</div>
-          <div class="stab" style="color:#e74c3c">❌ エラー (1)</div>
-        </div>
-        <table class="pv-table">
-          <thead>
-            <tr><th>行</th><th>判定</th><th>名前</th><th>メール</th><th>店舗</th><th>送信メール</th><th>状況詳細</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>2</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#0e9077;background:#e8f8f5;border:1px solid #b8e6d6;">🆕 新規登録</span></td><td>山本 健一</td><td>yamamoto@example.jp</td><td>渋谷店</td><td style="font-size:11px;color:#555;">招待メール(新規版)</td><td style="font-size:11px;color:#0e9077;">会社内に未登録のため新規作成し、管理者権限を付与</td></tr>
-            <tr><td>3</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#0e9077;background:#e8f8f5;border:1px solid #b8e6d6;">🆕 新規登録</span></td><td>佐藤 一郎</td><td>sato@example.jp</td><td>新宿店</td><td style="font-size:11px;color:#555;">招待メール(新規版)</td><td style="font-size:11px;color:#0e9077;">会社内に未登録のため新規作成し、管理者権限を付与</td></tr>
-            <tr><td>4</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#5c4dac;background:#ede7f6;border:1px solid #c5b6e1;">👥 権限付与</span></td><td>test</td><td>test@example.com</td><td>渋谷店</td><td style="font-size:11px;color:#555;">管理者権限付与のお知らせ</td><td style="font-size:11px;color:#5c4dac;">既存従業員 (招待承諾済み) に管理者権限を追加</td></tr>
-            <tr style="background:#fffaf0;"><td>5</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#f0960a;background:#fff8e1;border:1px solid #ffe0a3;">🔄 差し替え</span></td><td>林 健次郎</td><td>hayashi@example.jp</td><td>新宿店</td><td style="font-size:11px;color:#f0960a;">【再送・差し替え】招待メール</td><td style="font-size:11px;color:#f0960a;">招待済み・未承諾のため旧招待を無効化して再発行</td></tr>
-            <tr style="background:#fafafa;"><td>6</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#888888;background:#f5f5f5;border:1px solid #e0e0e0;">⏭ スキップ</span></td><td>鈴木 花子</td><td>suzuki@example.jp</td><td>渋谷店</td><td style="font-size:11px;color:#888888;">送信なし</td><td style="font-size:11px;color:#888888;">すでに管理者権限を持っているため何もしません</td></tr>
-            <tr style="background:#fffafa;"><td>7</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#c62828;background:#ffebee;border:1px solid #ffcdd2;">❌ エラー</span></td><td>高橋 太郎</td><td>takahashi@example.jp</td><td style="color:#c62828;">原宿店</td><td style="font-size:11px;color:#c62828;">送信なし</td><td style="font-size:11px;color:#c62828;">担当店舗「原宿店」が未登録のため取り込めません</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div style="margin-top:10px;padding:10px 12px;background:#fafafa;border:1px solid #e8e8e8;border-radius:6px;font-size:11px;line-height:1.6;"><div style="font-weight:700;color:#444;margin-bottom:6px;">判定の見方</div><div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:5px;"><div style="flex:0 0 88px;"><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#0e9077;background:#e8f8f5;border:1px solid #b8e6d6;white-space:nowrap;">🆕 新規登録</span></div><div style="flex:1;color:#555;">会社内に同じメールアドレスのユーザーがいない。新規作成して管理者権限を付与します。</div></div><div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:5px;"><div style="flex:0 0 88px;"><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#5c4dac;background:#ede7f6;border:1px solid #c5b6e1;white-space:nowrap;">👥 権限付与</span></div><div style="flex:1;color:#555;">従業員として在籍済みで招待も承諾済み。既存ユーザーに管理者権限を追加します（新規作成はしません）。</div></div><div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:5px;"><div style="flex:0 0 88px;"><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#f0960a;background:#fff8e1;border:1px solid #ffe0a3;white-space:nowrap;">🔄 差し替え</span></div><div style="flex:1;color:#555;">招待済みですが、まだ承諾されていません。旧招待を無効化して招待を再発行します。</div></div><div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:5px;"><div style="flex:0 0 88px;"><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#888888;background:#f5f5f5;border:1px solid #e0e0e0;white-space:nowrap;">⏭ スキップ</span></div><div style="flex:1;color:#555;">すでに管理者権限を持っています。何もしません（メールも送りません）。</div></div><div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:5px;"><div style="flex:0 0 88px;"><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#c62828;background:#ffebee;border:1px solid #ffcdd2;white-space:nowrap;">❌ エラー</span></div><div style="flex:1;color:#555;">必須項目の不足、担当店舗が未登録、メールアドレスの形式不正など。取り込みません。</div></div><div style="margin-top:6px;font-size:10px;color:#888;">判定はメールアドレスをもとに自動で行われます。「重複時の処理」の設定は管理者データには適用されません。</div></div>
-    </div>
 
     <div class="wcard">
       <div class="wcard-title" style="margin-bottom:8px">重複時の処理 <span style="font-size:10px;color:#888;font-weight:400;">(従業員データのみ適用)</span></div>
@@ -2897,8 +2825,7 @@ var SAAS_TYPE_LABEL = {
   'map-kot-store':   '店舗データ',
   'map-kot-emptype': '雇用区分データ',
   'map-kot-emp':     '従業員データ',
-  'map-kot-hr':      '従業員一覧(補完)',
-  'map-kot-admin':   '管理者データ'
+  'map-kot-hr':      '従業員一覧(補完)'
 };
 
 var TPL_SINGLE_CFG = [
@@ -2916,8 +2843,7 @@ var SAAS_SINGLE_CFG = [
   { key:'businesstype',    label:'業態', mapKey:'map-kot-businesstype',   settingsHash:'businesstype-ops-settings', required:false },
   { key:'store',    label:'店舗',           mapKey:'map-kot-store',   settingsHash:'store-ops-settings', required:false },
   { key:'emptype',  label:'雇用区分',       mapKey:'map-kot-emptype', settingsHash:'emptype-ops-settings', required:false },
-  { key:'employee', label:'従業員',         mapKey:'map-kot-emp',     settingsHash:'emp-ops-settings',   required:true  },
-  { key:'admin',    label:'管理者',         mapKey:'map-kot-admin',   settingsHash:'d1',                 required:false }
+  { key:'employee', label:'従業員',         mapKey:'map-kot-emp',     settingsHash:'emp-ops-settings',   required:true  }
 ];
 
 // per-key state (currentIdx + multi-mode flag)
@@ -3147,14 +3073,8 @@ function renderSaasMappingSingleScreen(cfg) {
       ['店舗','store',true,'渋谷店'],
       ['雇用区分','emptype',true,'正社員A'],
       ['交通費','commute',false,'¥30,000/月']
-    ],
-    admin:    [
-      ['管理者コード','admin_code',false,'ADM001'],
-      ['氏名','name',true,'山本 健一'],
-      ['メール','email',true,'yamamoto@example.jp'],
-      ['店舗','store',false,'渋谷店'],
-      ['権限','__NA__',false,'店舗管理者']   // ラクミー側に対応項目なし (権限は常に「管理者」固定)
     ]
+    // admin(管理者) は外部連携では扱わない (外部サービスに該当列なし。管理者はテンプレート⑤で登録)
   };
   var defs = sampleRowsByKey[k] || [];
   // ① 4列テーブル (列名 / → / ラクミー項目 / サンプル値)
@@ -4080,23 +4000,20 @@ var SAAS_KEY_LABEL = {
   'map-kot-businesstype':'業態',
   'map-kot-store':'店舗',
   'map-kot-emptype':'雇用区分',
-  'map-kot-emp':'従業員',
-  'map-kot-admin':'管理者'
+  'map-kot-emp':'従業員'
 };
 // 5種すべて対応: businesstype/store/emptype/employee/admin
 var SAAS_PREVIEW_KEY_TO_SEC = {
   'map-kot-businesstype':   'businesstype',
   'map-kot-store':   'store',
   'map-kot-emptype': 'emptype',
-  'map-kot-emp':     'emp',
-  'map-kot-admin':   'admin'
+  'map-kot-emp':     'emp'
 };
 var SAAS_TYPE_TO_PREVIEW_KEY = {
   businesstype:    'map-kot-businesstype',
   store:    'map-kot-store',
   emptype:  'map-kot-emptype',
-  employee: 'map-kot-emp',
-  admin:    'map-kot-admin'
+  employee: 'map-kot-emp'
 };
 function setupSaasPreviewSingleTabs() {
   var order = (typeof getSingleSaasOrder === 'function') ? getSingleSaasOrder() : [];
@@ -4191,7 +4108,7 @@ function returnToSourceSetting() {
         var targetId = null;
         // 2026-05-19: SaaS は 5 種すべて対応 (futureOnly 撤去)
         var tplKeys  = ['businesstype','store','emptype','employee','admin'];
-        var saasKeys = ['businesstype','store','emptype','employee','admin'];
+        var saasKeys = ['businesstype','store','emptype','employee'];
         var goto_    = params.get('goto');
         // 設定画面経由でも初期設定の連携元サービスを引き継ぐ (?src=kot|jobcan|other)
         var srcParam = params.get('src');
@@ -4333,8 +4250,7 @@ var SAAS_WIZ_DEFS = {
     { key:'map-kot-emp',   name:'従業員データ',     badge:'必須', bc:'#0e9077', required:true,  hint:'KoT「従業員データ(employee_info)」をエクスポートしてアップロード' },
     { key:'map-kot-hr',    name:'従業員一覧',       badge:'任意', bc:'#e67e22', required:false, hint:'KoT「従業員一覧エクスポート(hr_)」給与補完用' },
     { key:'map-kot-group', name:'所属グループデータ', badge:'任意', bc:'#e67e22', required:false, hint:'KoTの所属グループ(店舗マッピング用)' },
-    { key:'map-kot-rate',  name:'単価データ',       badge:'任意', bc:'#e67e22', required:false, hint:'KoTの単価(給与補完用)' },
-    { key:'map-kot-admin', name:'管理者データ',     badge:'任意', bc:'#e67e22', required:false, hint:'管理者(メールアドレスの突合で登録方法を自動判定)' }
+    { key:'map-kot-rate',  name:'単価データ',       badge:'任意', bc:'#e67e22', required:false, hint:'KoTの単価(給与補完用)' }
   ],
   jc: [
     { key:'businesstype', name:'業態', badge:'テンプレ', bc:'#7b1fa2', dl:'downloadBusinesstypeTemplate', required:false, hint:'ラクミーの業態テンプレートに記入してアップロード', chk:'[data-saas-extra="businesstype"]' },
@@ -5628,8 +5544,8 @@ function switchTplDataTypeTab(type) {
 
 // 外部勤怠サービス (s-saas-preview) 用 取り込みデータ種別タブ切替
 function switchSaasDataTypeTab(type) {
-  var tabs = { master:'saas-typetab-master', employee:'saas-typetab-employee', admin:'saas-typetab-admin' };
-  var sections = { master:'saas-confirm-master', employee:'saas-confirm-employee', admin:'saas-confirm-admin' };
+  var tabs = { master:'saas-typetab-master', employee:'saas-typetab-employee' };
+  var sections = { master:'saas-confirm-master', employee:'saas-confirm-employee' };
   Object.keys(tabs).forEach(function(k) {
     var btn = document.getElementById(tabs[k]);
     if (btn) {
