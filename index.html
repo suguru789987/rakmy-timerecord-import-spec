@@ -286,6 +286,7 @@
     <button class="current" onclick="go('s-top')">トップ</button>
     <div class="dn-sep"></div>
     <div style="font-size:10px;color:#1a9e7e;font-weight:700;padding:6px 8px 2px;">★ 新規初期セットアップ (setup)</div>
+    <button onclick="demoOpenSetupHome()" style="color:#1a9e7e;font-size:11px;">└ 初期セットアップ トップ（登録方法選択）↗</button>
     <button onclick="demoOpenSetup('tpl')"  style="color:#1a9e7e;font-size:11px;">└ テンプレ取込 → アップロード</button>
     <button onclick="demoOpenSetup('saas')" style="color:#1a9e7e;font-size:11px;">└ 外部勤怠取込 → アップロード</button>
     <button onclick="demoOpenSetup('tpl');go('s-tpl2')"  style="color:#1a9e7e;font-size:11px;">→ 確認・実行</button>
@@ -5719,6 +5720,13 @@ function applyHashRouting() {
       applySaasMode('ops');
     }
   } catch (e) { /* no-op */ }
+}
+
+// デモ用: 初期セットアップのトップ(登録方法選択画面)を開く。
+// この画面は本リポではなく owner-mock (page-b0) に存在するため、別タブで開く。
+// 「設定画面で1件ずつ登録」か「CSV一括インポート」かを選ぶ Step0 の画面。
+function demoOpenSetupHome() {
+  window.open('https://suguru789987.github.io/rakmy-owner-registration-mock/#b0', '_blank');
 }
 
 // デモ用: 新規初期セットアップ動線を一発で開く(setupモード = 進捗チップ + 戻るバナー + 見出し文言つき)
