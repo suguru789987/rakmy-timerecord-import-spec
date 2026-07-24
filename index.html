@@ -285,6 +285,12 @@
     <h4>画面切替（デモ用）</h4>
     <button class="current" onclick="go('s-top')">トップ</button>
     <div class="dn-sep"></div>
+    <div style="font-size:10px;color:#1a9e7e;font-weight:700;padding:6px 8px 2px;">★ 新規初期セットアップ (setup)</div>
+    <button onclick="demoOpenSetup('tpl')"  style="color:#1a9e7e;font-size:11px;">└ テンプレ取込 → アップロード</button>
+    <button onclick="demoOpenSetup('saas')" style="color:#1a9e7e;font-size:11px;">└ 外部勤怠取込 → アップロード</button>
+    <button onclick="demoOpenSetup('tpl');go('s-tpl2')"  style="color:#1a9e7e;font-size:11px;">→ 確認・実行</button>
+    <button onclick="demoOpenSetup('tpl');go('s-tpl3')"  style="color:#1a9e7e;font-size:11px;">→ 完了 (初期セットアップへ戻る導線)</button>
+    <div class="dn-sep"></div>
     <div style="font-size:10px;color:#1a73e8;font-weight:700;padding:6px 8px 2px;">★ 運用更新: テンプレ取込 (設定画面別)</div>
     <button onclick="go('s-tpl-single-businesstype')"    style="color:#1a73e8;font-size:11px;">└ 業態</button>
     <button onclick="go('s-tpl-single-store')"    style="color:#1a73e8;font-size:11px;">└ 店舗</button>
@@ -5713,6 +5719,18 @@ function applyHashRouting() {
       applySaasMode('ops');
     }
   } catch (e) { /* no-op */ }
+}
+
+// デモ用: 新規初期セットアップ動線を一発で開く(setupモード = 進捗チップ + 戻るバナー + 見出し文言つき)
+// 左デモナビの「★ 新規初期セットアップ」から呼ばれる。回帰確認用の入口。
+function demoOpenSetup(kind) {
+  if (kind === 'saas') {
+    go('s-saas1');
+    if (typeof switchSaasMode === 'function') switchSaasMode('setup');
+  } else {
+    go('s-tpl1');
+    if (typeof switchTplMode === 'function') switchTplMode('setup');
+  }
 }
 
 // 外部連携画面のモード切替(デモ用トグルから)
