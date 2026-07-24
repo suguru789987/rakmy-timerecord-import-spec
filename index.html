@@ -290,8 +290,8 @@
     <button onclick="demoOpenSetup('tpl')"  style="color:#1a9e7e;font-size:11px;">└ テンプレ取込 → アップロード</button>
     <button onclick="demoOpenSetup('saas')" style="color:#1a9e7e;font-size:11px;">└ 外部勤怠取込 → アップロード</button>
     <button onclick="demoOpenSetup('tpl');go('s-tpl2')"  style="color:#1a9e7e;font-size:11px;">→ 確認・実行</button>
-    <button onclick="demoOpenSetup('tpl');go('s-tpl3');demoTplResult('allok')"   style="color:#1a9e7e;font-size:11px;">→ 完了 (全件成功)</button>
-    <button onclick="demoOpenSetup('tpl');go('s-tpl3');demoTplResult('partial')" style="color:#1a9e7e;font-size:11px;">→ 完了 (一部失敗・再取り込み)</button>
+    <button onclick="demoOpenSetup('tpl');go('s-tpl3');demoResult('tpl3','allok')"   style="color:#1a9e7e;font-size:11px;">→ 完了 (全件成功)</button>
+    <button onclick="demoOpenSetup('tpl');go('s-tpl3');demoResult('tpl3','partial')" style="color:#1a9e7e;font-size:11px;">→ 完了 (一部失敗・再取り込み)</button>
     <div class="dn-sep"></div>
     <div style="font-size:10px;color:#1a73e8;font-weight:700;padding:6px 8px 2px;">★ 運用更新: テンプレ取込 (設定画面別)</div>
     <button onclick="go('s-tpl-single-businesstype')"    style="color:#1a73e8;font-size:11px;">└ 業態</button>
@@ -729,10 +729,44 @@
     </div>
 
     <div class="wcard" style="text-align:center;padding:40px 24px;">
-      <div style="font-size:56px;margin-bottom:14px;">✅</div>
-      <h2 style="font-size:22px;font-weight:700;color:#0e9077;margin:0 0 8px 0;">インポート完了</h2>
+      <div style="font-size:56px;margin-bottom:14px;" id="tpls-result-icon">✅</div>
+      <h2 style="font-size:22px;font-weight:700;color:#0e9077;margin:0 0 8px 0;" id="tpls-result-title">インポート完了</h2>
       <div style="font-size:14px;color:#333;margin-bottom:6px;"><strong>5件</strong>のデータの取込が完了しました。</div>
       <div class="single-complete-guide" style="font-size:12px;color:#888;margin-bottom:24px;">続けて<strong>遷移元の設定画面</strong>で登録結果の一覧をご確認ください。</div>
+
+      <!-- ★ 取り込み実行結果 (2026-07-24): デモトグルで 全件成功 ↔ 一部失敗(部分成功) -->
+      <div style="text-align:left;margin-bottom:16px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+          <div style="font-size:11px;font-weight:700;color:#444;">取り込み実行結果</div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:9px;background:#fff3e0;border:1px dashed #e67e22;border-radius:6px;padding:3px 6px;">
+            <span style="color:#e67e22;font-weight:700;">🛠 デモ:</span>
+            <button id="tpls-result-toggle-allok" onclick="demoResult('tpls','allok')" style="font-size:9px;padding:2px 8px;border:1px solid #2ec4a0;background:#2ec4a0;color:#fff;border-radius:4px;cursor:pointer;font-weight:700;">全件成功</button>
+            <button id="tpls-result-toggle-partial" onclick="demoResult('tpls','partial')" style="font-size:9px;padding:2px 8px;border:1px solid #ccc;background:#fff;color:#555;border-radius:4px;cursor:pointer;">一部失敗(429)</button>
+          </div>
+        </div>
+        <div id="tpls-exec-allok" style="background:#e8f8f5;border:1px solid #b8e6d6;border-radius:8px;padding:10px 12px;font-size:11px;color:#0e9077;line-height:1.6;">
+          ✅ <strong>登録処理 5件すべて成功</strong>（失敗 0 件）
+        </div>
+        <div id="tpls-exec-partial" style="display:none;">
+          <div style="background:#fff8e1;border:1px solid #ffe0a3;border-radius:8px;padding:10px 12px;font-size:11px;color:#9c6a08;line-height:1.6;margin-bottom:8px;">
+            ⚠️ <strong>4件成功 / 1件失敗</strong>（部分成功）<br>
+            <span style="color:#555;">1件で招待APIが一時的に失敗しました。失敗分は登録されておらず、<strong>再取り込みで回収</strong>できます。</span>
+          </div>
+          <div style="border:1px solid #ffcdd2;border-radius:8px;overflow:hidden;margin-bottom:8px;">
+            <div style="background:#ffebee;color:#c62828;font-size:10px;font-weight:700;padding:6px 12px;">失敗した行 (1件) — 再取り込み対象</div>
+            <table class="pv-table" style="font-size:11px;">
+              <thead><tr><th>行</th><th>判定</th><th>名前</th><th>メール</th><th>失敗理由</th></tr></thead>
+              <tbody>
+                <tr><td>4</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#0e9077;background:#e8f8f5;border:1px solid #b8e6d6;">🆕 新規登録</span></td><td>林 健次郎</td><td>hayashi@example.jp</td><td style="color:#c62828;">招待APIの一時的な制限(429)</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="background:#fafafa;border:1px solid #e8e8e8;border-radius:6px;padding:8px 10px;font-size:10px;color:#666;line-height:1.7;">
+            💡 失敗した行はロールバック済みです。設定画面から再取り込みすると、失敗分は再び「新規登録」、成功済みは「差し替え/スキップ」に自動判定され、<strong>重複は発生しません</strong>。
+          </div>
+        </div>
+      </div>
+
       <!-- 招待メール送信ボタン (employee/admin 取込時のみ表示) -->
       <div id="tpl3-invite-mail-row" style="display:none;margin-bottom:16px;padding:14px 16px;background:#f0faf6;border:1px solid #b8e6d6;border-radius:8px;">
         <div style="font-size:12px;color:#0e9077;font-weight:700;margin-bottom:8px;">📧 取込済データに対する招待メール</div>
@@ -965,10 +999,44 @@
     </div>
 
     <div class="wcard" style="text-align:center;padding:40px 24px;">
-      <div style="font-size:56px;margin-bottom:14px;">✅</div>
-      <h2 style="font-size:22px;font-weight:700;color:#0e9077;margin:0 0 8px 0;">インポート完了</h2>
+      <div style="font-size:56px;margin-bottom:14px;" id="saasd-result-icon">✅</div>
+      <h2 style="font-size:22px;font-weight:700;color:#0e9077;margin:0 0 8px 0;" id="saasd-result-title">インポート完了</h2>
       <div style="font-size:14px;color:#333;margin-bottom:6px;"><strong>5件</strong>の外部勤怠データの取込が完了しました。</div>
       <div class="single-complete-guide" style="font-size:12px;color:#888;margin-bottom:24px;">続けて<strong>遷移元の設定画面</strong>で登録結果の一覧をご確認ください。</div>
+
+      <!-- ★ 取り込み実行結果 (2026-07-24): デモトグルで 全件成功 ↔ 一部失敗(部分成功) -->
+      <div style="text-align:left;margin-bottom:16px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+          <div style="font-size:11px;font-weight:700;color:#444;">取り込み実行結果</div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:9px;background:#fff3e0;border:1px dashed #e67e22;border-radius:6px;padding:3px 6px;">
+            <span style="color:#e67e22;font-weight:700;">🛠 デモ:</span>
+            <button id="saasd-result-toggle-allok" onclick="demoResult('saasd','allok')" style="font-size:9px;padding:2px 8px;border:1px solid #2ec4a0;background:#2ec4a0;color:#fff;border-radius:4px;cursor:pointer;font-weight:700;">全件成功</button>
+            <button id="saasd-result-toggle-partial" onclick="demoResult('saasd','partial')" style="font-size:9px;padding:2px 8px;border:1px solid #ccc;background:#fff;color:#555;border-radius:4px;cursor:pointer;">一部失敗(429)</button>
+          </div>
+        </div>
+        <div id="saasd-exec-allok" style="background:#e8f8f5;border:1px solid #b8e6d6;border-radius:8px;padding:10px 12px;font-size:11px;color:#0e9077;line-height:1.6;">
+          ✅ <strong>登録処理 5件すべて成功</strong>（失敗 0 件）
+        </div>
+        <div id="saasd-exec-partial" style="display:none;">
+          <div style="background:#fff8e1;border:1px solid #ffe0a3;border-radius:8px;padding:10px 12px;font-size:11px;color:#9c6a08;line-height:1.6;margin-bottom:8px;">
+            ⚠️ <strong>4件成功 / 1件失敗</strong>（部分成功）<br>
+            <span style="color:#555;">1件で招待APIが一時的に失敗しました。失敗分は登録されておらず、<strong>再取り込みで回収</strong>できます。</span>
+          </div>
+          <div style="border:1px solid #ffcdd2;border-radius:8px;overflow:hidden;margin-bottom:8px;">
+            <div style="background:#ffebee;color:#c62828;font-size:10px;font-weight:700;padding:6px 12px;">失敗した行 (1件) — 再取り込み対象</div>
+            <table class="pv-table" style="font-size:11px;">
+              <thead><tr><th>行</th><th>判定</th><th>名前</th><th>メール</th><th>失敗理由</th></tr></thead>
+              <tbody>
+                <tr><td>4</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#0e9077;background:#e8f8f5;border:1px solid #b8e6d6;">🆕 新規登録</span></td><td>林 健次郎</td><td>hayashi@example.jp</td><td style="color:#c62828;">招待APIの一時的な制限(429)</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="background:#fafafa;border:1px solid #e8e8e8;border-radius:6px;padding:8px 10px;font-size:10px;color:#666;line-height:1.7;">
+            💡 失敗した行はロールバック済みです。設定画面から再取り込みすると、失敗分は再び「新規登録」、成功済みは「差し替え/スキップ」に自動判定され、<strong>重複は発生しません</strong>。
+          </div>
+        </div>
+      </div>
+
       <!-- 招待メール送信ボタン (employee/admin 取込時のみ表示) -->
       <div id="saas3-invite-mail-row" style="display:none;margin-bottom:16px;padding:14px 16px;background:#f0faf6;border:1px solid #b8e6d6;border-radius:8px;">
         <div style="font-size:12px;color:#0e9077;font-weight:700;margin-bottom:8px;">📧 取込済データに対する招待メール</div>
@@ -1447,8 +1515,8 @@
 
     <div class="wcard">
       <div class="result-center">
-        <div class="r-icon">✅</div>
-        <h2>インポート完了</h2>
+        <div class="r-icon" id="tpl3-result-icon">✅</div>
+        <h2 id="tpl3-result-title">インポート完了</h2>
         <p>設定マスタ・従業員データが正常に登録されました</p>
         <div class="result-detail">
           <div style="font-size:11px;font-weight:600;color:#888;padding-bottom:4px;">①〜③ 設定マスタ</div>
@@ -1474,8 +1542,8 @@
             <div style="font-size:11px;font-weight:700;color:#444;">取り込み実行結果</div>
             <div style="display:flex;align-items:center;gap:6px;font-size:9px;background:#fff3e0;border:1px dashed #e67e22;border-radius:6px;padding:3px 6px;">
               <span style="color:#e67e22;font-weight:700;">🛠 デモ:</span>
-              <button id="tpl3-result-toggle-allok" onclick="demoTplResult('allok')" style="font-size:9px;padding:2px 8px;border:1px solid #2ec4a0;background:#2ec4a0;color:#fff;border-radius:4px;cursor:pointer;font-weight:700;">全件成功</button>
-              <button id="tpl3-result-toggle-partial" onclick="demoTplResult('partial')" style="font-size:9px;padding:2px 8px;border:1px solid #ccc;background:#fff;color:#555;border-radius:4px;cursor:pointer;">一部失敗(429)</button>
+              <button id="tpl3-result-toggle-allok" onclick="demoResult('tpl3','allok')" style="font-size:9px;padding:2px 8px;border:1px solid #2ec4a0;background:#2ec4a0;color:#fff;border-radius:4px;cursor:pointer;font-weight:700;">全件成功</button>
+              <button id="tpl3-result-toggle-partial" onclick="demoResult('tpl3','partial')" style="font-size:9px;padding:2px 8px;border:1px solid #ccc;background:#fff;color:#555;border-radius:4px;cursor:pointer;">一部失敗(429)</button>
             </div>
           </div>
 
@@ -2557,13 +2625,48 @@
 
     <div class="wcard">
       <div class="result-center">
-        <div class="r-icon">✅</div>
-        <h2>インポート完了</h2>
+        <div class="r-icon" id="saas4-result-icon">✅</div>
+        <h2 id="saas4-result-title">インポート完了</h2>
         <p>KoT 従業員データのインポートが完了しました</p>
         <div class="result-detail">
           <div class="rd-row"><span>新規登録</span><span class="rd-val rd-green">12件</span></div>
           <div class="rd-row"><span>更新</span><span class="rd-val rd-yellow">2件</span></div>
-          <div class="rd-row"><span>エラー（スキップ）</span><span class="rd-val rd-red">1件</span></div>
+          <div class="rd-row"><span>エラー（取り込まず）</span><span class="rd-val rd-red">1件</span></div>
+        </div>
+
+        <!-- ★ 取り込み実行結果 (2026-07-24): デモトグルで 全件成功 ↔ 一部失敗(部分成功) -->
+        <div style="border-top:2px solid #e0e0e0;margin-top:12px;padding-top:12px;text-align:left;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+            <div style="font-size:11px;font-weight:700;color:#444;">取り込み実行結果</div>
+            <div style="display:flex;align-items:center;gap:6px;font-size:9px;background:#fff3e0;border:1px dashed #e67e22;border-radius:6px;padding:3px 6px;">
+              <span style="color:#e67e22;font-weight:700;">🛠 デモ:</span>
+              <button id="saas4-result-toggle-allok" onclick="demoResult('saas4','allok')" style="font-size:9px;padding:2px 8px;border:1px solid #2ec4a0;background:#2ec4a0;color:#fff;border-radius:4px;cursor:pointer;font-weight:700;">全件成功</button>
+              <button id="saas4-result-toggle-partial" onclick="demoResult('saas4','partial')" style="font-size:9px;padding:2px 8px;border:1px solid #ccc;background:#fff;color:#555;border-radius:4px;cursor:pointer;">一部失敗(429)</button>
+            </div>
+          </div>
+          <div id="saas4-exec-allok" style="background:#e8f8f5;border:1px solid #b8e6d6;border-radius:8px;padding:10px 12px;font-size:11px;color:#0e9077;line-height:1.6;">
+            ✅ <strong>登録処理 14件すべて成功</strong>（失敗 0 件）<br>
+            <span style="color:#555;">新規登録・更新の対象行に対し、招待メールの送信まで完了しました。</span>
+          </div>
+          <div id="saas4-exec-partial" style="display:none;">
+            <div style="background:#fff8e1;border:1px solid #ffe0a3;border-radius:8px;padding:10px 12px;font-size:11px;color:#9c6a08;line-height:1.6;margin-bottom:8px;">
+              ⚠️ <strong>13件成功 / 1件失敗</strong>（部分成功）<br>
+              <span style="color:#555;">一部の行で招待APIが一時的に失敗しました。失敗分は登録されておらず、<strong>再取り込みで回収</strong>できます。</span>
+            </div>
+            <div style="border:1px solid #ffcdd2;border-radius:8px;overflow:hidden;margin-bottom:8px;">
+              <div style="background:#ffebee;color:#c62828;font-size:10px;font-weight:700;padding:6px 12px;">失敗した行 (1件) — 再取り込み対象</div>
+              <table class="pv-table" style="font-size:11px;">
+                <thead><tr><th>行</th><th>判定</th><th>名前</th><th>メール</th><th>失敗理由</th></tr></thead>
+                <tbody>
+                  <tr><td>7</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#0e9077;background:#e8f8f5;border:1px solid #b8e6d6;">🆕 新規登録</span></td><td>田村 拓也</td><td>tamura@example.jp</td><td style="color:#c62828;">招待APIの一時的な制限(429)。時間をおくと解消します</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div style="background:#fafafa;border:1px solid #e8e8e8;border-radius:6px;padding:8px 10px;font-size:10px;color:#666;line-height:1.7;">
+              💡 失敗した行はDBに残っていません（ロールバック済み）。再取り込みすると再び「新規登録」として処理されます。
+              一方、今回成功した行は次回「更新」「スキップ」に自動判定されるため、<strong>重複ユーザーは作られません</strong>。
+            </div>
+          </div>
         </div>
 
         <!-- 招待メール一括送信ブロック -->
@@ -2574,6 +2677,10 @@
             <span style="color:#666;font-size:10px;">※ メアド未入力の従業員には送信できません(下記「補完」セクション参照)。同一メアドが管理者と重複する場合は<strong>1アカウントに統合(ロール累積)</strong>されます。</span>
           </div>
           <button class="btn btn-primary" style="width:100%;padding:12px;font-size:13px;" onclick="showInviteSentModal(12)">✉️ 全員に招待メールを一括送信 (合計 12 通)</button>
+        </div>
+
+        <div style="display:flex;gap:8px;justify-content:center;">
+          <button id="saas4-retry-btn" class="btn btn-primary" style="display:none;" onclick="go('s-saas1')">失敗した1件を再取り込み →</button>
         </div>
       </div>
     </div>
@@ -5764,31 +5871,37 @@ function applyHashRouting() {
   } catch (e) { /* no-op */ }
 }
 
-// デモ用: 完了画面(s-tpl3)の取り込み実行結果を「全件成功」↔「一部失敗(部分成功)」で切替。
+// デモ用: 完了画面の取り込み実行結果を「全件成功」↔「一部失敗(部分成功)」で切替。
 // 部分成功は、行ごとのClerk招待API失敗でロールバックできず一部だけ登録された状態を再現。
 // 失敗行は再取り込みで回収され、成功済みは差し替え/スキップに落ちて重複回避される旨を明示。
-function demoTplResult(mode) {
-  var allok = document.getElementById('tpl3-exec-allok');
-  var partial = document.getElementById('tpl3-exec-partial');
-  var retry = document.getElementById('tpl3-retry-btn');
-  var tA = document.getElementById('tpl3-result-toggle-allok');
-  var tP = document.getElementById('tpl3-result-toggle-partial');
-  var isPartial = (mode === 'partial');
-  if (allok) allok.style.display = isPartial ? 'none' : '';
-  if (partial) partial.style.display = isPartial ? '' : 'none';
-  if (retry) retry.style.display = isPartial ? '' : 'none';
+// scope: 'tpl3'(テンプレ) / 'saas4'(外部勤怠) / 'tpls'(運用更新テンプレ) / 'saasd'(運用更新外部勤怠)
+// 大見出し(アイコン/タイトル)も状態反映する: 全成功=✅インポート完了 / 部分成功=⚠️一部未完了で終了
+function demoResult(scope, mode) {
+  var isP = (mode === 'partial');
+  var g = function (suf) { return document.getElementById(scope + '-' + suf); };
+  var allok = g('exec-allok'), partial = g('exec-partial'), retry = g('retry-btn');
+  if (allok) allok.style.display = isP ? 'none' : '';
+  if (partial) partial.style.display = isP ? '' : 'none';
+  if (retry) retry.style.display = isP ? '' : 'none';
+  // 大見出しの状態反映 (C)
+  var icon = g('result-icon'), title = g('result-title');
+  if (icon) icon.textContent = isP ? '⚠️' : '✅';
+  if (title) { title.textContent = isP ? '一部未完了で終了' : 'インポート完了'; title.style.color = isP ? '#9c6a08' : '#0e9077'; }
   // トグルの active 表示
+  var tA = g('result-toggle-allok'), tP = g('result-toggle-partial');
   if (tA && tP) {
-    tA.style.background = isPartial ? '#fff' : '#2ec4a0';
-    tA.style.color = isPartial ? '#555' : '#fff';
-    tA.style.borderColor = isPartial ? '#ccc' : '#2ec4a0';
-    tA.style.fontWeight = isPartial ? '400' : '700';
-    tP.style.background = isPartial ? '#e67e22' : '#fff';
-    tP.style.color = isPartial ? '#fff' : '#555';
-    tP.style.borderColor = isPartial ? '#e67e22' : '#ccc';
-    tP.style.fontWeight = isPartial ? '700' : '400';
+    tA.style.background = isP ? '#fff' : '#2ec4a0';
+    tA.style.color = isP ? '#555' : '#fff';
+    tA.style.borderColor = isP ? '#ccc' : '#2ec4a0';
+    tA.style.fontWeight = isP ? '400' : '700';
+    tP.style.background = isP ? '#e67e22' : '#fff';
+    tP.style.color = isP ? '#fff' : '#555';
+    tP.style.borderColor = isP ? '#e67e22' : '#ccc';
+    tP.style.fontWeight = isP ? '700' : '400';
   }
 }
+// 後方互換: 旧名 (s-tpl3 用)
+function demoTplResult(mode) { demoResult('tpl3', mode); }
 
 // デモ用: 初期セットアップのトップ(登録方法選択画面)を開く。
 // この画面は本リポではなく owner-mock (page-b0) に存在するため、別タブで開く。
