@@ -731,7 +731,7 @@
     <div class="wcard" style="text-align:center;padding:40px 24px;">
       <div style="font-size:56px;margin-bottom:14px;" id="tpls-result-icon">✅</div>
       <h2 style="font-size:22px;font-weight:700;color:#0e9077;margin:0 0 8px 0;" id="tpls-result-title">インポート完了</h2>
-      <div style="font-size:14px;color:#333;margin-bottom:6px;"><strong>5件</strong>のデータの取込が完了しました。</div>
+      <div style="font-size:14px;color:#333;margin-bottom:6px;" id="tpls-result-sub" data-ok="5件のデータの取込が完了しました。" data-partial="5件中 4件を登録しました。1件は未完了です（再取り込みで回収できます）。"><strong>5件</strong>のデータの取込が完了しました。</div>
       <div class="single-complete-guide" style="font-size:12px;color:#888;margin-bottom:24px;">続けて<strong>遷移元の設定画面</strong>で登録結果の一覧をご確認ください。</div>
 
       <!-- ★ 取り込み実行結果 (2026-07-24): デモトグルで 全件成功 ↔ 一部失敗(部分成功) -->
@@ -1001,7 +1001,7 @@
     <div class="wcard" style="text-align:center;padding:40px 24px;">
       <div style="font-size:56px;margin-bottom:14px;" id="saasd-result-icon">✅</div>
       <h2 style="font-size:22px;font-weight:700;color:#0e9077;margin:0 0 8px 0;" id="saasd-result-title">インポート完了</h2>
-      <div style="font-size:14px;color:#333;margin-bottom:6px;"><strong>5件</strong>の外部勤怠データの取込が完了しました。</div>
+      <div style="font-size:14px;color:#333;margin-bottom:6px;" id="saasd-result-sub" data-ok="5件の外部勤怠データの取込が完了しました。" data-partial="5件中 4件を登録しました。1件は未完了です（再取り込みで回収できます）。"><strong>5件</strong>の外部勤怠データの取込が完了しました。</div>
       <div class="single-complete-guide" style="font-size:12px;color:#888;margin-bottom:24px;">続けて<strong>遷移元の設定画面</strong>で登録結果の一覧をご確認ください。</div>
 
       <!-- ★ 取り込み実行結果 (2026-07-24): デモトグルで 全件成功 ↔ 一部失敗(部分成功) -->
@@ -1517,7 +1517,7 @@
       <div class="result-center">
         <div class="r-icon" id="tpl3-result-icon">✅</div>
         <h2 id="tpl3-result-title">インポート完了</h2>
-        <p>設定マスタ・従業員データが正常に登録されました</p>
+        <p id="tpl3-result-sub" data-ok="設定マスタ・従業員データが正常に登録されました" data-partial="一部の行が登録されていません。失敗分は下の一覧から再取り込みで回収してください。">設定マスタ・従業員データが正常に登録されました</p>
         <div class="result-detail">
           <div style="font-size:11px;font-weight:600;color:#888;padding-bottom:4px;">①〜③ 設定マスタ</div>
           <div class="rd-row"><span>業態</span><span class="rd-val rd-green">2件 登録</span></div>
@@ -2627,7 +2627,7 @@
       <div class="result-center">
         <div class="r-icon" id="saas4-result-icon">✅</div>
         <h2 id="saas4-result-title">インポート完了</h2>
-        <p>KoT 従業員データのインポートが完了しました</p>
+        <p id="saas4-result-sub" data-ok="KoT 従業員データのインポートが完了しました" data-partial="一部の行が登録されていません。失敗分は下の一覧から再取り込みで回収してください。">KoT 従業員データのインポートが完了しました</p>
         <div class="result-detail">
           <div class="rd-row"><span>新規登録</span><span class="rd-val rd-green">12件</span></div>
           <div class="rd-row"><span>更新</span><span class="rd-val rd-yellow">2件</span></div>
@@ -5887,6 +5887,9 @@ function demoResult(scope, mode) {
   var icon = g('result-icon'), title = g('result-title');
   if (icon) icon.textContent = isP ? '⚠️' : '✅';
   if (title) { title.textContent = isP ? '一部未完了で終了' : 'インポート完了'; title.style.color = isP ? '#9c6a08' : '#0e9077'; }
+  // 見出し直下の説明文も状態反映 (data-ok / data-partial を切替)
+  var sub = g('result-sub');
+  if (sub) { sub.textContent = isP ? (sub.getAttribute('data-partial') || '') : (sub.getAttribute('data-ok') || ''); sub.style.color = isP ? '#9c6a08' : ''; }
   // トグルの active 表示
   var tA = g('result-toggle-allok'), tP = g('result-toggle-partial');
   if (tA && tP) {
