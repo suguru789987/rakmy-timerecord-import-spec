@@ -1199,14 +1199,7 @@
       <div style="margin-top:12px;padding:10px 12px;background:#fafafa;border:1px solid #e8e8e8;border-radius:6px;font-size:11px;line-height:1.7;color:#555;">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:4px;">
           <div style="font-weight:700;color:#444;">取込上限・受付拒否</div>
-          <div style="display:flex;align-items:center;gap:5px;font-size:9px;background:#fff3e0;border:1px dashed #e67e22;border-radius:6px;padding:3px 6px;">
-            <span style="color:#e67e22;font-weight:700;">🛠 デモ:</span>
-            <button onclick="demoUploadReject('rows');" style="font-size:9px;padding:2px 7px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;">行数超過</button>
-            <button onclick="demoUploadReject('size');" style="font-size:9px;padding:2px 7px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;">サイズ超過</button>
-            <button onclick="demoUploadReject('encoding');" style="font-size:9px;padding:2px 7px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;">文字コード</button>
-            <button onclick="demoUploadReject('columns');" style="font-size:9px;padding:2px 7px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;">列不一致</button>
-            <button onclick="demoUploadReject('empty');" style="font-size:9px;padding:2px 7px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;">0件</button>
-          </div>
+          <div class="upload-reject-demo"></div>
         </div>
         1回に取り込めるのは <strong>500行</strong>（ヘッダー行を除いたデータ行数）まで、ファイルサイズは <strong>5MB</strong> までです。<strong>④従業員のみ 200行</strong>（1行あたり最大3リクエストのため・README §7.5）。<br>
         上限を超えたファイル、および文字コード不正・列名不一致・データ0件のファイルは、<strong>アップロード直後（プレビュー生成前）に受付を拒否</strong>します。上のデモボタンで各状態を確認できます。<br>
@@ -5888,6 +5881,16 @@ function demoZeroTarget(isZero) {
     grp.parentNode.insertBefore(box, grp);
   }
   box.style.display = isZero ? '' : 'none';
+  // サマリーボックスも連動させる(エラー0件のまま「1件もありません」と出ると矛盾して見えるため)
+  var boxes = sc.querySelectorAll('.pv-summary .pv-box');
+  for (var i = 0; i < boxes.length; i++) {
+    var num = boxes[i].querySelector('.num'); if (!num) continue;
+    if (!boxes[i].dataset.origNum) boxes[i].dataset.origNum = num.textContent;
+    if (!isZero) { num.textContent = boxes[i].dataset.origNum; continue; }
+    if (boxes[i].classList.contains('pv-total')) num.textContent = boxes[i].dataset.origNum;
+    else if (boxes[i].classList.contains('pv-err')) num.textContent = boxes[i].dataset.origNum ? sc.querySelector('.pv-summary .pv-total .num').textContent : '0';
+    else num.textContent = '0';
+  }
   var base = btn.getAttribute('data-label-base') || btn.textContent;
   btn.disabled = !!isZero;
   btn.style.opacity = isZero ? '.4' : '';
@@ -5931,16 +5934,21 @@ var UPLOAD_REJECT_MSG = {
 };
 function demoUploadReject(kind) {
   var d = UPLOAD_REJECT_MSG[kind]; if (!d) return;
-  // 全画面共通: 現在アクティブな画面の .content 先頭に注入する。
-  // 実装時もアップロード直後(プレビュー生成前)に弾き、ファイル一覧には追加しないこと。
   var sc = document.querySelector('.screen.active'); if (!sc) return;
-  var host = sc.querySelector('.content') || sc;
-  var box = host.querySelector('.upload-reject-box');
+  // バナーは「操作した場所のすぐ隣」に出す。.content の先頭に入れると
+  // アップロード欄までスクロールしている利用者には見えず、押しても何も起きていないように見える。
+  var demoBar = sc.querySelector('.upload-reject-demo');
+  var box = sc.querySelector('.upload-reject-box');
   if (!box) {
     box = document.createElement('div');
     box.className = 'upload-reject-box';
-    box.style.cssText = 'margin-bottom:14px;padding:12px 14px;background:#ffebee;border:1px solid #ffcdd2;border-radius:8px;';
-    host.insertBefore(box, host.firstChild);
+    box.style.cssText = 'margin:12px 0;padding:12px 14px;background:#ffebee;border:1px solid #ffcdd2;border-radius:8px;';
+    if (demoBar && demoBar.parentNode) {
+      demoBar.parentNode.insertBefore(box, demoBar);   // デモバーの直前(=アップロード欄の直下)
+    } else {
+      var host = sc.querySelector('.content') || sc;
+      host.insertBefore(box, host.firstChild);
+    }
   }
   box.innerHTML =
     '<div style="display:flex;align-items:flex-start;gap:10px;">' +
@@ -5949,10 +5957,9 @@ function demoUploadReject(kind) {
         '<div style="font-size:13px;font-weight:700;color:#c62828;margin-bottom:4px;">' + d.t + '</div>' +
         '<div style="font-size:11px;color:#9c4d12;line-height:1.8;">' + d.m + '</div>' +
       '</div>' +
-      '<button onclick="clearUploadReject();" style="font-size:10px;padding:4px 10px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;white-space:nowrap;">\u9589\u3058\u308b</button>' +
+      '<button onclick="clearUploadReject();" style="font-size:10px;padding:4px 10px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;white-space:nowrap;">閉じる</button>' +
     '</div>';
   box.style.display = '';
-  box.scrollIntoView({behavior:'smooth', block:'center'});
 }
 function clearUploadReject() {
   var boxes = document.querySelectorAll('.upload-reject-box');
@@ -5997,6 +6004,44 @@ function runImport(btn, targetScreen, total, label) {
   }, 170);
 }
 
+// ★ 取り込まなかった行(プレビューで除外したエラー行) (2026-07-28 / README §9.7)
+// 実行時の失敗(§7.7)は失敗行テーブルで回収できるが、実行"前"にプレビューで除外した行は
+// 完了画面から消えてしまい「全件成功」と読めてしまう。除外分も完了画面で必ず開示する。
+var EXCLUDED_ROWS_DEMO = {
+  tpls:  { n:1, rows:[['9','小林誠','kobayashi@example.com','雇用区分「アルバイトD」が未登録']] },
+  saasd: { n:1, rows:[['9','小林誠','kobayashi@example.com','雇用区分「アルバイトD」が未登録']] },
+  tpl3:  { n:3, rows:[['9','小林誠','kobayashi@example.com','雇用区分「アルバイトD」が未登録'],
+                      ['10','大野翔','ono@example.com','退職済みの従業員と同じ従業員コード'],
+                      ['11','森本彩','morimoto@example.com','担当店舗以外の従業員']] },
+  saas4: { n:1, rows:[['7','EMP-006','-','雇用区分がラクミー側に未登録']] }
+};
+function renderExcludedRowsBlocks() {
+  Object.keys(EXCLUDED_ROWS_DEMO).forEach(function (scope) {
+    var allok = document.getElementById(scope + '-exec-allok');
+    if (!allok || !allok.parentNode) return;
+    var wrap = allok.parentNode;
+    if (wrap.querySelector('.excluded-rows-box')) return;
+    var d = EXCLUDED_ROWS_DEMO[scope];
+    var box = document.createElement('div');
+    box.className = 'excluded-rows-box';
+    box.style.cssText = 'margin-top:10px;border:1px solid #ffe0a3;border-radius:8px;overflow:hidden;text-align:left;';
+    var tr = d.rows.map(function (r) {
+      return '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td><td>' + r[2] + '</td><td style="color:#9c6a08;">' + r[3] + '</td></tr>';
+    }).join('');
+    box.innerHTML =
+      '<div style="background:#fff8e1;color:#9c6a08;font-size:10px;font-weight:700;padding:6px 12px;">' +
+        '取り込まなかった行 (' + d.n + '件) — プレビューでエラーのため除外' +
+      '</div>' +
+      '<table class="pv-table" style="font-size:11px;"><thead><tr><th>行</th><th>対象</th><th>メール</th><th>除外理由</th></tr></thead><tbody>' + tr + '</tbody></table>' +
+      '<div style="padding:8px 10px;background:#fafafa;border-top:1px solid #eee;font-size:10px;color:#666;line-height:1.7;">' +
+        'これらの行は<strong>実行前に除外</strong>されており、登録されていません。原因を解消してから再取り込みしてください。' +
+        '「失敗した行をCSVでダウンロード」には、この除外分も含まれます。' +
+      '</div>';
+    wrap.appendChild(box);
+  });
+}
+document.addEventListener('DOMContentLoaded', renderExcludedRowsBlocks);
+
 // ★ 失敗行CSVダウンロード (2026-07-28 / README §7.7・§9.2)
 // 元テンプレートと同一列 + 末尾に「失敗理由」列。修正してそのまま再アップロードできる形式。
 // 「要手動確認」(補償削除に失敗した行) は再取り込みすると重複するため、このCSVには含めない。
@@ -6012,7 +6057,19 @@ var FAILED_ROWS_DEMO = {
 };
 function downloadFailedRowsCsv(scope) {
   var d = FAILED_ROWS_DEMO[scope] || FAILED_ROWS_DEMO.tpl3;
-  var blob = new Blob([[d.header].concat(d.rows).join('\n')], {type:'text/tab-separated-values'});
+  // 実行時の失敗に加え、プレビューで除外した行も含める (README §9.7)
+  var ex = EXCLUDED_ROWS_DEMO[scope];
+  var rows = d.rows.slice();
+  if (ex) {
+    ex.rows.forEach(function (r) {
+      var cols = d.header.split('\t').length;
+      var line = new Array(cols).fill('');
+      line[0] = r[1];
+      line[cols - 1] = 'プレビューでエラーのため除外: ' + r[3];
+      rows.push(line.join('\t'));
+    });
+  }
+  var blob = new Blob([[d.header].concat(rows).join('\n')], {type:'text/tab-separated-values'});
   var a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   // 実装時のファイル名: {元ファイル名}_失敗行_{YYYYMMDD}.csv
