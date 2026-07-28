@@ -25,6 +25,15 @@ for cls,n in [('next-steps-box',4),('auto-code-note',4),('excluded-rows-box',4)]
     if cls not in h: ng.append('クラス未定義: '+cls)
 if h.count('最大500行・5MB）'): ng.append('種別を無視した500行表記が残存')
 if '_失敗行_{YYYYMMDD}.csv' in r: ng.append('CSV拡張子が仕様とモックで不一致')
+# §0 前提条件の存在と内容 (一般論での仕様作成を防ぐ土台)
+if '## 0. 前提条件' not in r: ng.append('§0 前提条件が存在しない')
+else:
+    z = r[r.find('## 0. 前提条件'): r.find('## 1. テンプレートインポート')]
+    for k in ['origin/feature/189','roleEnum','userStoreAssignments','employmentCategoryEnum','employee_code','neon-http']:
+        if k not in z: ng.append('§0 に前提の記載がない: '+k)
+    if '本節に書かれていない前提で判断してはならない' not in z:
+        ng.append('§0 に運用ルール(一般論禁止)の記載がない')
+
 # 仕様が主張する実体の検査 (文字列の有無だけでなく実装を見る)
 if 'BOM付きUTF-8' in r:
     dl = h.count("new Blob(['\\ufeff'")
