@@ -5722,7 +5722,8 @@ function downloadBusinesstypeTemplate() {
     'カフェ',
     '居酒屋・バー'
   ];
-  var blob = new Blob([rows.join('\n')], {type:'text/tab-separated-values'});
+  // BOM付きUTF-8で配布する (README §9.5)。Excelで開いて保存し直しても UTF-8 が維持され、文字コード不正の大半を入口で防げる。
+  var blob = new Blob(['\ufeff' + rows.join('\n')], {type:'text/tab-separated-values;charset=utf-8'});
   var a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = 'ラクミー_インポートテンプレート_①業態.tsv';
@@ -5737,7 +5738,8 @@ function downloadStoreTemplate() {
     '新宿店\tカフェ\t160-0022\t東京都新宿区新宿3-3-3\t08:00〜22:00',
     '池袋店\t居酒屋・バー\t171-0021\t東京都豊島区西池袋1-1-1\t10:00〜22:00'
   ];
-  var blob = new Blob([rows.join('\n')], {type:'text/tab-separated-values'});
+  // BOM付きUTF-8で配布する (README §9.5)。Excelで開いて保存し直しても UTF-8 が維持され、文字コード不正の大半を入口で防げる。
+  var blob = new Blob(['\ufeff' + rows.join('\n')], {type:'text/tab-separated-values;charset=utf-8'});
   var a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = 'ラクミー_インポートテンプレート_②店舗.tsv';
@@ -5752,7 +5754,8 @@ function downloadEmptypeTemplate() {
     'パートB\t\t時給\t1200\t\t',
     'アルバイトC\t\t時給\t1100\t\t'
   ];
-  var blob = new Blob([rows.join('\n')], {type:'text/tab-separated-values'});
+  // BOM付きUTF-8で配布する (README §9.5)。Excelで開いて保存し直しても UTF-8 が維持され、文字コード不正の大半を入口で防げる。
+  var blob = new Blob(['\ufeff' + rows.join('\n')], {type:'text/tab-separated-values;charset=utf-8'});
   var a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = 'ラクミー_インポートテンプレート_③雇用区分.tsv';
@@ -5767,7 +5770,8 @@ function downloadAdminTemplate() {
     '田中一郎\ttanaka-mgr@example.com\t新宿店',
     '高橋次郎\ttakahashi-mgr@example.com\t渋谷店,新宿店,池袋店'
   ];
-  var blob = new Blob([rows.join('\n')], {type:'text/tab-separated-values'});
+  // BOM付きUTF-8で配布する (README §9.5)。Excelで開いて保存し直しても UTF-8 が維持され、文字コード不正の大半を入口で防げる。
+  var blob = new Blob(['\ufeff' + rows.join('\n')], {type:'text/tab-separated-values;charset=utf-8'});
   var a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = 'ラクミー_インポートテンプレート_⑤管理者.tsv';
@@ -5791,7 +5795,8 @@ function downloadEmployeeTemplate() {
     '鈴木次郎\t090-5555-6666\tsuzuki@example.com\t\t正社員A\t新宿店\t月額\t30000',
     '高橋美咲\t080-7777-8888\ttakahashi@example.com\t\tアルバイトC\t新宿店\t日額\t800'
   ];
-  var blob = new Blob([rows.join('\n')], {type:'text/tab-separated-values'});
+  // BOM付きUTF-8で配布する (README §9.5)。Excelで開いて保存し直しても UTF-8 が維持され、文字コード不正の大半を入口で防げる。
+  var blob = new Blob(['\ufeff' + rows.join('\n')], {type:'text/tab-separated-values;charset=utf-8'});
   var a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = 'ラクミー_インポートテンプレート_④従業員.tsv';
@@ -6129,7 +6134,7 @@ function downloadFailedRowsCsv(scope) {
       rows.push(line.join('\t'));
     });
   }
-  var blob = new Blob([[d.header].concat(rows).join('\n')], {type:'text/tab-separated-values'});
+  var blob = new Blob(['\ufeff' + [d.header].concat(rows).join('\n')], {type:'text/tab-separated-values;charset=utf-8'});
   var a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   // 実装時のファイル名: {元ファイル名}_失敗行_{YYYYMMDD}.csv
@@ -6157,7 +6162,8 @@ function downloadHokanTemplate() {
     '森本彩\tEMP-014\t\t\t\t',
     '石田健一\tEMP-015\t\t\t\t'
   ];
-  var blob = new Blob([rows.join('\n')], {type:'text/tab-separated-values'});
+  // BOM付きUTF-8で配布する (README §9.5)。Excelで開いて保存し直しても UTF-8 が維持され、文字コード不正の大半を入口で防げる。
+  var blob = new Blob(['\ufeff' + rows.join('\n')], {type:'text/tab-separated-values;charset=utf-8'});
   var a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = '補完用テンプレート_従業員データ.tsv';

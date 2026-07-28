@@ -25,6 +25,13 @@ for cls,n in [('next-steps-box',4),('auto-code-note',4),('excluded-rows-box',4)]
     if cls not in h: ng.append('クラス未定義: '+cls)
 if h.count('最大500行・5MB）'): ng.append('種別を無視した500行表記が残存')
 if '_失敗行_{YYYYMMDD}.csv' in r: ng.append('CSV拡張子が仕様とモックで不一致')
+# 仕様が主張する実体の検査 (文字列の有無だけでなく実装を見る)
+if 'BOM付きUTF-8' in r:
+    dl = h.count("new Blob(['\\ufeff'")
+    if dl == 0: ng.append('§9.5 はBOM付きUTF-8と定めているが、モックのBlobにBOMが無い')
+if 'EMP-{5桁のランダム数字}' in r or '5桁のランダム数字' in r:
+    if 'EMP-{companyId' in r: ng.append('§8.1 に旧採番規則(companyIdプレフィックス)が残存')
+
 # 適用範囲ラベルの語彙固定 (表記ゆれ防止)
 VOCAB={'テンプレートのみ（先行実装）','外部勤怠のみ（後続実装）','両方式共通','方式別に定義済み'}
 for l in {x.strip() for x in re.findall(r'\*\*適用範囲:\s*([^*]+?)\*\*', r)}:
