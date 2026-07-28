@@ -363,6 +363,26 @@
       <span style="font-size:11px;color:#888;">（初期設定で選択済み。変更は右上「インポート方式を再設定」から）</span>
     </div>
 
+    <!-- ★ 権限による出し分け (2026-07-28 / README §9.6) -->
+    <!-- アプリ側では manager もインポート対象の操作権限を持つ (src/lib/api/permissions.ts)。
+         ただし管理者は担当店舗のみが範囲のため、全社マスタ(業態/店舗/雇用区分)は取り込ませない。 -->
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 14px;background:#f7f9fb;border:1px solid #e3e8ee;border-radius:8px;margin-bottom:14px;">
+      <div style="font-size:11px;color:#555;line-height:1.7;">
+        <strong id="hub-role-label" style="color:#222;">オーナーとしてログイン中</strong>
+        <span id="hub-role-desc" style="color:#888;">— すべての種別を取り込めます</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:9px;background:#fff3e0;border:1px dashed #e67e22;border-radius:6px;padding:3px 6px;">
+        <span style="color:#e67e22;font-weight:700;">🛠 デモ:</span>
+        <button id="hub-role-owner" onclick="setHubRole('owner');" style="font-size:9px;padding:2px 8px;border:1px solid #2ec4a0;background:#2ec4a0;color:#fff;border-radius:4px;cursor:pointer;font-weight:700;">オーナー</button>
+        <button id="hub-role-manager" onclick="setHubRole('manager');" style="font-size:9px;padding:2px 8px;border:1px solid #ccc;background:#fff;color:#555;border-radius:4px;cursor:pointer;">管理者(店長)</button>
+      </div>
+    </div>
+
+    <div id="hub-role-note" style="display:none;padding:10px 14px;background:#fff8e1;border:1px solid #ffe0a3;border-radius:8px;font-size:11px;color:#9c6a08;line-height:1.8;margin-bottom:14px;">
+      業態・店舗・雇用区分は<strong>会社全体の設定</strong>のため、オーナーのみが取り込めます。<br>
+      <span style="color:#666;">従業員の取り込みは<strong>担当店舗の行のみ</strong>が対象です。担当外の店舗名が含まれる行はエラーとして扱われ、取り込まれません。</span>
+    </div>
+
     <!-- STEP1: 取り込む種類を選択(方式は現在設定を使用・毎回選ばせない) -->
     <div id="hub-list-view" style="display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:24px;">
       <div class="hub-row" onclick="hubGoEntity('businesstype')"><div style="font-size:26px;">🏷</div><div style="flex:1;min-width:120px;"><div style="font-size:15px;font-weight:700;">業態</div><div style="font-size:11px;color:#888;">業態名（1列）</div></div><button class="btn btn-primary hub-go-label" style="font-size:12px;padding:9px 16px;pointer-events:none;">📄 取り込み →</button></div>
@@ -642,7 +662,7 @@
           <tbody>
             <tr><td class="st-new">● 新規</td><td>正社員A</td><td>EMP-TYPE-001</td><td>月給</td><td>¥200,000</td><td>160</td><td>20</td></tr>
             <tr><td class="st-new">● 新規</td><td>パートB</td><td>EMP-TYPE-002</td><td>時給</td><td>¥1,200</td><td>-</td><td>-</td></tr>
-            <tr><td class="st-upd">● 更新</td><td>日給スタッフC</td><td>EMP-TYPE-003</td><td>日給</td><td>¥10,500</td><td>8</td><td>-</td></tr>
+            <tr><td class="st-upd">● 更新</td><td>アルバイトC</td><td>EMP-TYPE-003</td><td>時給</td><td>¥1,150</td><td></td><td>-</td></tr>
           </tbody>
         </table>
       </div>
@@ -664,7 +684,7 @@
             <tr><td>3</td><td class="st-new">● 新規</td><td>佐藤花子</td><td>080-9876-5432</td><td>sato@example.com</td><td>正社員A</td><td>渋谷店</td><td>¥50,000/月</td></tr>
             <tr><td>4</td><td class="st-new">● 新規</td><td>田中一郎</td><td>070-1111-2222</td><td>tanaka@example.com</td><td>パートB</td><td>渋谷店</td><td>¥500/日</td></tr>
             <tr><td>5</td><td class="st-upd">● 更新</td><td>鈴木次郎</td><td>090-5555-6666</td><td>suzuki@example.com</td><td>正社員A</td><td>新宿店</td><td>¥30,000/月</td></tr>
-            <tr><td>6</td><td class="st-upd">● 更新</td><td>高橋美咲</td><td>080-7777-8888</td><td>takahashi@example.com</td><td>日給スタッフC</td><td>新宿店</td><td>¥800/日</td></tr>
+            <tr><td>6</td><td class="st-upd">● 更新</td><td>高橋美咲</td><td>080-7777-8888</td><td>takahashi@example.com</td><td>アルバイトC</td><td>新宿店</td><td>¥800/日</td></tr>
           </tbody>
         </table>
       </div>
@@ -702,7 +722,7 @@
 
     <div class="btn-group">
       <button class="btn btn-ghost" onclick="goBackToTplSingle();">← 戻る</button>
-      <button class="btn btn-primary" onclick="go('s-tpl3-single');">✓ インポート実行</button>
+      <button class="btn btn-primary" onclick="runImport(this,'s-tpl3-single',5,'設定マスタ');">✓ インポート実行</button>
     </div>
 
     <div style="margin-top:24px;padding:12px 14px;background:#fff8ed;border:1px solid #fde68a;border-radius:8px;font-size:11px;color:#9c4d12;line-height:1.7;">
@@ -756,7 +776,9 @@
                 <tr><td>4</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#0e9077;background:#e8f8f5;border:1px solid #b8e6d6;">🆕 新規登録</span></td><td>林 健次郎</td><td>hayashi@example.jp</td><td style="color:#c62828;">招待APIの一時的な制限(429)</td></tr>
               </tbody>
             </table>
-          </div>
+          
+<!-- ★ 失敗行CSVダウンロード (2026-07-28 / README §7.7・§9.2) -->
+<div style="padding:8px 12px;background:#fff;border-top:1px solid #ffcdd2;"><button class="btn btn-outline-g" style="font-size:11px;padding:6px 14px;" onclick="downloadFailedRowsCsv('tpls');">⬇ 失敗した行をCSVでダウンロード</button><span style="margin-left:8px;font-size:10px;color:#888;">元テンプレートと同じ列＋末尾に「失敗理由」列。修正してそのまま再アップロードできます。</span></div></div>
           <div style="background:#fafafa;border:1px solid #e8e8e8;border-radius:6px;padding:8px 10px;font-size:10px;color:#666;line-height:1.7;">
             💡 失敗した行はロールバック済みです。設定画面から再取り込みすると、失敗分は再び「新規登録」、成功済みは「差し替え/スキップ」に自動判定され、<strong>重複は発生しません</strong>。
           </div>
@@ -893,9 +915,9 @@
           <tbody>
             <tr><td class="st-new">● 新規</td><td>正社員A</td><td>EMP-TYPE-001</td><td>月給</td><td>¥200,000</td><td></td></tr>
             <tr><td class="st-new">● 新規</td><td>パートB</td><td>EMP-TYPE-002</td><td>時給</td><td>¥1,200</td><td></td></tr>
-            <tr><td class="st-new">● 新規</td><td>日給スタッフC</td><td>EMP-TYPE-003</td><td>日給</td><td>¥10,000</td><td></td></tr>
+            <tr><td class="st-new">● 新規</td><td>アルバイトC</td><td>EMP-TYPE-003</td><td>時給</td><td>¥1,100</td><td></td></tr>
             <tr><td class="st-upd">● 更新</td><td>正社員B</td><td>EMP-TYPE-004</td><td>月給</td><td>¥220,000</td><td></td></tr>
-            <tr data-err-val="成果報酬" data-err-type="invalid-value" style="background:#fffafa;"><td class="st-err">✗ エラー</td><td>業務委託α</td><td>EMP-TYPE-005</td><td style="color:#c62828;">成果報酬 <span style="font-size:10px;">(許可値: 月給/日給/時給)</span></td><td>¥0</td><td style="white-space:nowrap;font-size:0;"><button onclick="openMasterAddRedirect('emptype','業務委託α');" style="font-size:10px;padding:5px 10px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;margin-right:4px;">➕ マスタに追加</button><button onclick="openRowEditModal('給与体系','成果報酬','月給');" style="font-size:10px;padding:5px 10px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;margin-right:4px;">✏️ 行編集</button><button onclick="markRowSkipped(this);" style="font-size:10px;padding:5px 10px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;">⊘ スキップ</button></td></tr>
+            <tr data-err-val="成果報酬" data-err-type="invalid-value" style="background:#fffafa;"><td class="st-err">✗ エラー</td><td>業務委託α</td><td>EMP-TYPE-005</td><td style="color:#c62828;">成果報酬 <span style="font-size:10px;">(許可値: 月給/時給)</span></td><td>¥0</td><td style="white-space:nowrap;font-size:0;"><button onclick="openMasterAddRedirect('emptype','業務委託α');" style="font-size:10px;padding:5px 10px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;margin-right:4px;">➕ マスタに追加</button><button onclick="openRowEditModal('給与体系','成果報酬','月給');" style="font-size:10px;padding:5px 10px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;margin-right:4px;">✏️ 行編集</button><button onclick="markRowSkipped(this);" style="font-size:10px;padding:5px 10px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;">⊘ スキップ</button></td></tr>
           </tbody>
         </table>
       </div>
@@ -934,7 +956,7 @@
             <tr data-err-val="派遣社員X" data-err-type="master-missing" style="background:#fffafa;"><td class="st-err">✗ エラー</td><td>渡辺健</td><td>watanabe@example.com</td><td>新宿店</td><td style="color:#c62828;">派遣社員X</td><td style="white-space:nowrap;font-size:0;"><button onclick="openMasterAddRedirect('emptype','派遣社員X');" style="font-size:10px;padding:5px 10px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;margin-right:4px;">➕ マスタに追加</button><button onclick="openRowEditModal('雇用区分','派遣社員X','');" style="font-size:10px;padding:5px 10px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;margin-right:4px;">✏️ 行編集</button><button onclick="markRowSkipped(this);" style="font-size:10px;padding:5px 10px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;">⊘ スキップ</button></td></tr>
             <tr data-err-val="業務委託契約A" data-err-type="master-missing" style="background:#fffafa;"><td class="st-err">✗ エラー</td><td>中村真理</td><td>nakamura@example.com</td><td>池袋店</td><td style="color:#c62828;">業務委託契約A</td><td style="white-space:nowrap;font-size:0;"><button onclick="openMasterAddRedirect('emptype','業務委託契約A');" style="font-size:10px;padding:5px 10px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;margin-right:4px;">➕ マスタに追加</button><button onclick="openRowEditModal('雇用区分','業務委託契約A','');" style="font-size:10px;padding:5px 10px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;margin-right:4px;">✏️ 行編集</button><button onclick="markRowSkipped(this);" style="font-size:10px;padding:5px 10px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;">⊘ スキップ</button></td></tr>
             <tr data-err-val="正社員 A" data-err-type="master-naming" style="background:#fffafa;"><td class="st-err">✗ エラー</td><td>西村あい</td><td>nishimura@example.com</td><td>渋谷店</td><td style="color:#c62828;">正社員 A <span style="font-size:10px;color:#888;">(候補: 正社員A)</span></td><td style="white-space:nowrap;font-size:0;"><button onclick="openMasterAddRedirect('emptype','正社員 A');" style="font-size:10px;padding:5px 10px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;margin-right:4px;">➕ マスタに追加</button><button onclick="openRowEditModal('雇用区分','正社員 A','正社員A');" style="font-size:10px;padding:5px 10px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;margin-right:4px;">✏️ 行編集</button><button onclick="markRowSkipped(this);" style="font-size:10px;padding:5px 10px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;">⊘ スキップ</button></td></tr>
-            <tr><td class="st-upd">● 更新</td><td>高橋美咲</td><td>takahashi@example.com</td><td>新宿店</td><td>日給スタッフC</td><td></td></tr>
+            <tr><td class="st-upd">● 更新</td><td>高橋美咲</td><td>takahashi@example.com</td><td>新宿店</td><td>アルバイトC</td><td></td></tr>
           </tbody>
         </table>
       </div>
@@ -942,7 +964,7 @@
 
     <div class="btn-group" style="margin-top:14px;">
       <button class="btn btn-ghost" onclick="goBackToSaasSingle();">← 戻る</button>
-      <button class="btn btn-primary" onclick="go('s-saas-done-single');">✓ インポート実行</button>
+      <button class="btn btn-primary" onclick="runImport(this,'s-saas-done-single',5,'設定マスタ');">✓ インポート実行</button>
     </div>
 
     <div style="margin-top:24px;padding:12px 14px;background:#fff8ed;border:1px solid #fde68a;border-radius:8px;font-size:11px;color:#9c4d12;line-height:1.7;">
@@ -996,7 +1018,9 @@
                 <tr><td>4</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#0e9077;background:#e8f8f5;border:1px solid #b8e6d6;">🆕 新規登録</span></td><td>林 健次郎</td><td>hayashi@example.jp</td><td style="color:#c62828;">招待APIの一時的な制限(429)</td></tr>
               </tbody>
             </table>
-          </div>
+          
+<!-- ★ 失敗行CSVダウンロード (2026-07-28 / README §7.7・§9.2) -->
+<div style="padding:8px 12px;background:#fff;border-top:1px solid #ffcdd2;"><button class="btn btn-outline-g" style="font-size:11px;padding:6px 14px;" onclick="downloadFailedRowsCsv('saasd');">⬇ 失敗した行をCSVでダウンロード</button><span style="margin-left:8px;font-size:10px;color:#888;">元テンプレートと同じ列＋末尾に「失敗理由」列。修正してそのまま再アップロードできます。</span></div></div>
           <div style="background:#fafafa;border:1px solid #e8e8e8;border-radius:6px;padding:8px 10px;font-size:10px;color:#666;line-height:1.7;">
             💡 失敗した行はロールバック済みです。設定画面から再取り込みすると、失敗分は再び「新規登録」、成功済みは「差し替え/スキップ」に自動判定され、<strong>重複は発生しません</strong>。
           </div>
@@ -1166,14 +1190,35 @@
         <div class="ub-hint">TSV / CSV（1ファイルあたり 最大500行・5MB）</div>
       </div>
 
-      <!-- 取込上限の仕様メモ (2026-07-23 確定) -->
-      <div style="margin-top:12px;padding:10px 12px;background:#fafafa;border:1px solid #e8e8e8;border-radius:6px;font-size:11px;line-height:1.7;color:#555;">
-        <div style="font-weight:700;color:#444;margin-bottom:4px;">取込上限</div>
-        1回に取り込めるのは <strong>500行</strong>（ヘッダー行を除いたデータ行数）まで、ファイルサイズは <strong>5MB</strong> までです。<br>
-        上限を超えたファイルは、アップロード直後（プレビュー生成前）に受付を拒否します。<br>
-        <div style="margin-top:6px;padding:8px 10px;background:#ffebee;border:1px solid #ffcdd2;border-radius:4px;color:#c62828;">
-          1回に取り込めるのは500行までです。ファイルを分割してから、もう一度アップロードしてください。（アップロードされたファイル: 1,240行）
+      <!-- ★ ファイル受付拒否の状態 (2026-07-28 / README §9.3・§9.5) -->
+      <!-- 上限超過・形式不正はアップロード直後(プレビュー生成前)に弾く。プレビューへ進ませない。 -->
+      <div id="tpl-upload-reject" style="display:none;margin-top:12px;padding:12px 14px;background:#ffebee;border:1px solid #ffcdd2;border-radius:8px;">
+        <div style="display:flex;align-items:flex-start;gap:10px;">
+          <span style="font-size:18px;line-height:1.2;">❌</span>
+          <div style="flex:1;">
+            <div id="tpl-upload-reject-title" style="font-size:13px;font-weight:700;color:#c62828;margin-bottom:4px;">ファイルを受け付けられませんでした</div>
+            <div id="tpl-upload-reject-msg" style="font-size:11px;color:#9c4d12;line-height:1.8;"></div>
+          </div>
+          <button onclick="clearUploadReject();" style="font-size:10px;padding:4px 10px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;white-space:nowrap;">閉じる</button>
         </div>
+      </div>
+
+      <!-- 取込上限の仕様メモ (2026-07-23 確定 / 2026-07-28 デモトグル追加) -->
+      <div style="margin-top:12px;padding:10px 12px;background:#fafafa;border:1px solid #e8e8e8;border-radius:6px;font-size:11px;line-height:1.7;color:#555;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:4px;">
+          <div style="font-weight:700;color:#444;">取込上限・受付拒否</div>
+          <div style="display:flex;align-items:center;gap:5px;font-size:9px;background:#fff3e0;border:1px dashed #e67e22;border-radius:6px;padding:3px 6px;">
+            <span style="color:#e67e22;font-weight:700;">🛠 デモ:</span>
+            <button onclick="demoUploadReject('rows');" style="font-size:9px;padding:2px 7px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;">行数超過</button>
+            <button onclick="demoUploadReject('size');" style="font-size:9px;padding:2px 7px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;">サイズ超過</button>
+            <button onclick="demoUploadReject('encoding');" style="font-size:9px;padding:2px 7px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;">文字コード</button>
+            <button onclick="demoUploadReject('columns');" style="font-size:9px;padding:2px 7px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;">列不一致</button>
+            <button onclick="demoUploadReject('empty');" style="font-size:9px;padding:2px 7px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;">0件</button>
+          </div>
+        </div>
+        1回に取り込めるのは <strong>500行</strong>（ヘッダー行を除いたデータ行数）まで、ファイルサイズは <strong>5MB</strong> までです。<strong>④従業員のみ 200行</strong>（1行あたり最大3リクエストのため・README §7.5）。<br>
+        上限を超えたファイル、および文字コード不正・列名不一致・データ0件のファイルは、<strong>アップロード直後（プレビュー生成前）に受付を拒否</strong>します。上のデモボタンで各状態を確認できます。<br>
+        <span style="color:#888;">※ テンプレートDLは <strong>BOM付きUTF-8</strong> で配布します。Excelで開いて保存し直しても UTF-8 が維持されるため、文字コード不正の大半を入口で防げます（README §9.5）。</span>
       </div>
 
       <!-- アップロード済みファイル一覧(JSで動的に行を追加。tpl-up-file1/file2は旧仕様残骸で非使用) -->
@@ -1291,7 +1336,7 @@
         <tbody>
           <tr><td class="st-new">● 新規</td><td>正社員A</td><td>EMP-TYPE-001</td><td>月給</td><td>¥200,000</td><td>160</td><td>20</td></tr>
           <tr><td class="st-new">● 新規</td><td>パートB</td><td>EMP-TYPE-002</td><td>時給</td><td>¥1,200</td><td>-</td><td>-</td></tr>
-          <tr><td class="st-new">● 新規</td><td>日給スタッフC</td><td>EMP-TYPE-003</td><td>日給</td><td>¥10,000</td><td>8</td><td>-</td></tr>
+          <tr><td class="st-new">● 新規</td><td>アルバイトC</td><td>EMP-TYPE-003</td><td>時給</td><td>¥1,100</td><td></td><td>-</td></tr>
         </tbody>
       </table>
     </div>
@@ -1323,7 +1368,7 @@
           <tr><td>3</td><td class="st-new">● 新規</td><td>佐藤花子</td><td>080-9876-5432</td><td>sato@example.com</td><td>正社員A</td><td>渋谷店</td><td>月額</td><td>¥50,000</td><td></td></tr>
           <tr><td>4</td><td class="st-new">● 新規</td><td>田中一郎</td><td>070-1111-2222</td><td>tanaka@example.com</td><td>パートB</td><td>渋谷店</td><td>日額</td><td>¥500</td><td></td></tr>
           <tr><td>5</td><td class="st-new">● 新規</td><td>鈴木次郎</td><td>090-5555-6666</td><td>suzuki@example.com</td><td>正社員A</td><td>新宿店</td><td>月額</td><td>¥30,000</td><td></td></tr>
-          <tr><td>6</td><td class="st-new">● 新規</td><td>高橋美咲</td><td>080-7777-8888</td><td>takahashi@example.com</td><td>日給スタッフC</td><td>新宿店</td><td>日額</td><td>¥800</td><td></td></tr>
+          <tr><td>6</td><td class="st-new">● 新規</td><td>高橋美咲</td><td>080-7777-8888</td><td>takahashi@example.com</td><td>アルバイトC</td><td>新宿店</td><td>日額</td><td>¥800</td><td></td></tr>
           <tr><td>7</td><td class="st-new">● 新規</td><td>渡辺健太</td><td>090-3333-4444</td><td>watanabe@example.com</td><td>パートB</td><td>渋谷店</td><td>日額</td><td>¥500</td><td></td></tr>
           <tr><td>8</td><td class="st-upd">● 更新</td><td>中村由美</td><td>080-2222-3333</td><td>nakamura@example.com</td><td>正社員A</td><td>渋谷店</td><td>月額</td><td>¥40,000</td><td>交通費を変更</td></tr>
           <tr><td>9</td><td class="st-err">✗ エラー</td><td>小林誠</td><td>070-9999-0000</td><td>kobayashi@example.com</td><td style="color:#e74c3c">アルバイトD</td><td>渋谷店</td><td>日額</td><td>¥400</td><td style="color:#e74c3c;font-size:11px">雇用区分「アルバイトD」が未登録</td></tr>
@@ -1414,9 +1459,20 @@
       </div>
     </div>
 
+    <!-- ★ 取り込み対象0件の状態 (2026-07-28 / README §9.4) -->
+    <div id="tpl-zero-target" style="display:none;margin-bottom:12px;padding:12px 14px;background:#ffebee;border:1px solid #ffcdd2;border-radius:8px;font-size:12px;color:#c62828;line-height:1.8;">
+      <strong>取り込めるデータが1件もありません。</strong><br>
+      <span style="color:#9c4d12;font-size:11px;">すべての行にエラーがあります。エラーを解消するか、ファイルを修正してからもう一度アップロードしてください。</span>
+    </div>
+
     <div class="btn-group">
       <button class="btn btn-ghost" onclick="go('s-tpl1')">← 戻る</button>
-      <button class="btn btn-primary" onclick="go('s-tpl3')">エラー行を除いてインポート実行</button>
+      <button id="tpl-import-exec-btn" class="btn btn-primary" onclick="runImport(this,'s-tpl3',11,'従業員・管理者');">エラー行を除いてインポート実行</button>
+      <div style="display:flex;align-items:center;gap:5px;font-size:9px;background:#fff3e0;border:1px dashed #e67e22;border-radius:6px;padding:3px 6px;margin-left:8px;">
+        <span style="color:#e67e22;font-weight:700;">🛠 デモ:</span>
+        <button onclick="demoZeroTarget(false);" style="font-size:9px;padding:2px 7px;border:1px solid #2ec4a0;background:#2ec4a0;color:#fff;border-radius:4px;cursor:pointer;font-weight:700;">通常</button>
+        <button onclick="demoZeroTarget(true);" style="font-size:9px;padding:2px 7px;border:1px solid #ccc;background:#fff;color:#555;border-radius:4px;cursor:pointer;">全件エラー(0件)</button>
+      </div>
     </div>
   </div>
 </div>
@@ -1533,7 +1589,9 @@
                   <tr><td>3</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#0e9077;background:#e8f8f5;border:1px solid #b8e6d6;">🆕 新規登録</span></td><td>佐藤 一郎</td><td>sato@example.jp</td><td style="color:#c62828;">招待APIの一時的な制限(429)。時間をおくと解消します</td></tr>
                 </tbody>
               </table>
-            </div>
+            
+<!-- ★ 失敗行CSVダウンロード (2026-07-28 / README §7.7・§9.2) -->
+<div style="padding:8px 12px;background:#fff;border-top:1px solid #ffcdd2;"><button class="btn btn-outline-g" style="font-size:11px;padding:6px 14px;" onclick="downloadFailedRowsCsv('tpl3');">⬇ 失敗した行をCSVでダウンロード</button><span style="margin-left:8px;font-size:10px;color:#888;">元テンプレートと同じ列＋末尾に「失敗理由」列。修正してそのまま再アップロードできます。</span></div></div>
             <div style="background:#fafafa;border:1px solid #e8e8e8;border-radius:6px;padding:8px 10px;font-size:10px;color:#666;line-height:1.7;">
               💡 失敗した行はDBに残っていません（ロールバック済み）。再取り込みすると再び「新規登録」として処理されます。
               一方、今回成功した行は次回「差し替え」「スキップ」に自動判定されるため、<strong>重複ユーザーは作られません</strong>。
@@ -2388,7 +2446,7 @@
     <div class="btn-group">
       <button class="btn btn-ghost" onclick="go('s-saas1')">← 戻る</button>
       <button id="saas-preview-save-btn" class="btn btn-ghost setup-only-btn" style="display:none;background:#fff3e0;border:1px solid #e67e22;color:#e67e22;font-weight:700;" onclick="saveImportDraftMappingStep('s-saas-preview')">💾 一時保存</button>
-      <button id="saas-preview-import-btn" class="btn btn-primary" onclick="go('s-saas4')">エラー行を除いてインポート実行（14件）</button>
+      <button id="saas-preview-import-btn" class="btn btn-primary" onclick="runImport(this,'s-saas4',14,'従業員');">エラー行を除いてインポート実行（14件）</button>
     </div>
   </div>
 </div>
@@ -2589,7 +2647,9 @@
                   <tr><td>7</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#0e9077;background:#e8f8f5;border:1px solid #b8e6d6;">🆕 新規登録</span></td><td>田村 拓也</td><td>tamura@example.jp</td><td style="color:#c62828;">招待APIの一時的な制限(429)。時間をおくと解消します</td></tr>
                 </tbody>
               </table>
-            </div>
+            
+<!-- ★ 失敗行CSVダウンロード (2026-07-28 / README §7.7・§9.2) -->
+<div style="padding:8px 12px;background:#fff;border-top:1px solid #ffcdd2;"><button class="btn btn-outline-g" style="font-size:11px;padding:6px 14px;" onclick="downloadFailedRowsCsv('saas4');">⬇ 失敗した行をCSVでダウンロード</button><span style="margin-left:8px;font-size:10px;color:#888;">元テンプレートと同じ列＋末尾に「失敗理由」列。修正してそのまま再アップロードできます。</span></div></div>
             <div style="background:#fafafa;border:1px solid #e8e8e8;border-radius:6px;padding:8px 10px;font-size:10px;color:#666;line-height:1.7;">
               💡 失敗した行はDBに残っていません（ロールバック済み）。再取り込みすると再び「新規登録」として処理されます。
               一方、今回成功した行は次回「更新」「スキップ」に自動判定されるため、<strong>重複ユーザーは作られません</strong>。
@@ -2665,6 +2725,25 @@
 
 </div><!-- /main -->
 </div><!-- /app -->
+
+<!-- ===== 取り込み実行中オーバーレイ (2026-07-28 / README §9.1) ===== -->
+<!-- ④従業員は1行あたり最大3リクエスト(§8.2)のため実行に時間がかかる。無表示だと連打され多重実行になる。 -->
+<div id="import-running-overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:10000;justify-content:center;align-items:center;padding:20px;">
+  <div style="background:#fff;border-radius:12px;max-width:460px;width:100%;padding:32px 28px;text-align:center;">
+    <div style="width:56px;height:56px;border-radius:50%;border:4px solid #e8f8f5;border-top-color:#2ec4a0;margin:0 auto 18px;animation:impSpin 0.9s linear infinite;"></div>
+    <h3 style="font-size:17px;font-weight:800;margin:0 0 8px;color:#222;">取り込みを実行しています</h3>
+    <div id="import-running-label" style="font-size:12px;color:#666;margin-bottom:16px;">従業員 を登録中…</div>
+    <div style="height:8px;background:#eee;border-radius:99px;overflow:hidden;margin-bottom:8px;">
+      <div id="import-running-bar" style="height:100%;width:0%;background:#2ec4a0;transition:width .18s linear;"></div>
+    </div>
+    <div id="import-running-count" style="font-size:12px;font-weight:700;color:#0e9077;">0 / 0 件</div>
+    <div style="margin-top:16px;padding:10px 12px;background:#fff8e1;border:1px solid #ffe0a3;border-radius:6px;font-size:11px;color:#9c6a08;line-height:1.7;">
+      この画面を閉じたりブラウザを更新したりしないでください。<br>
+      <span style="color:#666;">中断した場合、途中まで登録された行はそのまま残ります。再取り込みすると「差し替え／スキップ」に自動判定されるため重複は発生しません。</span>
+    </div>
+  </div>
+</div>
+<style>@keyframes impSpin { to { transform: rotate(360deg); } }</style>
 
 <!-- ===== 中断保存完了モーダル ===== -->
 <div id="import-save-draft-overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:9999;justify-content:center;align-items:center;padding:20px;">
@@ -3523,7 +3602,7 @@ var MASTER_ADD_FIELDS = {
              { k:'address', label:'住所',             required:false }],
   emptype:  [{ k:'name',    label:'区分名',           required:true, autoFromMissing:true },
              { k:'code',    label:'区分コード',       required:false },
-             { k:'pay_type',label:'給与体系',         required:false, type:'select', options:['月給','日給','時給'] },
+             { k:'pay_type',label:'給与体系',         required:false, type:'select', options:['月給','時給'] },
              { k:'base_pay',label:'基準金額',         required:false }],
   employee: [{ k:'name',    label:'氏名',             required:true, autoFromMissing:true },
              { k:'code',    label:'従業員コード',     required:false }],
@@ -5671,9 +5750,9 @@ function downloadStoreTemplate() {
 function downloadEmptypeTemplate() {
   var rows = [
     '雇用区分名\t雇用区分コード\t給与体系\t金額\t月次契約労働時間\t月みなし残業時間',
-    '正社員A\tEMP-TYPE-001\t月給\t200000\t160\t20',
-    'パートB\tEMP-TYPE-002\t時給\t1200\t\t',
-    '日給スタッフC\tEMP-TYPE-003\t日給\t10000\t8\t'
+    '正社員A\t\t月給\t200000\t160\t20',
+    'パートB\t\t時給\t1200\t\t',
+    'アルバイトC\t\t時給\t1100\t\t'
   ];
   var blob = new Blob([rows.join('\n')], {type:'text/tab-separated-values'});
   var a = document.createElement('a');
@@ -5708,16 +5787,143 @@ function downloadMasterTemplate() {
 function downloadEmployeeTemplate() {
   var rows = [
     '従業員名\t電話番号\tメールアドレス\t従業員コード\t雇用区分名\t店舗名\t交通費単位\t交通費',
-    '山田太郎\t090-1234-5678\tyamada@example.com\tEMP-001\t正社員A\t渋谷店\t月額\t30000',
+    '山田太郎\t090-1234-5678\tyamada@example.com\t\t正社員A\t渋谷店\t月額\t30000',
     '佐藤花子\t080-9876-5432\tsato@example.com\t\t正社員A\t渋谷店\t月額\t50000',
-    '田中一郎\t070-1111-2222\ttanaka@example.com\tEMP-003\tパートB\t渋谷店\t日額\t500',
+    '田中一郎\t070-1111-2222\ttanaka@example.com\t\tパートB\t渋谷店\t日額\t500',
     '鈴木次郎\t090-5555-6666\tsuzuki@example.com\t\t正社員A\t新宿店\t月額\t30000',
-    '高橋美咲\t080-7777-8888\ttakahashi@example.com\t\t日給スタッフC\t新宿店\t日額\t800'
+    '高橋美咲\t080-7777-8888\ttakahashi@example.com\t\tアルバイトC\t新宿店\t日額\t800'
   ];
   var blob = new Blob([rows.join('\n')], {type:'text/tab-separated-values'});
   var a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = 'ラクミー_インポートテンプレート_④従業員.tsv';
+  a.click();
+}
+
+// ★ 権限(オーナー/管理者)による出し分け (2026-07-28 / README §9.6)
+// 全社マスタ(業態/店舗/雇用区分)はオーナーのみ。管理者は従業員・管理者のみ、かつ担当店舗の行に限る。
+function setHubRole(role) {
+  var isMgr = (role === 'manager');
+  var rows = document.querySelectorAll('#hub-list-view .hub-row');
+  // 並び順: 業態 / 店舗 / 雇用区分 / 従業員 / 管理者
+  for (var i = 0; i < rows.length; i++) {
+    var ownerOnly = (i < 3);
+    rows[i].style.display = (isMgr && ownerOnly) ? 'none' : '';
+  }
+  var lbl = document.getElementById('hub-role-label');
+  var dsc = document.getElementById('hub-role-desc');
+  var note = document.getElementById('hub-role-note');
+  if (lbl) lbl.textContent = isMgr ? '管理者(店長)としてログイン中' : 'オーナーとしてログイン中';
+  if (dsc) dsc.textContent = isMgr ? '— 従業員・管理者のみ、担当店舗の範囲で取り込めます' : '— すべての種別を取り込めます';
+  if (note) note.style.display = isMgr ? '' : 'none';
+  var bo = document.getElementById('hub-role-owner'), bm = document.getElementById('hub-role-manager');
+  if (bo && bm) {
+    bo.style.background = isMgr ? '#fff' : '#2ec4a0'; bo.style.color = isMgr ? '#555' : '#fff';
+    bo.style.borderColor = isMgr ? '#ccc' : '#2ec4a0'; bo.style.fontWeight = isMgr ? '400' : '700';
+    bm.style.background = isMgr ? '#2ec4a0' : '#fff'; bm.style.color = isMgr ? '#fff' : '#555';
+    bm.style.borderColor = isMgr ? '#2ec4a0' : '#ccc'; bm.style.fontWeight = isMgr ? '700' : '400';
+  }
+}
+
+// ★ 取り込み対象0件の状態 (2026-07-28 / README §9.4)
+// 全行がエラーのとき、実行ボタンを不活性にして0件実行を防ぐ。
+function demoZeroTarget(isZero) {
+  var box = document.getElementById('tpl-zero-target');
+  var btn = document.getElementById('tpl-import-exec-btn');
+  if (box) box.style.display = isZero ? '' : 'none';
+  if (btn) {
+    btn.disabled = !!isZero;
+    btn.style.opacity = isZero ? '.4' : '';
+    btn.style.cursor = isZero ? 'not-allowed' : '';
+    btn.textContent = isZero ? 'エラー行を除いてインポート実行（0件）' : 'エラー行を除いてインポート実行';
+    btn.title = isZero ? '取り込めるデータが1件もありません' : '';
+  }
+}
+
+// ★ ファイル受付拒否の状態 (2026-07-28 / README §9.3・§9.5)
+// 上限超過・形式不正はプレビュー生成前に弾く。ファイル一覧にも追加しない。
+var UPLOAD_REJECT_MSG = {
+  rows:     { t:'ファイルの行数が上限を超えています',
+              m:'1回に取り込めるのは500行までです。ファイルを分割してから、もう一度アップロードしてください。（アップロードされたファイル: 1,240行）<br><span style="color:#666;">※ ④従業員は200行までです。</span>' },
+  size:     { t:'ファイルサイズが上限を超えています',
+              m:'1ファイルあたり5MBまでです。不要な列や空行を削除するか、ファイルを分割してからアップロードしてください。（アップロードされたファイル: 8.2MB）' },
+  encoding: { t:'文字コードを判別できませんでした',
+              m:'ファイルの文字コードが UTF-8 ではない可能性があります。テンプレートをダウンロードし直し、Excelで「CSV UTF-8 (コンマ区切り)」形式で保存してからアップロードしてください。' },
+  columns:  { t:'テンプレートの列が一致しません',
+              m:'このファイルには必要な列がありません。別の種別のテンプレートをアップロードしていないかご確認ください。<br><span style="color:#666;">必要な列: 従業員名 / 電話番号 / メールアドレス / 従業員コード / 雇用区分名 / 店舗名 / 交通費単位 / 交通費<br>見つかった列: 店舗名 / 所属業態 / 郵便番号 / 住所 / 営業時間</span>' },
+  empty:    { t:'取り込めるデータがありません',
+              m:'ヘッダー行のみで、データ行が1件もありません。データを入力してからアップロードしてください。' }
+};
+function demoUploadReject(kind) {
+  var d = UPLOAD_REJECT_MSG[kind]; if (!d) return;
+  var box = document.getElementById('tpl-upload-reject');
+  document.getElementById('tpl-upload-reject-title').textContent = d.t;
+  document.getElementById('tpl-upload-reject-msg').innerHTML = d.m;
+  if (box) { box.style.display = ''; box.scrollIntoView({behavior:'smooth', block:'center'}); }
+}
+function clearUploadReject() {
+  var box = document.getElementById('tpl-upload-reject');
+  if (box) box.style.display = 'none';
+}
+
+// ★ 取り込み実行中の状態 + 二重押下防止 (2026-07-28 / README §9.1)
+// 実装時は擬似進捗ではなく、サーバーから返る実際の処理済み件数で更新すること。
+var _importRunning = false;
+function runImport(btn, targetScreen, total, label) {
+  if (_importRunning) return;                 // 二重押下防止
+  _importRunning = true;
+  if (btn) { btn.disabled = true; btn.style.opacity = '.5'; btn.style.cursor = 'not-allowed'; }
+
+  var ov = document.getElementById('import-running-overlay');
+  var bar = document.getElementById('import-running-bar');
+  var cnt = document.getElementById('import-running-count');
+  var lbl = document.getElementById('import-running-label');
+  if (lbl) lbl.textContent = (label || 'データ') + ' を登録中…';
+  if (ov) ov.style.display = 'flex';
+
+  // 実行中はブラウザ離脱を警告する (§9.1)
+  window.onbeforeunload = function () { return '取り込みを実行中です。このページを離れると処理が中断されます。'; };
+
+  var done = 0;
+  var tick = setInterval(function () {
+    done++;
+    var pct = Math.round(done / total * 100);
+    if (bar) bar.style.width = pct + '%';
+    if (cnt) cnt.textContent = done + ' / ' + total + ' 件';
+    if (done >= total) {
+      clearInterval(tick);
+      setTimeout(function () {
+        window.onbeforeunload = null;
+        if (ov) ov.style.display = 'none';
+        if (btn) { btn.disabled = false; btn.style.opacity = ''; btn.style.cursor = ''; }
+        _importRunning = false;
+        if (bar) bar.style.width = '0%';
+        go(targetScreen);
+      }, 420);
+    }
+  }, 170);
+}
+
+// ★ 失敗行CSVダウンロード (2026-07-28 / README §7.7・§9.2)
+// 元テンプレートと同一列 + 末尾に「失敗理由」列。修正してそのまま再アップロードできる形式。
+// 「要手動確認」(補償削除に失敗した行) は再取り込みすると重複するため、このCSVには含めない。
+var FAILED_ROWS_DEMO = {
+  tpls:  { file:'④従業員', header:'従業員名\t電話番号\tメールアドレス\t従業員コード\t雇用区分名\t店舗名\t交通費単位\t交通費\t失敗理由',
+           rows:['林 健次郎\t090-2222-3333\thayashi@example.jp\t\t正社員A\t渋谷店\t月額\t30000\t招待APIの一時的な制限(429)'] },
+  saasd: { file:'④従業員', header:'従業員名\t電話番号\tメールアドレス\t従業員コード\t雇用区分名\t店舗名\t交通費単位\t交通費\t失敗理由',
+           rows:['林 健次郎\t090-2222-3333\thayashi@example.jp\t\t正社員A\t渋谷店\t月額\t30000\t招待APIの一時的な制限(429)'] },
+  tpl3:  { file:'⑤管理者', header:'管理者名\tメールアドレス\t担当店舗\t失敗理由',
+           rows:['佐藤 一郎\tsato@example.jp\t渋谷店\t招待APIの一時的な制限(429)。時間をおくと解消します'] },
+  saas4: { file:'④従業員', header:'従業員名\t電話番号\tメールアドレス\t従業員コード\t雇用区分名\t店舗名\t交通費単位\t交通費\t失敗理由',
+           rows:['林 健次郎\t090-2222-3333\thayashi@example.jp\t\t正社員A\t渋谷店\t月額\t30000\t招待APIの一時的な制限(429)'] }
+};
+function downloadFailedRowsCsv(scope) {
+  var d = FAILED_ROWS_DEMO[scope] || FAILED_ROWS_DEMO.tpl3;
+  var blob = new Blob([[d.header].concat(d.rows).join('\n')], {type:'text/tab-separated-values'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  // 実装時のファイル名: {元ファイル名}_失敗行_{YYYYMMDD}.csv
+  a.download = 'ラクミー_' + d.file + '_失敗行_20260728.tsv';
   a.click();
 }
 
@@ -5788,7 +5994,9 @@ function applyHashRouting() {
 }
 
 // デモ用: 完了画面の取り込み実行結果を「全件成功」↔「一部失敗(部分成功)」で切替。
-// 部分成功は、行ごとのClerk招待API失敗でロールバックできず一部だけ登録された状態を再現。
+// 部分成功は、行ごとのClerk招待API失敗で一部の行だけ登録できなかった状態を再現。
+// ロールバック粒度は「行単位の補償削除」(README §7.7 / 2026-07-28 確定): バッチ全体は巻き戻さず
+// 成功行はDBに残す。失敗行はDBに残さない(insert後に招待APIが失敗した場合はそのレコードを補償削除)。
 // 失敗行は再取り込みで回収され、成功済みは差し替え/スキップに落ちて重複回避される旨を明示。
 // scope: 'tpl3'(テンプレ) / 'saas4'(外部勤怠) / 'tpls'(運用更新テンプレ) / 'saasd'(運用更新外部勤怠)
 // 大見出し(アイコン/タイトル)も状態反映する: 全成功=✅インポート完了 / 部分成功=⚠️一部未完了で終了
