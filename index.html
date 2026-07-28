@@ -4535,6 +4535,7 @@ function go(id) {
   if (typeof clearUploadReject === 'function') clearUploadReject();
   if (typeof renderUploadRejectDemoBars === 'function') renderUploadRejectDemoBars();
   if (typeof renderZeroTargetDemoBars === 'function') renderZeroTargetDemoBars();
+  if (typeof renderPhaseBanners === 'function') renderPhaseBanners();
   if (typeof demoZeroTarget === 'function') demoZeroTarget(false);
   document.querySelectorAll('.demo-nav button').forEach(b => b.classList.remove('current'));
   document.querySelectorAll('.demo-nav button').forEach(b => {
@@ -5990,6 +5991,27 @@ function runImport(btn, targetScreen, total, label) {
     }
   }, 170);
 }
+
+// ★ 実装フェーズのバナー (2026-07-28 / README §概要「実装フェーズと仕様の正本」・§10)
+// 先行実装はテンプレートインポート(s-tpl* 系)。外部勤怠(s-saas* 系)は後続フェーズ。
+// 画面を撤去せず参照用として残し、先行実装の対象外であることを画面上でも示す(A案)。
+function renderPhaseBanners() {
+  var screens = document.querySelectorAll('.screen[id^="s-saas"]');
+  for (var i = 0; i < screens.length; i++) {
+    var sc = screens[i];
+    var host = sc.querySelector('.content') || sc;
+    if (host.querySelector('.phase-banner')) continue;
+    var b = document.createElement('div');
+    b.className = 'phase-banner';
+    b.style.cssText = 'margin-bottom:14px;padding:10px 14px;background:#f3f0ff;border:1px solid #d6ccff;border-radius:8px;font-size:11px;color:#5c4dac;line-height:1.8;';
+    b.innerHTML =
+      '<strong>後続フェーズ・参照用</strong>　外部勤怠サービスインポートは<strong>後続実装</strong>です。' +
+      '先行実装の対象はテンプレートインポート（<code>s-tpl*</code> 系）のみ。<br>' +
+      '<span style="color:#7a6fb8;">この画面の内容は後続フェーズで §1 の確定内容に追随させる前提で、先行フェーズでは凍結します。外部勤怠で未定義の論点は README §10 を参照してください。</span>';
+    host.insertBefore(b, host.firstChild);
+  }
+}
+document.addEventListener('DOMContentLoaded', renderPhaseBanners);
 
 // ★ 現在画面の取込対象種別を判定する共通ヘルパー (2026-07-28 / README §7.5・§9.3)
 // 単体取込画面は data 属性で種別を持つ。一括画面(複数種別)は null を返す。
