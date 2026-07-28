@@ -25,6 +25,11 @@ for cls,n in [('next-steps-box',4),('auto-code-note',4),('excluded-rows-box',4)]
     if cls not in h: ng.append('クラス未定義: '+cls)
 if h.count('最大500行・5MB）'): ng.append('種別を無視した500行表記が残存')
 if '_失敗行_{YYYYMMDD}.csv' in r: ng.append('CSV拡張子が仕様とモックで不一致')
+# 適用範囲ラベルの語彙固定 (表記ゆれ防止)
+VOCAB={'テンプレートのみ（先行実装）','外部勤怠のみ（後続実装）','両方式共通','方式別に定義済み'}
+for l in {x.strip() for x in re.findall(r'\*\*適用範囲:\s*([^*]+?)\*\*', r)}:
+    if l not in VOCAB: ng.append('適用範囲ラベルの表記ゆれ: '+l)
+
 # 適用範囲の網羅: §7.1〜§9.7 の全小節に「適用範囲」行があるか (テンプレ/外部の混同防止)
 for m in re.finditer(r'^### ([789]\.\d+)\s[^\n]*\n(.{0,400})', r, re.M|re.S):
     if '適用範囲:' not in m.group(2): ng.append('適用範囲の記載がない: §'+m.group(1))
