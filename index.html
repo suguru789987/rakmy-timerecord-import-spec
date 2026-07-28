@@ -718,11 +718,16 @@
         <div class="dup-opt selected" onclick="selDup(this)">スキップ (既存を保持)</div>
         <div class="dup-opt" onclick="selDup(this)">上書き更新</div>
       </div>
+      <!-- ★ 空欄セルの扱い (2026-07-28 / README §4.3・§8.7) -->
+      <div style="margin-top:8px;padding:8px 10px;background:#f7f9fb;border:1px solid #e3e8ee;border-radius:6px;font-size:11px;color:#555;line-height:1.7;">
+        「上書き更新」を選んだ場合も、<strong>CSVで空欄の列は変更されません</strong>（空欄で既存の値が消えることはありません）。<br>
+        <span style="color:#888;">値を消したい場合は、取り込み後に各設定画面から編集してください。</span>
+      </div>
     </div>
 
     <div class="btn-group">
       <button class="btn btn-ghost" onclick="goBackToTplSingle();">← 戻る</button>
-      <button class="btn btn-primary" onclick="runImport(this,'s-tpl3-single',5,'設定マスタ');">✓ インポート実行</button>
+      <button class="btn btn-primary" data-import-exec data-label-base="✓ インポート実行" onclick="runImport(this,'s-tpl3-single',5,'設定マスタ');">✓ インポート実行</button>
     </div>
 
     <div style="margin-top:24px;padding:12px 14px;background:#fff8ed;border:1px solid #fde68a;border-radius:8px;font-size:11px;color:#9c4d12;line-height:1.7;">
@@ -964,7 +969,7 @@
 
     <div class="btn-group" style="margin-top:14px;">
       <button class="btn btn-ghost" onclick="goBackToSaasSingle();">← 戻る</button>
-      <button class="btn btn-primary" onclick="runImport(this,'s-saas-done-single',5,'設定マスタ');">✓ インポート実行</button>
+      <button class="btn btn-primary" data-import-exec data-label-base="✓ インポート実行" onclick="runImport(this,'s-saas-done-single',5,'設定マスタ');">✓ インポート実行</button>
     </div>
 
     <div style="margin-top:24px;padding:12px 14px;background:#fff8ed;border:1px solid #fde68a;border-radius:8px;font-size:11px;color:#9c4d12;line-height:1.7;">
@@ -1187,20 +1192,7 @@
         <div class="ub-icon" style="font-size:28px;">📁</div>
         <div class="ub-text" style="font-size:13px;">ファイルをドラッグ＆ドロップ</div>
         <div class="ub-btn" style="font-size:12px;padding:6px 16px;" onclick="demoTplUpload()">ファイルを選択</div>
-        <div class="ub-hint">TSV / CSV（1ファイルあたり 最大500行・5MB）</div>
-      </div>
-
-      <!-- ★ ファイル受付拒否の状態 (2026-07-28 / README §9.3・§9.5) -->
-      <!-- 上限超過・形式不正はアップロード直後(プレビュー生成前)に弾く。プレビューへ進ませない。 -->
-      <div id="tpl-upload-reject" style="display:none;margin-top:12px;padding:12px 14px;background:#ffebee;border:1px solid #ffcdd2;border-radius:8px;">
-        <div style="display:flex;align-items:flex-start;gap:10px;">
-          <span style="font-size:18px;line-height:1.2;">❌</span>
-          <div style="flex:1;">
-            <div id="tpl-upload-reject-title" style="font-size:13px;font-weight:700;color:#c62828;margin-bottom:4px;">ファイルを受け付けられませんでした</div>
-            <div id="tpl-upload-reject-msg" style="font-size:11px;color:#9c4d12;line-height:1.8;"></div>
-          </div>
-          <button onclick="clearUploadReject();" style="font-size:10px;padding:4px 10px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;white-space:nowrap;">閉じる</button>
-        </div>
+        <div class="ub-hint">TSV / CSV（1ファイルあたり 最大500行・5MB／<strong>④従業員は200行</strong>）</div>
       </div>
 
       <!-- 取込上限の仕様メモ (2026-07-23 確定 / 2026-07-28 デモトグル追加) -->
@@ -1299,6 +1291,9 @@
     <!-- 設定マスタ確認セクション -->
     <div id="tpl-confirm-master">
     <div class="map-section-header"><span style="background:#2ec4a0;color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;">①〜③</span> 設定マスタ</div>
+    <div style="margin-bottom:10px;padding:8px 10px;background:#f7f9fb;border:1px solid #e3e8ee;border-radius:6px;font-size:11px;color:#555;line-height:1.7;">
+      表に表示されるコードは<strong>自動採番された値</strong>です（CSVで空欄にした場合）。採番の形式は README §8.1 を参照してください。コードは全社横断でユニークなため、CSVでの任意指定は衝突しやすく非推奨です。
+    </div>
     <div class="alert alert-info">①〜③ 設定マスタ: <strong>5行</strong>を検出し、<strong>業態 2件</strong>／<strong>店舗 2件</strong>／<strong>雇用区分 3件</strong> に仕分けました。重複は自動で除外されます。</div>
 
     <div class="pv-summary">
@@ -1372,6 +1367,10 @@
           <tr><td>7</td><td class="st-new">● 新規</td><td>渡辺健太</td><td>090-3333-4444</td><td>watanabe@example.com</td><td>パートB</td><td>渋谷店</td><td>日額</td><td>¥500</td><td></td></tr>
           <tr><td>8</td><td class="st-upd">● 更新</td><td>中村由美</td><td>080-2222-3333</td><td>nakamura@example.com</td><td>正社員A</td><td>渋谷店</td><td>月額</td><td>¥40,000</td><td>交通費を変更</td></tr>
           <tr><td>9</td><td class="st-err">✗ エラー</td><td>小林誠</td><td>070-9999-0000</td><td>kobayashi@example.com</td><td style="color:#e74c3c">アルバイトD</td><td>渋谷店</td><td>日額</td><td>¥400</td><td style="color:#e74c3c;font-size:11px">雇用区分「アルバイトD」が未登録</td></tr>
+          <!-- ★ 退職者との突合エラー (2026-07-28 / README §8.9) -->
+          <tr data-err-type="retired" style="background:#fffafa;"><td>10</td><td class="st-err">✗ エラー</td><td>大野翔</td><td>090-8888-1111</td><td>ono@example.com</td><td>正社員A</td><td>渋谷店</td><td>月額</td><td>¥30,000</td><td style="color:#e74c3c;font-size:11px">退職済みの従業員と同じ従業員コードです。再雇用の場合は従業員一覧から復帰の手続きを行ってください。</td></tr>
+          <!-- ★ 担当店舗外エラー (管理者ログイン時のみ発生 / README §9.6) -->
+          <tr data-err-type="out-of-scope" style="background:#fffafa;"><td>11</td><td class="st-err">✗ エラー</td><td>森本彩</td><td>080-4444-5555</td><td>morimoto@example.com</td><td>パートB</td><td style="color:#e74c3c">池袋店</td><td>日額</td><td>¥600</td><td style="color:#e74c3c;font-size:11px">担当店舗以外の従業員は取り込めません。（管理者ログイン時のみ）</td></tr>
         </tbody>
       </table>
     </div>
@@ -1457,22 +1456,16 @@
         <div class="dup-opt selected" onclick="selDup(this)">スキップ（既存を保持）</div>
         <div class="dup-opt" onclick="selDup(this)">上書き更新</div>
       </div>
-    </div>
-
-    <!-- ★ 取り込み対象0件の状態 (2026-07-28 / README §9.4) -->
-    <div id="tpl-zero-target" style="display:none;margin-bottom:12px;padding:12px 14px;background:#ffebee;border:1px solid #ffcdd2;border-radius:8px;font-size:12px;color:#c62828;line-height:1.8;">
-      <strong>取り込めるデータが1件もありません。</strong><br>
-      <span style="color:#9c4d12;font-size:11px;">すべての行にエラーがあります。エラーを解消するか、ファイルを修正してからもう一度アップロードしてください。</span>
+      <!-- ★ 空欄セルの扱い (2026-07-28 / README §4.3・§8.7) -->
+      <div style="margin-top:8px;padding:8px 10px;background:#f7f9fb;border:1px solid #e3e8ee;border-radius:6px;font-size:11px;color:#555;line-height:1.7;">
+        「上書き更新」を選んだ場合も、<strong>CSVで空欄の列は変更されません</strong>（空欄で既存の値が消えることはありません）。<br>
+        <span style="color:#888;">値を消したい場合は、取り込み後に各設定画面から編集してください。</span>
+      </div>
     </div>
 
     <div class="btn-group">
       <button class="btn btn-ghost" onclick="go('s-tpl1')">← 戻る</button>
-      <button id="tpl-import-exec-btn" class="btn btn-primary" onclick="runImport(this,'s-tpl3',11,'従業員・管理者');">エラー行を除いてインポート実行</button>
-      <div style="display:flex;align-items:center;gap:5px;font-size:9px;background:#fff3e0;border:1px dashed #e67e22;border-radius:6px;padding:3px 6px;margin-left:8px;">
-        <span style="color:#e67e22;font-weight:700;">🛠 デモ:</span>
-        <button onclick="demoZeroTarget(false);" style="font-size:9px;padding:2px 7px;border:1px solid #2ec4a0;background:#2ec4a0;color:#fff;border-radius:4px;cursor:pointer;font-weight:700;">通常</button>
-        <button onclick="demoZeroTarget(true);" style="font-size:9px;padding:2px 7px;border:1px solid #ccc;background:#fff;color:#555;border-radius:4px;cursor:pointer;">全件エラー(0件)</button>
-      </div>
+      <button id="tpl-import-exec-btn" class="btn btn-primary" data-import-exec data-label-base="エラー行を除いてインポート実行" onclick="runImport(this,'s-tpl3',11,'従業員・管理者');">エラー行を除いてインポート実行</button>
     </div>
   </div>
 </div>
@@ -1508,8 +1501,9 @@
         <div class="ub-icon" style="font-size:28px;">📁</div>
         <div class="ub-text" style="font-size:13px;">ファイルをドラッグ&ドロップ</div>
         <div class="ub-btn" style="font-size:12px;padding:6px 16px;" onclick="demoTplCompleteUpload()">ファイルを選択</div>
-        <div class="ub-hint">TSV / CSV（1ファイルあたり 最大500行・5MB）</div>
+        <div class="ub-hint">TSV / CSV（1ファイルあたり 最大<strong>200行</strong>・5MB）<span style="color:#aaa;">※ 対象が④従業員のみのため</span></div>
       </div>
+      <div class="upload-reject-demo" style="margin-top:10px;"></div>
       <div id="tpl-complete-files" style="display:none;margin-top:10px;"></div>
     </div>
 
@@ -1612,6 +1606,15 @@
           <button class="btn btn-primary" style="width:100%;padding:12px;font-size:13px;" onclick="showInviteSentModal(10)">✉️ 全員に招待メールを一括送信 (合計 10 通)</button>
         </div>
 
+        <!-- ★ 次にやること (2026-07-28 / README §8.3) -->
+        <div style="text-align:left;margin-bottom:16px;padding:12px 14px;background:#f0faf6;border:1px solid #b8e6d6;border-radius:8px;">
+          <div style="font-size:12px;font-weight:700;color:#0e9077;margin-bottom:6px;">次にやること</div>
+          <div style="font-size:11px;color:#555;line-height:1.9;">
+            ・<strong>複数店舗で勤務する従業員</strong>がいる場合は、従業員一覧から所属店舗を追加してください。<br>
+            <span style="color:#888;">CSVの「店舗名」は主たる勤務先1件のみを登録します（README §8.3）。</span><br>
+            ・従業員コード・雇用区分コードを空欄にした行は<strong>自動採番</strong>されています。各設定画面で確認できます。
+          </div>
+        </div>
         <div style="display:flex;gap:8px;justify-content:center;">
           <button class="btn btn-ghost" onclick="go('s-top')">トップへ戻る</button>
           <button id="tpl3-retry-btn" class="btn btn-primary" style="display:none;" onclick="go('s-tpl1')">失敗した1件を再取り込み →</button>
@@ -1831,8 +1834,9 @@
           <div class="ub-icon" style="font-size:28px;">📁</div>
           <div class="ub-text" style="font-size:13px;">ファイルをドラッグ＆ドロップ</div>
           <div class="ub-btn" style="font-size:12px;padding:6px 16px;" onclick="demoUploadFile()">ファイルを選択</div>
-          <div class="ub-hint">CSV / TSV（1ファイルあたり 最大500行・5MB）</div>
+          <div class="ub-hint">CSV / TSV（1ファイルあたり 最大500行・5MB／<strong>従業員は200行</strong>）</div>
         </div>
+        <div class="upload-reject-demo" style="margin-top:10px;"></div>
 
         <!-- アップロード済みファイル一覧 -->
         <div id="saas-up-files" style="display:none;margin-top:10px;">
@@ -2440,13 +2444,18 @@
       <div class="dup-sel">
         <div class="dup-opt selected" onclick="selDup(this)">上書き更新</div>
         <div class="dup-opt" onclick="selDup(this)">スキップ（既存を保持）</div>
+      <!-- ★ 空欄セルの扱い (2026-07-28 / README §4.3・§8.7) -->
+      <div style="margin-top:8px;padding:8px 10px;background:#f7f9fb;border:1px solid #e3e8ee;border-radius:6px;font-size:11px;color:#555;line-height:1.7;">
+        「上書き更新」を選んだ場合も、<strong>CSVで空欄の列は変更されません</strong>（空欄で既存の値が消えることはありません）。<br>
+        <span style="color:#888;">値を消したい場合は、取り込み後に各設定画面から編集してください。</span>
+      </div>
       </div>
     </div>
 
     <div class="btn-group">
       <button class="btn btn-ghost" onclick="go('s-saas1')">← 戻る</button>
       <button id="saas-preview-save-btn" class="btn btn-ghost setup-only-btn" style="display:none;background:#fff3e0;border:1px solid #e67e22;color:#e67e22;font-weight:700;" onclick="saveImportDraftMappingStep('s-saas-preview')">💾 一時保存</button>
-      <button id="saas-preview-import-btn" class="btn btn-primary" onclick="runImport(this,'s-saas4',14,'従業員');">エラー行を除いてインポート実行（14件）</button>
+      <button id="saas-preview-import-btn" class="btn btn-primary" data-import-exec data-label-base="エラー行を除いてインポート実行（14件）" onclick="runImport(this,'s-saas4',14,'従業員');">エラー行を除いてインポート実行（14件）</button>
     </div>
   </div>
 </div>
@@ -2718,6 +2727,15 @@
     </div>
 
     <div style="display:flex;gap:8px;justify-content:center;margin-top:20px;">
+      <!-- ★ 次にやること (2026-07-28 / README §8.3) -->
+      <div style="text-align:left;margin-bottom:16px;padding:12px 14px;background:#f0faf6;border:1px solid #b8e6d6;border-radius:8px;">
+        <div style="font-size:12px;font-weight:700;color:#0e9077;margin-bottom:6px;">次にやること</div>
+        <div style="font-size:11px;color:#555;line-height:1.9;">
+          ・<strong>複数店舗で勤務する従業員</strong>がいる場合は、従業員一覧から所属店舗を追加してください。<br>
+          <span style="color:#888;">CSVの「店舗名」は主たる勤務先1件のみを登録します（README §8.3）。</span><br>
+          ・従業員コード・雇用区分コードを空欄にした行は<strong>自動採番</strong>されています。各設定画面で確認できます。
+        </div>
+      </div>
       <button class="btn btn-primary" onclick="go('s-top')">インポートトップへ戻る</button>
     </div>
   </div>
@@ -3013,8 +3031,9 @@ headerSwitchLink +
 '      <div style="font-size:32px;margin-bottom:8px;">📎</div>' +
 '      <div style="font-size:13px;">ファイルをドラッグ&ドロップ または</div>' +
 '      <div style="margin-top:10px;"><button class="btn btn-primary" style="font-size:12px;" onclick="singleTplFileSelected(\'' + k + '\')">ファイルを選択</button></div>' +
-'      <div style="margin-top:8px;font-size:10px;color:#aaa;">CSV / TSV（1ファイルあたり 最大500行・5MB）</div>' +
+'      <div style="margin-top:8px;font-size:10px;color:#aaa;">CSV / TSV（1ファイルあたり 最大' + rowLimitOf(k) + '行・5MB）</div>' +
 '    </div>' +
+'    <div class="upload-reject-demo" style="margin-top:10px;"></div>' +
 '    <div id="single-tpl-' + k + '-upload-log" style="margin-top:10px;font-size:11px;color:#888;line-height:1.7;text-align:left;"></div>' +
 '  </div>' +
 '  <div class="btn-group">' +
@@ -3105,8 +3124,9 @@ futureBanner +
 '      <div style="font-size:32px;margin-bottom:8px;">📎</div>' +
 '      <div style="font-size:13px;">ファイルをドラッグ&ドロップ または</div>' +
 '      <div style="margin-top:10px;"><button class="btn btn-primary" style="font-size:12px;" onclick="singleSaasFileSelected(\'' + k + '\')">ファイルを選択</button></div>' +
-'      <div style="margin-top:8px;font-size:10px;color:#aaa;">CSV / TSV（1ファイルあたり 最大500行・5MB）</div>' +
+'      <div style="margin-top:8px;font-size:10px;color:#aaa;">CSV / TSV（1ファイルあたり 最大' + rowLimitOf(k) + '行・5MB）</div>' +
 '    </div>' +
+'    <div class="upload-reject-demo" style="margin-top:10px;"></div>' +
 '    <div id="single-saas-' + k + '-upload-log" style="margin-top:10px;font-size:11px;color:#888;line-height:1.7;text-align:left;"></div>' +
 '  </div>' +
 '  <div class="btn-group" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">' +
@@ -4263,7 +4283,7 @@ function renderTplWizard() {
   var step2;
   if (up) step2 = '<div style="display:flex;align-items:center;gap:8px;padding:14px;border:1px solid #b8e6d6;background:#f0faf6;border-radius:8px;font-size:15px;color:#0e9077;font-weight:700;">📄 '+it.key+'_data.tsv<button type="button" onclick="tplWizReupload();" style="margin-left:auto;display:inline-flex;align-items:center;gap:5px;font-size:12px;padding:6px 14px;border:1px solid #bbb;border-radius:6px;background:#fff;color:#444;cursor:pointer;font-weight:600;">🔄 アップし直す</button></div>';
   else if (!dl) step2 = '<div style="padding:18px;border:1px dashed #ddd;border-radius:8px;text-align:center;font-size:12px;color:#b0b0b0;background:#fafafa;">🔒 先に「テンプレートをダウンロード」してください</div>';
-  else step2 = '<div class="upload-box" onclick="tplWizUpload();" style="padding:26px;cursor:pointer;"><div class="ub-icon" style="font-size:30px;">📁</div><div class="ub-text" style="font-size:15px;">ファイルをドラッグ＆ドロップ / クリックで選択</div><div class="ub-hint" style="font-size:12px;">TSV / CSV（1ファイルあたり 最大500行・5MB）</div></div>';
+  else step2 = '<div class="upload-box" onclick="tplWizUpload();" style="padding:26px;cursor:pointer;"><div class="ub-icon" style="font-size:30px;">📁</div><div class="ub-text" style="font-size:15px;">ファイルをドラッグ＆ドロップ / クリックで選択</div><div class="ub-hint" style="font-size:12px;">TSV / CSV（1ファイルあたり 最大'+rowLimitOf(it.key)+'行・5MB）</div></div>';
   // カードの「次へ」は "次のアップロード項目へ進む" 用途のみ(未完了かつ最終項目でないとき)。
   // 確認画面への遷移は枠外(フッター)の「確認画面へ →」に一本化。全アップロード完了時はカードの次へは出さない
   // (戻る・ステップ項目直接クリックは可能)。
@@ -4382,7 +4402,7 @@ function renderSaasWizard(){
     var step2;
     if (up) step2='<div style="display:flex;align-items:center;gap:8px;padding:14px;border:1px solid #b8e6d6;background:#f0faf6;border-radius:8px;font-size:15px;color:#0e9077;font-weight:700;">📄 '+it.key.replace(/^map-/,'').replace(/-/g,'_')+'_export.csv<button type="button" onclick="saasWizReupload();" style="margin-left:auto;display:inline-flex;align-items:center;gap:5px;font-size:12px;padding:6px 14px;border:1px solid #bbb;border-radius:6px;background:#fff;color:#444;cursor:pointer;font-weight:600;">🔄 アップし直す</button></div>';
     else if (lockUpload) step2='<div style="padding:18px;border:1px dashed #ddd;border-radius:8px;text-align:center;font-size:14px;color:#b0b0b0;background:#fafafa;">🔒 先に「テンプレートをダウンロード」してください</div>';
-    else step2='<div class="upload-box" onclick="saasWizUpload();" style="padding:26px;cursor:pointer;"><div class="ub-icon" style="font-size:30px;">📁</div><div class="ub-text" style="font-size:15px;">ファイルをドラッグ＆ドロップ / クリックで選択</div><div class="ub-hint" style="font-size:12px;">CSV / TSV（1ファイルあたり 最大500行・5MB）</div></div>';
+    else step2='<div class="upload-box" onclick="saasWizUpload();" style="padding:26px;cursor:pointer;"><div class="ub-icon" style="font-size:30px;">📁</div><div class="ub-text" style="font-size:15px;">ファイルをドラッグ＆ドロップ / クリックで選択</div><div class="ub-hint" style="font-size:12px;">CSV / TSV（1ファイルあたり 最大'+rowLimitOf(it.key)+'行・5MB）</div></div>';
     html+='<div style="display:flex;align-items:flex-start;gap:12px;">'+_twStep(''+stepNum)+'<div style="flex:1;"><div style="font-size:16px;font-weight:700;margin-bottom:16px;">アップロード'+_twBadge(up)+'</div>'+step2+'</div></div>';
   }
   // 取り込み中データ一覧: 何がアップ済みかを明示(SaaSは必須/任意が混在するため、完了モーダルの代わりに常時表示)
@@ -4539,6 +4559,11 @@ function go(id) {
   }
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+  // 受付拒否バナーは画面遷移で持ち越さない。デモバーは動的生成画面にも配る。(README §9.3〜§9.5)
+  if (typeof clearUploadReject === 'function') clearUploadReject();
+  if (typeof renderUploadRejectDemoBars === 'function') renderUploadRejectDemoBars();
+  if (typeof renderZeroTargetDemoBars === 'function') renderZeroTargetDemoBars();
+  if (typeof demoZeroTarget === 'function') demoZeroTarget(false);
   document.querySelectorAll('.demo-nav button').forEach(b => b.classList.remove('current'));
   document.querySelectorAll('.demo-nav button').forEach(b => {
     if (b.getAttribute('onclick') && b.getAttribute('onclick').includes("'" + id + "'")) b.classList.add('current');
@@ -5800,6 +5825,27 @@ function downloadEmployeeTemplate() {
   a.click();
 }
 
+// ★ 受付拒否デモバーを全アップロード画面に配る (2026-07-28 / README §9.3・§9.5)
+// .upload-reject-demo プレースホルダを持つ画面すべてに同じ操作列を描画する。
+// 動的生成される単体取込画面にも効くよう、描画後にも呼べる形にしてある。
+function renderUploadRejectDemoBars() {
+  var kinds = [['rows','行数超過'],['size','サイズ超過'],['encoding','文字コード'],['columns','列不一致'],['empty','0件']];
+  var html = '<div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;font-size:9px;background:#fff3e0;border:1px dashed #e67e22;border-radius:6px;padding:3px 6px;">' +
+             '<span style="color:#e67e22;font-weight:700;">\u{1F6E0} デモ: 受付拒否</span>';
+  for (var i = 0; i < kinds.length; i++) {
+    html += '<button onclick="demoUploadReject(\'' + kinds[i][0] + '\');" style="font-size:9px;padding:2px 7px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;">' + kinds[i][1] + '</button>';
+  }
+  html += '</div>';
+  var hosts = document.querySelectorAll('.upload-reject-demo');
+  for (var j = 0; j < hosts.length; j++) { if (!hosts[j].innerHTML) hosts[j].innerHTML = html; }
+}
+document.addEventListener('DOMContentLoaded', renderUploadRejectDemoBars);
+
+// ★ 種別ごとの取込上限 (2026-07-28 / README §7.5・§8.2)
+// ④従業員は1行あたり最大3リクエスト(作成+Clerk招待 / 交通費 / 店舗割当)のため200行に制限。
+// POST /api/employees が交通費まで受け取れるよう拡張されたら500行に戻してよい。
+function rowLimitOf(entityKey) { return entityKey === 'employee' ? '200' : '500'; }
+
 // ★ 権限(オーナー/管理者)による出し分け (2026-07-28 / README §9.6)
 // 全社マスタ(業態/店舗/雇用区分)はオーナーのみ。管理者は従業員・管理者のみ、かつ担当店舗の行に限る。
 function setHubRole(role) {
@@ -5828,17 +5874,46 @@ function setHubRole(role) {
 // ★ 取り込み対象0件の状態 (2026-07-28 / README §9.4)
 // 全行がエラーのとき、実行ボタンを不活性にして0件実行を防ぐ。
 function demoZeroTarget(isZero) {
-  var box = document.getElementById('tpl-zero-target');
-  var btn = document.getElementById('tpl-import-exec-btn');
-  if (box) box.style.display = isZero ? '' : 'none';
-  if (btn) {
-    btn.disabled = !!isZero;
-    btn.style.opacity = isZero ? '.4' : '';
-    btn.style.cursor = isZero ? 'not-allowed' : '';
-    btn.textContent = isZero ? 'エラー行を除いてインポート実行（0件）' : 'エラー行を除いてインポート実行';
-    btn.title = isZero ? '取り込めるデータが1件もありません' : '';
+  // 全画面共通: アクティブ画面の [data-import-exec] を不活性化し、理由ボックスを注入する。
+  var sc = document.querySelector('.screen.active'); if (!sc) return;
+  var btn = sc.querySelector('[data-import-exec]'); if (!btn) return;
+  var grp = btn.parentNode;
+  var box = grp.parentNode.querySelector('.zero-target-box');
+  if (!box) {
+    box = document.createElement('div');
+    box.className = 'zero-target-box';
+    box.style.cssText = 'margin-bottom:12px;padding:12px 14px;background:#ffebee;border:1px solid #ffcdd2;border-radius:8px;font-size:12px;color:#c62828;line-height:1.8;';
+    box.innerHTML = '<strong>取り込めるデータが1件もありません。</strong><br>' +
+      '<span style="color:#9c4d12;font-size:11px;">すべての行にエラーがあります。エラーを解消するか、ファイルを修正してからもう一度アップロードしてください。</span>';
+    grp.parentNode.insertBefore(box, grp);
+  }
+  box.style.display = isZero ? '' : 'none';
+  var base = btn.getAttribute('data-label-base') || btn.textContent;
+  btn.disabled = !!isZero;
+  btn.style.opacity = isZero ? '.4' : '';
+  btn.style.cursor = isZero ? 'not-allowed' : '';
+  btn.textContent = isZero ? base.replace(/（[0-9]+件）$/, '') + '（0件）' : base;
+  btn.title = isZero ? '取り込めるデータが1件もありません' : '';
+}
+
+// ★ 0件デモバーを全プレビュー画面に配る (2026-07-28 / README §9.4)
+function renderZeroTargetDemoBars() {
+  var html = '<span style="display:inline-flex;align-items:center;gap:5px;font-size:9px;background:#fff3e0;border:1px dashed #e67e22;border-radius:6px;padding:3px 6px;margin-left:8px;">' +
+    '<span style="color:#e67e22;font-weight:700;">🛠 デモ:</span>' +
+    '<button onclick="demoZeroTarget(false);" style="font-size:9px;padding:2px 7px;border:1px solid #2ec4a0;background:#2ec4a0;color:#fff;border-radius:4px;cursor:pointer;font-weight:700;">通常</button>' +
+    '<button onclick="demoZeroTarget(true);" style="font-size:9px;padding:2px 7px;border:1px solid #ccc;background:#fff;color:#555;border-radius:4px;cursor:pointer;">全件エラー(0件)</button>' +
+    '</span>';
+  var btns = document.querySelectorAll('[data-import-exec]');
+  for (var i = 0; i < btns.length; i++) {
+    if (btns[i].parentNode.querySelector('.zero-demo-bar')) continue;
+    var w = document.createElement('span');
+    w.className = 'zero-demo-bar';
+    w.style.display = 'inline-flex';
+    w.innerHTML = html;
+    btns[i].parentNode.insertBefore(w, btns[i].nextSibling);
   }
 }
+document.addEventListener('DOMContentLoaded', renderZeroTargetDemoBars);
 
 // ★ ファイル受付拒否の状態 (2026-07-28 / README §9.3・§9.5)
 // 上限超過・形式不正はプレビュー生成前に弾く。ファイル一覧にも追加しない。
@@ -5856,14 +5931,32 @@ var UPLOAD_REJECT_MSG = {
 };
 function demoUploadReject(kind) {
   var d = UPLOAD_REJECT_MSG[kind]; if (!d) return;
-  var box = document.getElementById('tpl-upload-reject');
-  document.getElementById('tpl-upload-reject-title').textContent = d.t;
-  document.getElementById('tpl-upload-reject-msg').innerHTML = d.m;
-  if (box) { box.style.display = ''; box.scrollIntoView({behavior:'smooth', block:'center'}); }
+  // 全画面共通: 現在アクティブな画面の .content 先頭に注入する。
+  // 実装時もアップロード直後(プレビュー生成前)に弾き、ファイル一覧には追加しないこと。
+  var sc = document.querySelector('.screen.active'); if (!sc) return;
+  var host = sc.querySelector('.content') || sc;
+  var box = host.querySelector('.upload-reject-box');
+  if (!box) {
+    box = document.createElement('div');
+    box.className = 'upload-reject-box';
+    box.style.cssText = 'margin-bottom:14px;padding:12px 14px;background:#ffebee;border:1px solid #ffcdd2;border-radius:8px;';
+    host.insertBefore(box, host.firstChild);
+  }
+  box.innerHTML =
+    '<div style="display:flex;align-items:flex-start;gap:10px;">' +
+      '<span style="font-size:18px;line-height:1.2;">\u274c</span>' +
+      '<div style="flex:1;">' +
+        '<div style="font-size:13px;font-weight:700;color:#c62828;margin-bottom:4px;">' + d.t + '</div>' +
+        '<div style="font-size:11px;color:#9c4d12;line-height:1.8;">' + d.m + '</div>' +
+      '</div>' +
+      '<button onclick="clearUploadReject();" style="font-size:10px;padding:4px 10px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;white-space:nowrap;">\u9589\u3058\u308b</button>' +
+    '</div>';
+  box.style.display = '';
+  box.scrollIntoView({behavior:'smooth', block:'center'});
 }
 function clearUploadReject() {
-  var box = document.getElementById('tpl-upload-reject');
-  if (box) box.style.display = 'none';
+  var boxes = document.querySelectorAll('.upload-reject-box');
+  for (var i = 0; i < boxes.length; i++) boxes[i].style.display = 'none';
 }
 
 // ★ 取り込み実行中の状態 + 二重押下防止 (2026-07-28 / README §9.1)
