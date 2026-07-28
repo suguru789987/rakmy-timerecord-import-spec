@@ -705,9 +705,26 @@
           <tbody>
             <tr><td>2</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#0e9077;background:#e8f8f5;border:1px solid #b8e6d6;">🆕 新規登録</span></td><td>山本 健一</td><td>yamamoto@example.jp</td><td>渋谷店</td><td style="font-size:11px;color:#555;">招待メール(新規版)</td><td style="font-size:11px;color:#0e9077;">会社内に未登録のため新規作成し、管理者権限を付与</td></tr>
             <tr><td>3</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#0e9077;background:#e8f8f5;border:1px solid #b8e6d6;">🆕 新規登録</span></td><td>佐藤 一郎</td><td>sato@example.jp</td><td>新宿店</td><td style="font-size:11px;color:#555;">招待メール(新規版)</td><td style="font-size:11px;color:#0e9077;">会社内に未登録のため新規作成し、管理者権限を付与</td></tr>
-            <tr><td>4</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#5c4dac;background:#ede7f6;border:1px solid #c5b6e1;">👥 権限付与</span></td><td>test</td><td>test@example.com</td><td>渋谷店</td><td style="font-size:11px;color:#555;">管理者権限付与のお知らせ</td><td style="font-size:11px;color:#5c4dac;">既存従業員 (招待承諾済み) に管理者権限を追加</td></tr>
+            <tr><td>4</td><td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#5c4dac;background:#ede7f6;border:1px solid #c5b6e1;">👥 権限付与</span></td><td>test</td><td>test@example.com</td><td data-keep-stores-cell data-merged="渋谷店, 新宿店" data-csv-only="渋谷店">渋谷店, 新宿店 <span style="font-size:10px;color:#0e9077;">(既存の所属店舗を追加)</span></td><td style="font-size:11px;color:#555;">管理者権限付与のお知らせ</td><td style="font-size:11px;color:#5c4dac;">既存従業員 (招待承諾済み) に管理者権限を追加</td></tr>
           </tbody>
         </table>
+      </div>
+            <!-- ★ 既存の所属店舗を維持する (2026-07-28 / README §7.1) -->
+      <!-- アプリ側は userStoreAssignments を delete→insert で置換するため、CSVに書かれていない
+           既存の所属店舗が消える。画面の「従業員から選択」タブの初期チェックに相当する仕組みを設ける。
+           対象は「権限付与」「差し替え」の行のみ(既存ユーザーに対する操作)。 -->
+      <div class="wcard keep-stores-card" style="margin-top:14px;">
+        <div class="wcard-title" style="margin-bottom:8px;">担当店舗の扱い <span style="font-size:10px;color:#888;font-weight:400;">(管理者データのみ適用)</span></div>
+        <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;font-size:12px;color:#333;line-height:1.7;">
+          <input type="checkbox" class="keep-stores-cb" checked onchange="toggleKeepStores(this);" style="accent-color:#2ec4a0;width:16px;height:16px;margin-top:2px;">
+          <span><strong>既存の所属店舗を維持する</strong>（推奨）<br>
+            <span style="font-size:11px;color:#666;">既存従業員を昇格させる行（権限付与・差し替え）で、CSVの担当店舗に<strong>その従業員の現在の所属店舗を自動で追加</strong>します。オフにすると、CSVに書いた担当店舗だけになり、書かれていない所属店舗は外れます。</span>
+          </span>
+        </label>
+        <div class="keep-stores-warn" style="display:none;margin-top:8px;padding:8px 10px;background:#fff8e1;border:1px solid #ffe0a3;border-radius:6px;font-size:11px;color:#9c6a08;line-height:1.7;">
+          既存の所属店舗「新宿店」が担当店舗に含まれていません。このまま取り込むと所属から外れます。<br>
+          <span style="color:#666;">エラーではありません。担当店舗を意図的に減らす場合はそのまま実行してください。</span>
+        </div>
       </div>
       <details class="legend-details" style="margin-top:10px;background:#fafafa;border:1px solid #e8e8e8;border-radius:6px;padding:10px 12px;"><summary style="cursor:pointer;font-size:11px;font-weight:700;color:#444;">判定の見方 <span style="font-weight:400;color:#888;">（5分岐の説明 — 必要なときに開いてください）</span></summary><div style="margin-top:8px;font-size:11px;line-height:1.6;"><div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:5px;"><div style="flex:0 0 88px;"><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#0e9077;background:#e8f8f5;border:1px solid #b8e6d6;white-space:nowrap;">🆕 新規登録</span></div><div style="flex:1;color:#555;">会社内に同じメールアドレスのユーザーがいない。新規作成して管理者権限を付与します。</div></div><div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:5px;"><div style="flex:0 0 88px;"><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#5c4dac;background:#ede7f6;border:1px solid #c5b6e1;white-space:nowrap;">👥 権限付与</span></div><div style="flex:1;color:#555;">従業員として在籍済みで招待も承諾済み。既存ユーザーに管理者権限を追加します（新規作成はしません）。</div></div><div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:5px;"><div style="flex:0 0 88px;"><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#f0960a;background:#fff8e1;border:1px solid #ffe0a3;white-space:nowrap;">🔄 差し替え</span></div><div style="flex:1;color:#555;">招待済みですが、まだ承諾されていません。旧招待を無効化して招待を再発行します。</div></div><div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:5px;"><div style="flex:0 0 88px;"><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#888888;background:#f5f5f5;border:1px solid #e0e0e0;white-space:nowrap;">⏭ スキップ</span></div><div style="flex:1;color:#555;">すでに管理者権限を持っています。何もしません（メールも送りません）。</div></div><div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:5px;"><div style="flex:0 0 88px;"><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#c62828;background:#ffebee;border:1px solid #ffcdd2;white-space:nowrap;">❌ エラー</span></div><div style="flex:1;color:#555;">必須項目の不足、担当店舗が未登録、メールアドレスの形式不正など。取り込みません。</div></div><div style="margin-top:6px;font-size:10px;color:#888;">判定はメールアドレスをもとに自動で行われます。「重複時の処理」の設定は管理者データには適用されません。</div></div></details>
     </div>
@@ -1409,7 +1426,7 @@
           <tr>
             <td>4</td>
             <td><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#5c4dac;background:#ede7f6;border:1px solid #c5b6e1;">👥 権限付与</span></td>
-            <td>test</td><td>test@example.com</td><td>渋谷店</td>
+            <td>test</td><td>test@example.com</td><td data-keep-stores-cell data-merged="渋谷店, 新宿店" data-csv-only="渋谷店">渋谷店, 新宿店 <span style="font-size:10px;color:#0e9077;">(既存の所属店舗を追加)</span></td>
             <td style="font-size:11px;color:#555;">管理者権限付与のお知らせ</td>
             <td style="font-size:11px;color:#5c4dac;">既存従業員 (招待承諾済み) に管理者権限を追加</td>
           </tr>
@@ -1437,7 +1454,24 @@
         </tbody>
       </table>
     </div>
-    <details class="legend-details" style="margin-top:10px;background:#fafafa;border:1px solid #e8e8e8;border-radius:6px;padding:10px 12px;"><summary style="cursor:pointer;font-size:11px;font-weight:700;color:#444;">判定の見方 <span style="font-weight:400;color:#888;">（5分岐の説明 — 必要なときに開いてください）</span></summary><div style="margin-top:8px;font-size:11px;line-height:1.6;"><div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:5px;"><div style="flex:0 0 88px;"><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#0e9077;background:#e8f8f5;border:1px solid #b8e6d6;white-space:nowrap;">🆕 新規登録</span></div><div style="flex:1;color:#555;">会社内に同じメールアドレスのユーザーがいない。新規作成して管理者権限を付与します。</div></div><div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:5px;"><div style="flex:0 0 88px;"><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#5c4dac;background:#ede7f6;border:1px solid #c5b6e1;white-space:nowrap;">👥 権限付与</span></div><div style="flex:1;color:#555;">従業員として在籍済みで招待も承諾済み。既存ユーザーに管理者権限を追加します（新規作成はしません）。</div></div><div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:5px;"><div style="flex:0 0 88px;"><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#f0960a;background:#fff8e1;border:1px solid #ffe0a3;white-space:nowrap;">🔄 差し替え</span></div><div style="flex:1;color:#555;">招待済みですが、まだ承諾されていません。旧招待を無効化して招待を再発行します。</div></div><div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:5px;"><div style="flex:0 0 88px;"><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#888888;background:#f5f5f5;border:1px solid #e0e0e0;white-space:nowrap;">⏭ スキップ</span></div><div style="flex:1;color:#555;">すでに管理者権限を持っています。何もしません（メールも送りません）。</div></div><div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:5px;"><div style="flex:0 0 88px;"><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#c62828;background:#ffebee;border:1px solid #ffcdd2;white-space:nowrap;">❌ エラー</span></div><div style="flex:1;color:#555;">必須項目の不足、担当店舗が未登録、メールアドレスの形式不正など。取り込みません。</div></div><div style="margin-top:6px;font-size:10px;color:#888;">判定はメールアドレスをもとに自動で行われます。「重複時の処理」の設定は管理者データには適用されません。</div></div></details>
+          <!-- ★ 既存の所属店舗を維持する (2026-07-28 / README §7.1) -->
+      <!-- アプリ側は userStoreAssignments を delete→insert で置換するため、CSVに書かれていない
+           既存の所属店舗が消える。画面の「従業員から選択」タブの初期チェックに相当する仕組みを設ける。
+           対象は「権限付与」「差し替え」の行のみ(既存ユーザーに対する操作)。 -->
+      <div class="wcard keep-stores-card" style="margin-top:14px;">
+        <div class="wcard-title" style="margin-bottom:8px;">担当店舗の扱い <span style="font-size:10px;color:#888;font-weight:400;">(管理者データのみ適用)</span></div>
+        <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;font-size:12px;color:#333;line-height:1.7;">
+          <input type="checkbox" class="keep-stores-cb" checked onchange="toggleKeepStores(this);" style="accent-color:#2ec4a0;width:16px;height:16px;margin-top:2px;">
+          <span><strong>既存の所属店舗を維持する</strong>（推奨）<br>
+            <span style="font-size:11px;color:#666;">既存従業員を昇格させる行（権限付与・差し替え）で、CSVの担当店舗に<strong>その従業員の現在の所属店舗を自動で追加</strong>します。オフにすると、CSVに書いた担当店舗だけになり、書かれていない所属店舗は外れます。</span>
+          </span>
+        </label>
+        <div class="keep-stores-warn" style="display:none;margin-top:8px;padding:8px 10px;background:#fff8e1;border:1px solid #ffe0a3;border-radius:6px;font-size:11px;color:#9c6a08;line-height:1.7;">
+          既存の所属店舗「新宿店」が担当店舗に含まれていません。このまま取り込むと所属から外れます。<br>
+          <span style="color:#666;">エラーではありません。担当店舗を意図的に減らす場合はそのまま実行してください。</span>
+        </div>
+      </div>
+      <details class="legend-details" style="margin-top:10px;background:#fafafa;border:1px solid #e8e8e8;border-radius:6px;padding:10px 12px;"><summary style="cursor:pointer;font-size:11px;font-weight:700;color:#444;">判定の見方 <span style="font-weight:400;color:#888;">（5分岐の説明 — 必要なときに開いてください）</span></summary><div style="margin-top:8px;font-size:11px;line-height:1.6;"><div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:5px;"><div style="flex:0 0 88px;"><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#0e9077;background:#e8f8f5;border:1px solid #b8e6d6;white-space:nowrap;">🆕 新規登録</span></div><div style="flex:1;color:#555;">会社内に同じメールアドレスのユーザーがいない。新規作成して管理者権限を付与します。</div></div><div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:5px;"><div style="flex:0 0 88px;"><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#5c4dac;background:#ede7f6;border:1px solid #c5b6e1;white-space:nowrap;">👥 権限付与</span></div><div style="flex:1;color:#555;">従業員として在籍済みで招待も承諾済み。既存ユーザーに管理者権限を追加します（新規作成はしません）。</div></div><div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:5px;"><div style="flex:0 0 88px;"><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#f0960a;background:#fff8e1;border:1px solid #ffe0a3;white-space:nowrap;">🔄 差し替え</span></div><div style="flex:1;color:#555;">招待済みですが、まだ承諾されていません。旧招待を無効化して招待を再発行します。</div></div><div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:5px;"><div style="flex:0 0 88px;"><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#888888;background:#f5f5f5;border:1px solid #e0e0e0;white-space:nowrap;">⏭ スキップ</span></div><div style="flex:1;color:#555;">すでに管理者権限を持っています。何もしません（メールも送りません）。</div></div><div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:5px;"><div style="flex:0 0 88px;"><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;color:#c62828;background:#ffebee;border:1px solid #ffcdd2;white-space:nowrap;">❌ エラー</span></div><div style="flex:1;color:#555;">必須項目の不足、担当店舗が未登録、メールアドレスの形式不正など。取り込みません。</div></div><div style="margin-top:6px;font-size:10px;color:#888;">判定はメールアドレスをもとに自動で行われます。「重複時の処理」の設定は管理者データには適用されません。</div></div></details>
     </div>
 
     <div class="wcard">
@@ -5990,6 +6024,27 @@ function runImport(btn, targetScreen, total, label) {
       }, 420);
     }
   }, 170);
+}
+
+// ★ 既存の所属店舗を維持する (2026-07-28 / README §7.1)
+// アプリ側は userStoreAssignments を delete→insert で置換する(promoteActiveEmployee /
+// promoteInvitingEmployee の両方で確認済み)。CSVに書かれていない既存の所属店舗が消えるため、
+// 画面の「従業員から選択」タブの初期チェックに相当する仕組みを設ける。
+//   オン(既定): APIに渡す storeIds = CSVの担当店舗 ∪ 既存の所属店舗
+//   オフ       : CSVの担当店舗のみ(=アプリ側の置換挙動そのまま)。差分がある行に警告を出す
+// 対象は「権限付与」「差し替え」の行のみ。新規登録は既存所属が無く、スキップ/エラーは取り込まない。
+function toggleKeepStores(cb) {
+  var card = cb.closest('.keep-stores-card'); if (!card) return;
+  var warn = card.querySelector('.keep-stores-warn');
+  if (warn) warn.style.display = cb.checked ? 'none' : '';
+  // デモ: 権限付与の行の担当店舗表示を切り替える(実装では storeIds の組み立てに反映する)
+  var sc = cb.closest('.screen'); if (!sc) return;
+  var cells = sc.querySelectorAll('[data-keep-stores-cell]');
+  for (var i = 0; i < cells.length; i++) {
+    cells[i].innerHTML = cb.checked
+      ? cells[i].getAttribute('data-merged') + ' <span style="font-size:10px;color:#0e9077;">(既存の所属店舗を追加)</span>'
+      : cells[i].getAttribute('data-csv-only') + ' <span style="font-size:10px;color:#c62828;">(新宿店が外れます)</span>';
+  }
 }
 
 // ★ 実装フェーズのバナー (2026-07-28 / README §概要「実装フェーズと仕様の正本」・§10)
