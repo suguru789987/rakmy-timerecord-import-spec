@@ -643,7 +643,11 @@
           <tbody>
             <tr><td class="st-new">● 新規</td><td>渋谷店</td><td>居酒屋</td><td>150-0002</td><td>東京都渋谷区渋谷1-1-1</td><td>11:00〜23:00</td></tr>
             <tr><td class="st-upd">● 更新</td><td>新宿店</td><td>カフェ</td><td>160-0022</td><td>東京都新宿区新宿3-3-3</td><td>08:00〜22:00</td></tr>
-          </tbody>
+          
+            <!-- ★ ②店舗の必須検証エラー (2026-07-28 / README §4.5-1) -->
+            <tr data-err-type="required-missing" style="background:#fffafa;"><td class="st-err">✗ エラー</td><td>池袋店</td><td>居酒屋・バー</td><td style="color:#c62828;">（空欄）</td><td>東京都豊島区西池袋1-1-1</td><td>10:00〜22:00</td></tr>
+            <!-- ★ ②店舗の名称→ID変換エラー (2026-07-28 / README §4.5-6) -->
+            <tr data-err-type="master-missing" style="background:#fffafa;"><td class="st-err">✗ エラー</td><td>横浜店</td><td style="color:#c62828;">ダイニングバー</td><td>220-0011</td><td>神奈川県横浜市西区高島2-2-2</td><td>17:00〜24:00</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -1284,19 +1288,19 @@
     <!-- 設定マスタ確認セクション -->
     <div id="tpl-confirm-master">
     <div class="map-section-header"><span style="background:#2ec4a0;color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;">①〜③</span> 設定マスタ</div>
-    <div class="alert alert-info">①〜③ 設定マスタ: <strong>5行</strong>を検出し、<strong>業態 2件</strong>／<strong>店舗 2件</strong>／<strong>雇用区分 3件</strong> に仕分けました。重複は自動で除外されます。</div>
+    <div class="alert alert-info">①〜③ 設定マスタ: <strong>7行</strong>を検出し、<strong>業態 2件</strong>／<strong>店舗 4件</strong>／<strong>雇用区分 3件</strong> に仕分けました。うち <strong>2件</strong> はエラーのため取り込まれません。重複は自動で除外されます。</div>
 
     <div class="pv-summary">
-      <div class="pv-box pv-total"><div class="num">5</div><div class="lbl">データ行数</div></div>
+      <div class="pv-box pv-total"><div class="num">7</div><div class="lbl">データ行数</div></div>
       <div class="pv-box pv-new"><div class="num">5</div><div class="lbl">新規登録</div></div>
       <div class="pv-box pv-upd"><div class="num">0</div><div class="lbl">更新</div></div>
-      <div class="pv-box pv-err"><div class="num">0</div><div class="lbl">エラー</div></div>
+      <div class="pv-box pv-err"><div class="num">2</div><div class="lbl">エラー</div></div>
     </div>
 
     <div class="wcard" style="padding:0;overflow:hidden;">
       <div class="stabs" style="padding: 0 14px;">
         <div class="stab active" onclick="switchMasterTab(this,0)">業態 (2)</div>
-        <div class="stab" onclick="switchMasterTab(this,1)">店舗 (2)</div>
+        <div class="stab" onclick="switchMasterTab(this,1)">店舗 (4)</div>
         <div class="stab" onclick="switchMasterTab(this,2)">雇用区分 (3)</div>
       </div>
       <!-- 業態 -->
@@ -1308,12 +1312,24 @@
         </tbody>
       </table>
       <!-- 店舗 -->
+      <!-- ★ ②店舗のエラー説明 (2026-07-28 / README §4.5-1・§4.5-6) -->
+      <div class="master-tab-content" id="master-tab-1-note" style="display:none;padding:12px 14px;background:#ffebee;border-bottom:1px solid #ffcdd2;">
+        <div style="font-size:13px;color:#c62828;font-weight:700;margin-bottom:4px;">2件のエラー</div>
+        <div style="font-size:11px;color:#9c4d12;line-height:1.8;">
+          ・<strong>池袋店</strong> — 郵便番号が空欄です。②店舗の郵便番号・住所・営業時間は必須です（README §4.5-1）<br>
+          ・<strong>横浜店</strong> — 業態「ダイニングバー」が登録されていません。先に①業態を取り込んでください（README §4.5-6）
+        </div>
+      </div>
       <table class="pv-table master-tab-content" id="master-tab-1" style="display:none;">
         <thead><tr><th style="width:60px">状態</th><th>店舗名</th><th>業態</th><th>郵便番号</th><th>住所</th><th>営業時間</th></tr></thead>
         <tbody>
           <tr><td class="st-new">● 新規</td><td>渋谷店</td><td>居酒屋</td><td>150-0002</td><td>東京都渋谷区渋谷1-1-1</td><td>11:00〜23:00</td></tr>
           <tr><td class="st-new">● 新規</td><td>新宿店</td><td>カフェ</td><td>160-0022</td><td>東京都新宿区新宿3-3-3</td><td>08:00〜22:00</td></tr>
-        </tbody>
+        
+            <!-- ★ ②店舗の必須検証エラー (2026-07-28 / README §4.5-1) -->
+            <tr data-err-type="required-missing" style="background:#fffafa;"><td class="st-err">✗ エラー</td><td>池袋店</td><td>居酒屋・バー</td><td style="color:#c62828;">（空欄）</td><td>東京都豊島区西池袋1-1-1</td><td>10:00〜22:00</td></tr>
+            <!-- ★ ②店舗の名称→ID変換エラー (2026-07-28 / README §4.5-6) -->
+            <tr data-err-type="master-missing" style="background:#fffafa;"><td class="st-err">✗ エラー</td><td>横浜店</td><td style="color:#c62828;">ダイニングバー</td><td>220-0011</td><td>神奈川県横浜市西区高島2-2-2</td><td>17:00〜24:00</td></tr></tbody>
       </table>
       <!-- 雇用区分 -->
       <table class="pv-table master-tab-content" id="master-tab-2" style="display:none;">
@@ -5599,6 +5615,9 @@ function switchMasterTab(el, idx) {
   el.classList.add('active');
   document.querySelectorAll('.master-tab-content').forEach(function(t) { t.style.display = 'none'; });
   document.getElementById('master-tab-' + idx).style.display = '';
+  // エラー説明バナー(あれば)も一緒に出す (README §4.5)
+  var note = document.getElementById('master-tab-' + idx + '-note');
+  if (note) note.style.display = '';
 }
 
 // ★ 取り込みデータ種別タブ切替 (2026-05-18 追加 / 大タブ)
