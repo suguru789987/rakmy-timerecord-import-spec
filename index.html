@@ -4552,6 +4552,7 @@ function go(id) {
   if (typeof renderUploadRejectDemoBars === 'function') renderUploadRejectDemoBars();
   if (typeof renderZeroTargetDemoBars === 'function') renderZeroTargetDemoBars();
   if (typeof renderPhaseBanners === 'function') renderPhaseBanners();
+  if (typeof renderErrorCsvButtons === 'function') renderErrorCsvButtons();
   if (typeof demoZeroTarget === 'function') demoZeroTarget(false);
   document.querySelectorAll('.demo-nav button').forEach(b => b.classList.remove('current'));
   document.querySelectorAll('.demo-nav button').forEach(b => {
@@ -5867,6 +5868,44 @@ function setHubRole(role) {
     bm.style.borderColor = isMgr ? '#2ec4a0' : '#ccc'; bm.style.fontWeight = isMgr ? '700' : '400';
   }
 }
+
+// ★ エラー行をCSVでダウンロード (2026-07-31 / README §7.2)
+// プレビューのエラー行は画面で直させない。CSVで落として修正し再アップさせる。
+// 書式は失敗行CSV(§9.2)と同一: 元テンプレートと同じ列 + 末尾に理由列。同じ仕組みを使い回す。
+var ERROR_ROWS_DEMO = {
+  store:    { file:'②店舗', header:'店舗名\t所属業態\t郵便番号\t住所\t営業時間\tエラー理由',
+              rows:['池袋店\t居酒屋・バー\t\t東京都豊島区西池袋1-1-1\t10:00〜22:00\t郵便番号が空欄です',
+                    '横浜店\tダイニングバー\t220-0011\t神奈川県横浜市西区高島2-2-2\t17:00〜24:00\t業態「ダイニングバー」が登録されていません'] },
+  employee: { file:'④従業員', header:'従業員名\t電話番号\tメールアドレス\t従業員コード\t雇用区分名\t店舗名\t交通費単位\t交通費\tエラー理由',
+              rows:['小林誠\t070-9999-0000\tkobayashi@example.com\t\tアルバイトD\t渋谷店\t日額\t400\t雇用区分「アルバイトD」が登録されていません'] }
+};
+function downloadErrorRowsCsv(kind) {
+  var d = ERROR_ROWS_DEMO[kind] || ERROR_ROWS_DEMO.store;
+  var blob = new Blob(['\ufeff' + [d.header].concat(d.rows).join('\n')], {type:'text/tab-separated-values;charset=utf-8'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  // 実装時のファイル名: {元ファイル名}_エラー行_{YYYYMMDD}.tsv
+  a.download = 'ラクミータイムレコード_インポートテンプレート_' + d.file + '_エラー行_20260731.tsv';
+  a.click();
+}
+
+// ★ エラー行CSVボタンをプレビュー画面に配る (2026-07-31 / README §7.2)
+// 先行実装の対象はテンプレート側(s-tpl*)のみ。外部勤怠側は後続フェーズ(§0.2)。
+function renderErrorCsvButtons() {
+  var targets = [{ sc:'s-tpl2', kind:'store' }, { sc:'s-tpl2-single', kind:'store' }];
+  targets.forEach(function (t) {
+    var sc = document.getElementById(t.sc); if (!sc) return;
+    var btn = sc.querySelector('[data-import-exec]'); if (!btn) return;
+    if (btn.parentNode.querySelector('.error-csv-btn')) return;
+    var b = document.createElement('button');
+    b.className = 'btn btn-outline-g error-csv-btn';
+    b.style.cssText = 'font-size:12px;padding:8px 14px;margin-right:8px;';
+    b.textContent = '⬇ エラー行をCSVでダウンロード';
+    b.setAttribute('onclick', "downloadErrorRowsCsv('" + t.kind + "');");
+    btn.parentNode.insertBefore(b, btn);
+  });
+}
+document.addEventListener('DOMContentLoaded', renderErrorCsvButtons);
 
 // ★ 取り込み対象0件の状態 (2026-07-28 / README §9.4)
 // 全行がエラーのとき、実行ボタンを不活性にして0件実行を防ぐ。
