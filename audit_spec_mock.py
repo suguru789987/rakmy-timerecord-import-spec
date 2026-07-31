@@ -25,6 +25,34 @@ for cls,n in [('next-steps-box',4),('auto-code-note',4),('excluded-rows-box',4)]
     if cls not in h: ng.append('クラス未定義: '+cls)
 if h.count('最大500行・5MB）'): ng.append('種別を無視した500行表記が残存')
 if '_失敗行_{YYYYMMDD}.csv' in r: ng.append('CSV拡張子が仕様とモックで不一致')
+# 方式の交差汚染検査 (テンプレ/外部勤怠が互いに混じっていないか)
+# 「テンプレートのみ」の節が s-saas* を実装例として引用していたら検出する。
+# 先行実装の仕様が後続実装の画面を根拠にすると、不要な工数が生まれるため。
+_secs=[(m.start(), m.group(2)) for m in re.finditer(r'^(#{2,3})\s*(\d+(?:\.\d+)?)[.\s]', r, re.M)]+[(len(r),'END')]
+for _i in range(len(_secs)-1):
+    _b = r[_secs[_i][0]:_secs[_i+1][0]]
+    _m = re.search(r'\*\*適用範囲:\s*([^*]+?)\*\*', _b)
+    if not _m: continue
+    _lab = _m.group(1).strip()
+    _body = _b[_m.end():]          # 適用範囲の注記そのものは除外して本文だけ見る
+    # 検出するのは「外部勤怠の画面を実装例・参考として引用している」場合のみ。
+    # 現状説明やスコープ注記としての言及は正当なので対象外。
+    # 先行実装の対象(テンプレートのみ / 両方式共通)は s-saas* を実装例にしてはならない。
+    # 先行実装では s-saas* 系を作らないため(§0.2)。
+    if _lab.startswith('テンプレートのみ') or _lab.startswith('両方式共通'):
+        for _line in _body.split('\n'):
+            _hit = re.search(r'(実装例|参考|と同じ形式|に倣[うい]|を踏襲)', _line)
+            if not _hit: continue
+            if not re.search(r'`s-saas[a-z0-9-]*`|単票プレビュー', _line): continue
+            # 否定文・経緯の説明・スコープ注記は対象外(「誤って引用した」等)
+            if re.search(r'誤って|してはならない|ではない|不要|後続フェーズ|参照用|対象外', _line): continue
+            ng.append('§'+_secs[_i][1]+' が外部勤怠の画面を実装例として引用している')
+            break
+    if _lab.startswith('外部勤怠のみ') and re.search(r'実装例[^\n]*`s-tpl', _body):
+        ng.append('§'+_secs[_i][1]+' は外部勤怠のみだがテンプレートの画面を実装例にしている')
+if '行内3択アクション' in r and '先行実装では不要' not in r:
+    ng.append('§7.2 に行内3択アクションが要件として残存している')
+
 # §0 前提条件の存在と内容 (一般論での仕様作成を防ぐ土台)
 if '## 0. 前提条件' not in r: ng.append('§0 前提条件が存在しない')
 else:
