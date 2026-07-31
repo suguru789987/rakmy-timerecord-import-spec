@@ -6055,9 +6055,9 @@ function runImport(btn, targetScreen, total, label) {
   }, 170);
 }
 
-// ★ 実装フェーズのバナー (2026-07-28 / README §概要「実装フェーズと仕様の正本」・§10)
-// 先行実装はテンプレートインポート(s-tpl* 系)。外部勤怠(s-saas* 系)は後続フェーズ。
-// 画面を撤去せず参照用として残し、先行実装の対象外であることを画面上でも示す(A案)。
+// ★ 凍結バナー (2026-07-31 / README §0.2・§2・§10)
+// 実装対象はテンプレートインポート(s-tpl* 系)のみ。外部勤怠(s-saas* 系)は仕様未完成のまま凍結。
+// 画面は資産として残すが、実装対象でないことを画面上で明示する。
 function renderPhaseBanners() {
   // 外部勤怠の画面に加え、s-tpl-complete(補完テンプレート)も対象。
   // 補完はマッピング不可項目を埋める外部勤怠専用機能で、遷移元は s-saas4 のみ。
@@ -6069,11 +6069,12 @@ function renderPhaseBanners() {
     if (host.querySelector('.phase-banner')) continue;
     var b = document.createElement('div');
     b.className = 'phase-banner';
-    b.style.cssText = 'margin-bottom:14px;padding:10px 14px;background:#f3f0ff;border:1px solid #d6ccff;border-radius:8px;font-size:11px;color:#5c4dac;line-height:1.8;';
+    b.style.cssText = 'margin-bottom:14px;padding:10px 14px;background:#f5f5f5;border:1px solid #ccc;border-radius:8px;font-size:11px;color:#666;line-height:1.8;';
     b.innerHTML =
-      '<strong>後続フェーズ・参照用</strong>　外部勤怠サービスインポートは<strong>後続実装</strong>です。' +
-      '先行実装の対象はテンプレートインポート（<code>s-tpl*</code> 系）のみ。<br>' +
-      '<span style="color:#7a6fb8;">この画面の内容は後続フェーズで §1 の確定内容に追随させる前提で、先行フェーズでは凍結します。外部勤怠で未定義の論点は README §10 を参照してください。</span>';
+      '<strong>⛔ 仕様未完成・凍結中（実装対象外）</strong>　外部勤怠サービスインポートは、' +
+      '<strong>仕様を維持する担当が不在のため開発を進められません</strong>。<br>' +
+      '<span style="color:#7a6fb8;">この画面は実装対象ではありません。内容は初版（2026-03-31）からほぼ更新されておらず、未定義の論点が6件残っています（README §10）。' +
+      '実装対象はテンプレートインポート（<code>s-tpl*</code> 系）のみです。</span>';
     host.insertBefore(b, host.firstChild);
   }
 }
