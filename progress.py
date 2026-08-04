@@ -5,22 +5,25 @@
 使い方:
     python3 progress.py
 
-受け入れ条件表の「実装状況」列に ○ / △ / ×、「判定」列に 合格 / 不合格 を記入してから実行する。
+受け入れ条件_確認表の「実装状況」列に ○ / △ / ×、「判定」列に 合格 / 不合格 を記入してから実行する。
+「崩れると起きること」は定義表から引く。
 空欄は「未確認」として扱う。
 """
 import io, os, sys, collections
 
 B = os.path.dirname(os.path.abspath(__file__))
-AC_PATH = os.path.join(B, '20260803_受け入れ条件表.tsv')
+DEF_PATH = os.path.join(B, '20260804_受け入れ条件_定義表.tsv')
+CHK_PATH = os.path.join(B, '20260804_受け入れ条件_確認表.tsv')
 MS_PATH = os.path.join(B, '20260804_実装マイルストーン表.tsv')
 
 def load(p):
     return [r.split('\t') for r in io.open(p, encoding='utf-8').read().rstrip('\n').split('\n')]
 
-ac = [r for r in load(AC_PATH)[1:] if r[0] != '#']
+df = {r[1]: r for r in load(DEF_PATH)[1:] if r[0] != '#'}     # 定義表: 条件ID -> 行
+ac = [r for r in load(CHK_PATH)[1:] if r[0] != '#']            # 確認表: 記入する側
 ms = {r[0]: r[1] for r in load(MS_PATH)[1:] if r[0] not in ('#', '合計')}
 
-MS_I, MVP_I, JUDGE_I, IMPL_I = 2, 4, 12, 11
+MS_I, MVP_I, JUDGE_I, IMPL_I = 2, 1, 9, 8   # 確認表の列位置
 
 def state(r):
     j = r[JUDGE_I].strip()
@@ -40,7 +43,7 @@ for k in ['M1', 'M2', 'M3', 'M4', 'M5', 'M6']:
     bar = '█' * done + '·' * (total - done)
     mark = '完了' if done == total and total else ('着手' if done else '未着手')
     print(f'  {k} {ms.get(k, ""):22} MVP必須 {done:>2}/{total:<2} {bar:<12} {mark}')
-    blockers += [r[1] for r in rows if state(r) == '不合格']
+    blockers += [r[0] for r in rows if state(r) == '不合格']
 
 print()
 allmvp = [r for r in ac if r[MVP_I] == 'MVP必須']
@@ -62,7 +65,7 @@ elif c['不合格']:
 elif cr['不合格']:
     print(f'  条件付きでリリース可。リリース必須に不合格が {cr["不合格"]} 件あります')
     print('    影響を確認し、回避策を案内できるか判断してください')
-    print('    ' + ' '.join(r[1] for r in rel if state(r) == '不合格'))
+    print('    ' + ' '.join(r[0] for r in rel if state(r) == '不合格'))
 else:
     print('  リリース可。MVP必須とリリース必須がすべて合格しています')
 
@@ -71,6 +74,7 @@ if c['不合格'] or cr['不合格']:
     print('  不合格の内訳（崩れると起きること）')
     for r in ac:
         if state(r) == '不合格' and r[MVP_I] in ('MVP必須', 'リリース必須'):
-            print(f'    {r[1]} [{r[MVP_I]}] {r[3][:34]}')
-            print(f'      → {r[8][:76]}')
+            risk = df[r[0]][5] if r[0] in df else ''
+            print(f'    {r[0]} [{r[MVP_I]}] {r[3][:34]}')
+            print(f'      → {risk[:76]}')
 sys.exit(1 if (c['不合格'] or c['未確認']) else 0)
