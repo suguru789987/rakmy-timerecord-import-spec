@@ -23,7 +23,7 @@ df = {r[1]: r for r in load(DEF_PATH)[1:] if r[0] != '#'}     # 定義表: 条�
 ac = [r for r in load(CHK_PATH)[1:] if r[0] != '#']            # 確認表: 記入する側
 ms = {r[0]: r[1] for r in load(MS_PATH)[1:] if r[0] not in ('#', '合計')}
 
-MS_I, MVP_I, JUDGE_I, IMPL_I = 2, 1, 9, 8   # 確認表の列位置
+MS_I, MVP_I, JUDGE_I, IMPL_I = 2, 1, 10, 8   # 確認表の列位置
 
 def state(r):
     j = r[JUDGE_I].strip()
