@@ -1,5 +1,5 @@
 区分	条件ID	受け入れ条件	合否の判定基準	対応する検証ID	必須/推奨	実装状況	判定	備考
-#		モック: https://suguru789987.github.io/rakmy-timerecord-import-spec/ ／ 仕様書: 20260803_CSV一括登録機能_仕様書（PdM向け）.md						
+#		モック（インポート）: https://suguru789987.github.io/rakmy-timerecord-import-spec/ ／ モック（手入力）: https://suguru789987.github.io/rakmy-owner-registration-mock/ ／ 仕様書: 20260803_CSV一括登録機能_仕様書（PdM向け）.md						
 A_前提	AC-001	テンプレートを5種類ダウンロードできる	①〜⑤すべてがダウンロードでき、Excelで開いて文字化けしない	OP-101	必須			BOM付きUTF-8で配布
 A_前提	AC-002	配布テンプレートのサンプル行にコードが入っていない	③④のコード列が空欄	OP-101	必須			入っていると他社と衝突する
 B_受付	AC-011	上限を超えたファイルを受け付けない	501行（④は201行）・5MB超で拒否され、プレビューに進まない	CA-001 / CA-003 / CA-005 / OP-211 / OP-213	必須			

@@ -159,7 +159,12 @@ python3 audit_spec_mock.py
 | `20260803_ヘルプページ_CSV一括登録_ドラフト.md` | ヘルプページの原稿。Framer掲載用。スクショマーカー11箇所 |
 | `ラクミータイムレコード_インポートテンプレート_*.tsv` | 配布テンプレート（列定義の正） |
 
-**ライブモック**: https://suguru789987.github.io/rakmy-timerecord-import-spec/
+**ライブモック（2つあります）**
+
+| モック | URL | 扱う範囲 |
+|---|---|---|
+| **CSVインポート**（本リポジトリ） | https://suguru789987.github.io/rakmy-timerecord-import-spec/ | 本仕様の対象。`s-tpl*` 系が実装対象 |
+| **登録・編集の全体**（owner-mock） | https://suguru789987.github.io/rakmy-owner-registration-mock/ | 手入力の登録・編集・削除、初期セットアップ、権限、打刻 |
 
 主要ディープリンク
 - テンプレート取込（初期一括）: `.../#tpl-setup`

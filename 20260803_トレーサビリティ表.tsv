@@ -1,5 +1,5 @@
 仕様§	仕様の内容	受け入れ条件ID	検証ID	カバレッジ
-#	モック: https://suguru789987.github.io/rakmy-timerecord-import-spec/ ／ 仕様書: 20260803_CSV一括登録機能_仕様書（PdM向け）.md			
+#	モック（インポート）: https://suguru789987.github.io/rakmy-timerecord-import-spec/ ／ モック（手入力）: https://suguru789987.github.io/rakmy-owner-registration-mock/ ／ 仕様書: 20260803_CSV一括登録機能_仕様書（PdM向け）.md			
 §4.1	内部仕分け（重複排除してマスタ生成）	AC-027	CA-056 / OP-108	OK
 §4.3	重複時の処理（スキップ／上書き更新・空欄セル）	AC-062	OP-702	OK
 §4.4	テンプレート列×書き込み仕様	AC-051	OP-601	OK

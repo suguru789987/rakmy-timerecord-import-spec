@@ -1,4 +1,5 @@
 データセットID	テンプレート	種別	CSVに入力する値	用途・対応する検証ID
+#	モック（インポート）: https://suguru789987.github.io/rakmy-timerecord-import-spec/ ／ モック（手入力）: https://suguru789987.github.io/rakmy-owner-registration-mock/			
 #	このファイルはCSVに入力する「データ」のみを定義します。環境の初期設定・境界値・ファイル再現手順は検証プラン側（操作系のP0前提／計算系の入力値列）に統合しました。			
 D1-1	①業態	正常	飲食店	
 D1-2	①業態	正常	カフェ	
