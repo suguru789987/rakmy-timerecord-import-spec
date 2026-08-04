@@ -23,7 +23,7 @@ df = {r[1]: r for r in load(DEF_PATH)[1:] if r[0] != '#'}     # 定義表: 条�
 ac = [r for r in load(CHK_PATH)[1:] if r[0] != '#']            # 確認表: 記入する側
 ms = {r[0]: r[1] for r in load(MS_PATH)[1:] if r[0] not in ('#', '合計')}
 
-MS_I, MVP_I, JUDGE_I, IMPL_I = 2, 1, 10, 8   # 確認表の列位置
+MS_I, MVP_I, JUDGE_I, IMPL_I = 3, 2, 11, 9   # 確認表の列位置
 
 def state(r):
     j = r[JUDGE_I].strip()
@@ -75,6 +75,6 @@ if c['不合格'] or cr['不合格']:
     for r in ac:
         if state(r) == '不合格' and r[MVP_I] in ('MVP必須', 'リリース必須'):
             risk = df[r[0]][5] if r[0] in df else ''
-            print(f'    {r[0]} [{r[MVP_I]}] {r[3][:34]}')
+            print(f'    {r[0]} [{r[MVP_I]}] {r[4][:34]}')
             print(f'      → {risk[:76]}')
 sys.exit(1 if (c['不合格'] or c['未確認']) else 0)
