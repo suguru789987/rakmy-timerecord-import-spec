@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="912" viewBox="0 0 980 912" font-family='"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif'>
+<rect width="980" height="912" fill="#ffffff"/>
+<defs><marker id="b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#9db1bd"/></marker></defs>
+<text x="130" y="54" font-size="26" font-weight="700" fill="#1b2a33">はじめて登録するときの順番</text>
+<text x="130" y="86" font-size="15.5" fill="#6b7a83">運用中の追加には、順番の制限はありません</text>
+<rect x="170" y="124" width="620" height="118" rx="12" fill="#eef4f8" stroke="#b9cdd9" stroke-width="1.5"/>
+<rect x="170" y="124" width="14" height="118" rx="7" fill="#2f4858"/><rect x="177" y="124" width="7" height="118" fill="#2f4858"/>
+<text x="152" y="174" font-size="17" font-weight="700" fill="#2f4858" text-anchor="end">1番目</text>
+<text x="206" y="172" font-size="21" font-weight="700" fill="#1b2a33">業態</text>
+<text x="264" y="172" font-size="15" fill="#6b7a83">お店の形態</text>
+<text x="206" y="208" font-size="14.5" fill="#8a99a3">先に登録が必要なものはありません</text>
+<path d="M480.0 248 L480.0 268" stroke="#9db1bd" stroke-width="2.5" marker-end="url(#b)"/>
+<rect x="170" y="280" width="620" height="118" rx="12" fill="#eef4f8" stroke="#b9cdd9" stroke-width="1.5"/>
+<rect x="170" y="280" width="14" height="118" rx="7" fill="#2f4858"/><rect x="177" y="280" width="7" height="118" fill="#2f4858"/>
+<text x="152" y="330" font-size="17" font-weight="700" fill="#2f4858" text-anchor="end">2番目</text>
+<text x="206" y="328" font-size="21" font-weight="700" fill="#1b2a33">店舗</text>
+<text x="264" y="328" font-size="15" fill="#6b7a83">店舗の情報</text>
+<rect x="206" y="344" width="90" height="27" rx="13.5" fill="#dcebf2" stroke="#a8cddd"/>
+<text x="219" y="363" font-size="14" font-weight="700" fill="#25647a">先に 業態</text>
+<text x="310" y="364" font-size="14.5" fill="#5c6b74">業態を選んで登録します</text>
+<path d="M480.0 404 L480.0 424" stroke="#9db1bd" stroke-width="2.5" marker-end="url(#b)"/>
+<rect x="170" y="436" width="620" height="118" rx="12" fill="#eef4f8" stroke="#b9cdd9" stroke-width="1.5"/>
+<rect x="170" y="436" width="14" height="118" rx="7" fill="#2f4858"/><rect x="177" y="436" width="7" height="118" fill="#2f4858"/>
+<text x="152" y="486" font-size="17" font-weight="700" fill="#2f4858" text-anchor="end">3番目</text>
+<text x="206" y="484" font-size="21" font-weight="700" fill="#1b2a33">雇用区分</text>
+<text x="306" y="484" font-size="15" fill="#6b7a83">給与の条件のまとまり</text>
+<text x="206" y="520" font-size="14.5" fill="#8a99a3">先に登録が必要なものはありません</text>
+<path d="M480.0 560 L480.0 580" stroke="#9db1bd" stroke-width="2.5" marker-end="url(#b)"/>
+<rect x="170" y="592" width="620" height="118" rx="12" fill="#eef4f8" stroke="#b9cdd9" stroke-width="1.5"/>
+<rect x="170" y="592" width="14" height="118" rx="7" fill="#2f4858"/><rect x="177" y="592" width="7" height="118" fill="#2f4858"/>
+<text x="152" y="642" font-size="17" font-weight="700" fill="#2f4858" text-anchor="end">4番目</text>
+<text x="206" y="640" font-size="21" font-weight="700" fill="#1b2a33">従業員</text>
+<text x="285" y="640" font-size="15" fill="#6b7a83">打刻する方</text>
+<rect x="206" y="656" width="160" height="27" rx="13.5" fill="#dcebf2" stroke="#a8cddd"/>
+<text x="219" y="675" font-size="14" font-weight="700" fill="#25647a">先に 店舗・雇用区分</text>
+<text x="380" y="676" font-size="14.5" fill="#5c6b74">店舗と雇用区分を選んで登録します</text>
+<path d="M480.0 716 L480.0 736" stroke="#9db1bd" stroke-width="2.5" marker-end="url(#b)"/>
+<rect x="170" y="748" width="620" height="118" rx="12" fill="#f7f8f9" stroke="#d8dee2" stroke-width="1.5"/>
+<rect x="170" y="748" width="14" height="118" rx="7" fill="#2f4858"/><rect x="177" y="748" width="7" height="118" fill="#2f4858"/>
+<text x="152" y="798" font-size="17" font-weight="700" fill="#2f4858" text-anchor="end">5番目</text>
+<text x="206" y="796" font-size="21" font-weight="700" fill="#1b2a33">管理者</text>
+<text x="285" y="796" font-size="15" fill="#6b7a83">勤怠を管理する方（任意）</text>
+<rect x="206" y="812" width="90" height="27" rx="13.5" fill="#dcebf2" stroke="#a8cddd"/>
+<text x="219" y="831" font-size="14" font-weight="700" fill="#25647a">先に 店舗</text>
+<text x="310" y="832" font-size="14.5" fill="#5c6b74">担当店舗を選んで登録します</text>
+<text x="170" y="898" font-size="14.5" fill="#8a99a3">順番が前後すると「登録されていません」というエラーになります</text>
+</svg>
