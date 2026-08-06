@@ -1494,3 +1494,24 @@ canManageEmploymentTypes / canCreateEmployee / canEditEmployee / canCreateManage
 | 中 | `business_types.label` / `stores.name` に `(company_id, name)` の複合ユニークを追加（§8.5） |
 | 中 | `(company_id, employee_code)` の複合ユニークへ移行（§8.1） |
 | 低 | `shift_restriction` → `deemed_overtime_hours`（integer）へリネーム＋型変更（§8.4） |
+
+## 資料を直したら必ず実行する
+
+```
+python3 check_all.py
+```
+
+**件数や列数は複数の資料に複製されています。** 受け入れ条件を1件でも直すと、
+仕様書・使い方.xlsx・エクセルの集計が同時に古くなります。目視では追えません。
+
+検査するもの:
+
+- 定義表 ↔ 確認表（条件ID・フロー・MVP区分・マイルストーン・満たすべきこと）
+- 合致条件や満たすべきことが重複していないか
+- 受け入れ条件の根拠が実在する検証IDか／参照されない検証項目がないか
+- 検証プランとデータセットの相互参照
+- 仕様書に書かれた件数・列数が実データと一致するか（15箇所）
+- ヘルプの掲載本文に内部メモ・丸数字・旧表記が残っていないか、節番号が連番か
+- デスクトップの配布物がリポジトリと一致するか
+
+終了コード0で整合。1件でも見つかれば1を返します。
