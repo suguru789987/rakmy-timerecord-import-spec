@@ -236,6 +236,8 @@ PAIRS = [
     ('Notion貼り付け用_md/02_ヘルプ_本文.md', '20260804_Notion掲載用_CSVで一括登録する.md'),
     ('ヘルプページ/ヘルプページ_作業用（チェックリスト付き）.md', '20260803_ヘルプページ_CSV一括登録_ドラフト.md'),
     ('仕様書/仕様書（PdM向け）.md', '20260803_CSV一括登録機能_仕様書（PdM向け）.md'),
+    ('仕様書/引き継ぎノート.md', 'HANDOFF.md'),
+    ('仕様書/判断の記録.md', 'JUDGMENT_LOG.md'),
 ]
 if os.path.isdir(DESK):
     for desk, repo in PAIRS:
@@ -244,6 +246,26 @@ if os.path.isdir(DESK):
             ng('配布物', f'デスクトップに {desk} が無い')
         elif a != b:
             ng('配布物', f'{desk} がリポジトリの {repo} と違う')
+
+    # エクセルは元になる md/tsv より新しいこと（古ければ作り直しが必要）
+    DERIVED = [
+        ('ヘルプページ/ヘルプページ.xlsx', ['20260804_Notion掲載用_CSVで一括登録する.md',
+                                            '20260803_ヘルプページ_CSV一括登録_ドラフト.md']),
+        ('20260805_タイムレコード_01_受入条件表.xlsx', ['20260804_受け入れ条件_確認表.tsv',
+                                                        '20260804_受け入れ条件_定義表.tsv']),
+        ('20260805_タイムレコード_02_検証プラン.xlsx', ['20260803_検証プラン_操作系.tsv',
+                                                        '20260803_検証プラン_計算系.tsv']),
+        ('20260805_タイムレコード_03_検証用データセット.xlsx', ['20260803_検証用データセット.tsv']),
+    ]
+    for x, srcs in DERIVED:
+        px = os.path.join(DESK, x)
+        if not os.path.exists(px):
+            ng('配布物', f'デスクトップに {x} が無い')
+            continue
+        for s in srcs:
+            ps = os.path.join(B, s)
+            if os.path.exists(ps) and os.path.getmtime(ps) > os.path.getmtime(px):
+                ng('配布物', f'{x} が {s} より古い（作り直しが必要）')
 else:
     print(f'（デスクトップ {DESK} が見つからないため配布物の確認は省略）\n')
 
