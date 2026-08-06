@@ -159,7 +159,78 @@ for m in set(re.findall(r'「(\d+)\. ', help_md)):
     if int(m) not in nums:
         ng('ヘルプ', f'本文が存在しない節「{m}番」を参照している')
 
-# ---------------------------------------------------------------- 6. 配布物の同期
+# ---------------------------------------------------------------- 6. 配布用エクセルの数字
+def xlsx_cells(name):
+    """配布用エクセルの全セルを (シート名, 行, 列, 値) で返す。openpyxl が無ければ空。"""
+    p = os.path.join(DESK, name)
+    if not os.path.exists(p):
+        return None
+    try:
+        from openpyxl import load_workbook
+    except ImportError:
+        return None
+    wb = load_workbook(p)
+    out = []
+    for ws in wb:
+        for row in ws.iter_rows():
+            for c in row:
+                if c.value is not None:
+                    out.append((ws.title, c.row, c.column, c.value))
+    return out
+
+
+def xlsx_pair(name, label, want, col=2):
+    """A列が label の行の col 列が want と一致するか。"""
+    cells = xlsx_cells(name)
+    if cells is None:
+        return
+    byrow = {}
+    for _, r, cc, v in cells:
+        byrow.setdefault(r, {})[cc] = v
+    found = False
+    for r, d in byrow.items():
+        if str(d.get(1, '')).strip() == label:
+            found = True
+            got = d.get(col)
+            if str(got).strip() != str(want):
+                ng('配布エクセル', f'{name} の「{label}」が {got} だが実データは {want}')
+    if not found:
+        ng('配布エクセル', f'{name} に「{label}」の行が見つからない（検査が空振りしている）')
+
+
+ms = collections.Counter(r[3] for r in C)
+if os.path.isdir(DESK):
+    for label, want in [('MVP必須', N['MVP必須']), ('リリース必須', N['リリース必須']),
+                        ('改善', N['改善'])]:
+        xlsx_pair('20260805_タイムレコード_00_定義表.xlsx', label, want)
+    for f in '1234':
+        rows = sum(1 for r in C if f in [x.strip() for x in r[1].split('/')])
+        cells = xlsx_cells('20260805_タイムレコード_00_定義表.xlsx') or []
+        hit = [v for _, r, cc, v in cells if cc == 1 and isinstance(v, str) and v.startswith(f'フロー{f} ')]
+        if not hit:
+            ng('配布エクセル', f'00_定義表.xlsx に「フロー{f}」の行が無い（検査が空振りしている）')
+        else:
+            byrow = {}
+            for _, r, cc, v in cells:
+                byrow.setdefault(r, {})[cc] = v
+            for r, d in byrow.items():
+                if isinstance(d.get(1), str) and d[1].startswith(f'フロー{f} '):
+                    if str(d.get(2)).strip() != str(rows):
+                        ng('配布エクセル', f'00_定義表.xlsx のフロー{f}が {d.get(2)} だが実データは {rows}')
+    # 使い方
+    use = xlsx_cells('20260805_タイムレコード_使い方.xlsx')
+    if use is not None:
+        text = '\n'.join(str(v) for _, _, _, v in use)
+        m = re.search(r'MVP必須(\d+)件をエンジニアと合意', text)
+        if not m:
+            ng('配布エクセル', '使い方.xlsx に「MVP必須N件をエンジニアと合意」が無い（検査が空振りしている）')
+        elif int(m.group(1)) != N['MVP必須']:
+            ng('配布エクセル', f'使い方.xlsx のMVP必須が {m.group(1)}件 だが実データは {N["MVP必須"]}件')
+        m = re.search(r'(\d+)〜(\d+)行 ?│? ?受入条件(\d+)件', text.replace(' ', ''))
+        if f'受入条件{N["受け入れ条件"]}件' not in text.replace(' ', ''):
+            ng('配布エクセル', f'使い方.xlsx の受入条件件数が {N["受け入れ条件"]}件 と書かれていない')
+
+# ---------------------------------------------------------------- 7. 配布物の同期
 PAIRS = [
     ('ヘルプページ/ヘルプページ_掲載用.md', '20260804_Notion掲載用_CSVで一括登録する.md'),
     ('Notion貼り付け用_md/02_ヘルプ_本文.md', '20260804_Notion掲載用_CSVで一括登録する.md'),
