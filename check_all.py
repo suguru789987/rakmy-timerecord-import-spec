@@ -290,6 +290,203 @@ if os.path.isdir(DESK):
 else:
     print(f'（デスクトップ {DESK} が見つからないため配布物の確認は省略）\n')
 
+
+
+# ---------------------------------------------------------------- 8. 検証プランの中身
+def plan_rows():
+    return [(ho, r) for r in OP] + [(ha, r) for r in CA]
+
+
+def pv(header, r, name):
+    i = col(header, name)
+    return r[i] if i is not None else ''
+
+
+SCREEN_KEY = {'確認画面': '確認画面', '完了画面': '完了画面', 'アップロード画面': 'アップロード',
+              '従業員一覧': '従業員一覧', '管理者一覧': '管理者一覧', '業態設定': '業態設定',
+              '店舗設定': '店舗設定', '雇用区分設定': '雇用区分設定', 'インポートTOP': 'インポート',
+              '初期セットアップ画面': '初期セットアップ', 'ダッシュボード': 'ダッシュボード',
+              '実行中の画面': '実行中', '各設定画面': '設定'}
+_pr = plan_rows()
+_ids = {pv(h, r, '検証ID') for h, r in _pr}
+
+for h, r in _pr:
+    v = pv(h, r, '検証ID')
+    exp = pv(h, r, '期待挙動（判定基準）')
+    scr = pv(h, r, '画面（どこを開いて操作するか）')
+    evi = pv(h, r, '証跡（撮る画面と状態）')
+    # 空欄が無いこと
+    for name in ['検証内容', '初期設定（前提データ）', '期待挙動（判定基準）', 'スクショファイル名',
+                 '証跡（撮る画面と状態）', '画面（どこを開いて操作するか）', '確認ポイント',
+                 '対応する条件ID', 'ヘルプ該当箇所']:
+        if not pv(h, r, name).strip():
+            ng('検証プラン', f'{v} の「{name}」が空欄')
+    # 期待挙動の【判定する画面】が、画面列か証跡列に出てくること
+    m = re.match(r'【([^】]+)】', exp)
+    if not m:
+        ng('検証プラン', f'{v} の期待挙動に【判定する画面】が無い')
+    else:
+        for lab in m.group(1).split('・'):
+            k = SCREEN_KEY.get(lab)
+            if k and k not in scr and k not in evi:
+                ng('検証プラン', f'{v} 期待挙動の【{lab}】が画面列にも証跡列にも出てこない')
+    # 先に実施する検証
+    for d_ in re.findall(r'(?:OP|CA)-\d+', pv(h, r, '先に実施する検証')):
+        if d_ not in _ids:
+            ng('検証プラン', f'{v} が存在しない {d_} を前提にしている')
+        if d_ == v:
+            ng('検証プラン', f'{v} が自分自身を前提にしている')
+
+# スクショファイル名
+_names = collections.Counter(pv(h, r, 'スクショファイル名') for h, r in _pr)
+for nm, cnt in _names.items():
+    if cnt > 1:
+        ng('検証プラン', f'スクショファイル名が重複: {nm}（{cnt}件）')
+    if nm and not nm.endswith('.png'):
+        ng('検証プラン', f'スクショファイル名の拡張子が.pngでない: {nm}')
+    if re.search(r'[\\/:*?"<>|]', nm):
+        ng('検証プラン', f'スクショファイル名に使えない文字: {nm}')
+
+# ---------------------------------------------------------------- 9. 紐付けの双方向一致
+plan2ac = {pv(h, r, '検証ID'): set(re.findall(r'AC-\d+', pv(h, r, '対応する条件ID'))) for h, r in _pr}
+ac2plan = collections.defaultdict(set)
+for r in C:
+    for m in re.findall(r'(?:OP|CA)-\d+', r[ievi]):
+        ac2plan[m].add(r[0])
+for v, s in plan2ac.items():
+    if s != ac2plan.get(v, set()):
+        ng('紐付け', f'{v} 条件IDが片側だけ プラン={sorted(s)} 受入条件={sorted(ac2plan.get(v, set()))}')
+
+ihelp_c = col(hc, 'ヘルプ該当箇所')
+_help_of = {pv(h, r, '検証ID'): pv(h, r, 'ヘルプ該当箇所') for h, r in _pr}
+if ihelp_c is not None:
+    for r in C:
+        exp = set()
+        for m in re.findall(r'(?:OP|CA)-\d+', r[ievi]):
+            for part in _help_of.get(m, '').split('／'):
+                p_ = part.strip()
+                if p_ and not p_.startswith('—'):
+                    exp.add(p_)
+        got = {x.strip() for x in r[ihelp_c].split('／') if x.strip() and not x.strip().startswith('—')}
+        if exp != got:
+            ng('紐付け', f'{r[0]} ヘルプ該当箇所が検証プランと違う 受入条件={sorted(got)} プラン由来={sorted(exp)}')
+
+# データセットの双方向
+# 検証プランは「D1」のようにまとめて参照することがある。その場合 D1-* 全体を指す
+_d2v = collections.defaultdict(set)
+_grp2v = collections.defaultdict(set)
+for h, r in _pr:
+    init = pv(h, r, '初期設定（前提データ）')
+    v_ = pv(h, r, '検証ID')
+    for m in re.findall(r'D\d+-\d+', init):
+        _d2v[m].add(v_)
+    for gmatch in re.findall(r'D([0-9])(?!-)', init):      # D1〜D5 のまとめ参照
+        _grp2v['D' + gmatch].add(v_)
+for r in DS:
+    did = r[ids_]
+    grp = did.split('-')[0]
+    covered = _d2v.get(did, set()) | _grp2v.get(grp, set())
+    side = set(re.findall(r'(?:OP|CA)-\d+', r[iuse]))
+    if _d2v.get(did, set()) - side:
+        ng('紐付け', f'{did} の用途欄に {sorted(_d2v[did] - side)} が書かれていない')
+    if side - covered:
+        ng('紐付け', f'{did} を使うと書かれた {sorted(side - covered)} が検証プランに書かれていない')
+
+# ---------------------------------------------------------------- 10. エクセル ↔ TSV（1行ずつ）
+def xlsx_sheet(name):
+    p = os.path.join(DESK, name)
+    if not os.path.exists(p):
+        return None
+    try:
+        from openpyxl import load_workbook
+    except ImportError:
+        return None
+    return load_workbook(p).active
+
+
+if os.path.isdir(DESK):
+    ws = xlsx_sheet('20260805_タイムレコード_02_検証プラン.xlsx')
+    if ws is not None:
+        hx = {str(ws.cell(2, i).value): i for i in range(1, ws.max_column + 1)}
+        tmap = {pv(h, r, '検証ID'): (h, r) for h, r in _pr}
+        if ws.max_row - 2 != len(_pr):
+            ng('エクセル', f'02_検証プランの件数 {ws.max_row - 2} ≠ TSV {len(_pr)}')
+        cols = ['検証内容', '期待挙動（判定基準）', '画面（どこを開いて操作するか）', 'スクショファイル名',
+                '証跡（撮る画面と状態）', '対応する条件ID', 'ヘルプ該当箇所', '先に実施する検証']
+        for rr in range(3, ws.max_row + 1):
+            k = ws.cell(rr, hx['検証ID']).value
+            if k not in tmap:
+                ng('エクセル', f'02_検証プランにTSVに無い {k}')
+                continue
+            h, r = tmap[k]
+            for cname in cols:
+                if cname not in hx:
+                    ng('検査の不備', f'02_検証プランに列「{cname}」が無い')
+                    continue
+                x = str(ws.cell(rr, hx[cname]).value or '').strip()
+                y = pv(h, r, cname).replace('**', '').strip()
+                if x != y:
+                    ng('エクセル', f'02_検証プラン {k} の「{cname}」がTSVと違う')
+
+    ws = xlsx_sheet('20260805_タイムレコード_01_受入条件表.xlsx')
+    if ws is not None:
+        hx = {str(ws.cell(28, i).value): i for i in range(1, ws.max_column + 1)}
+        dmap = {r[1]: r for r in D}
+        PAIR = [('実装レベル', lambda k: c[k][2]),
+                ('何を実装するか', lambda k: c[k][4]),
+                ('合格ライン（この数値を満たせば実装完了）', lambda k: c[k][6]),
+                ('実装できていないと起きること', lambda k: dmap[k][6]),
+                ('フロー', lambda k: c[k][1]),
+                ('確認方法', lambda k: c[k][7]),
+                ('対応検証ID', lambda k: c[k][8]),
+                ('ヘルプ該当箇所', lambda k: c[k][ihelp_c] if ihelp_c is not None else '')]
+        found = 0
+        for rr in range(29, ws.max_row + 1):
+            k = ws.cell(rr, hx.get('条件ID', 4)).value
+            if k not in c:
+                continue
+            found += 1
+            for cname, fn in PAIR:
+                if cname not in hx:
+                    ng('検査の不備', f'01_受入条件表に列「{cname}」が無い')
+                    continue
+                x = str(ws.cell(rr, hx[cname]).value or '').strip()
+                y = str(fn(k)).replace('**', '').strip()
+                if x != y:
+                    ng('エクセル', f'01_受入条件表 {k} の「{cname}」がTSVと違う')
+        if found != len(C):
+            ng('エクセル', f'01_受入条件表の件数 {found} ≠ TSV {len(C)}')
+
+    ws = xlsx_sheet('20260805_タイムレコード_03_検証用データセット.xlsx')
+    if ws is not None:
+        hx = {str(ws.cell(1, i).value): i for i in range(1, ws.max_column + 1)}
+        start = 2
+        if 'データセットID' not in hx:
+            hx = {str(ws.cell(2, i).value): i for i in range(1, ws.max_column + 1)}
+            start = 3
+        dm = {r[ids_]: r for r in DS}
+        for rr in range(start, ws.max_row + 1):
+            k = ws.cell(rr, 1).value
+            if k not in dm:
+                continue
+            for cname in ['CSVに入力する値', '用途・対応する検証ID']:
+                if cname not in hx:
+                    ng('検査の不備', f'03_検証用データセットに列「{cname}」が無い')
+                    continue
+                x = str(ws.cell(rr, hx[cname]).value or '').strip()
+                y = dm[k][col(hds, cname)].replace('**', '').strip()
+                if x != y:
+                    ng('エクセル', f'03_検証用データセット {k} の「{cname}」がTSVと違う')
+
+# マークダウンの記号がエクセルに残っていないか
+if os.path.isdir(DESK):
+    for nm in ['20260805_タイムレコード_01_受入条件表.xlsx', '20260805_タイムレコード_02_検証プラン.xlsx']:
+        cells = xlsx_cells(nm)
+        if cells:
+            bad = [v for _, _, _, v in cells if isinstance(v, str) and '**' in v]
+            if bad:
+                ng('エクセル', f'{nm} に ** が {len(bad)}セル残っている（太字に変換すること）')
+
 # ---------------------------------------------------------------- 出力
 print('=' * 72)
 print('  実データ')
