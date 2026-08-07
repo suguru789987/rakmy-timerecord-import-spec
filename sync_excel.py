@@ -86,3 +86,116 @@ for f in ['20260805_タイムレコード_01_受入条件表.xlsx','20260805_タ
           '20260805_タイムレコード_使い方.xlsx']:
     shutil.copy(os.path.join(D,f),'excel/')
 print(f'01: {n1}セル同期 ／ 02: {len(rows)}件 再生成 ／ excel/ へコピー')
+
+# ---- ヘルプページ.xlsx（掲載本文＋フロー図＋掲載前チェック）----
+def build_help():
+    from openpyxl.drawing.image import Image as XLImage
+    md = io.open('20260804_Notion掲載用_CSVで一括登録する.md', encoding='utf-8').read()
+    src = io.open('20260803_ヘルプページ_CSV一括登録_ドラフト.md', encoding='utf-8').read()
+    HF = PatternFill('solid', fgColor='2F4858'); HFo = Font(color='FFFFFF', bold=True, size=10)
+    H1F = PatternFill('solid', fgColor='2F4858'); H2F = PatternFill('solid', fgColor='DCE6F1')
+    H3F = PatternFill('solid', fgColor='EDF2F8')
+    def clean(s):
+        return re.sub(r'`(.+?)`', r'\1', re.sub(r'\*\*(.+?)\*\*', r'\1', s)).strip()
+    L = md.split('\n'); rows = []; para = []; i = 0; shot = 0
+    def flush():
+        nonlocal para
+        if para:
+            rows.append(['', '', clean('\n'.join(para))]); para = []
+    while i < len(L):
+        l = L[i]
+        if l.startswith('# '):
+            flush(); rows.append(['H1', clean(l[2:]), '']); i += 1; continue
+        if l.startswith('## '):
+            flush(); rows.append(['H2', clean(l[3:]), '']); i += 1; continue
+        if l.startswith('### '):
+            flush(); rows.append(['H3', clean(l[4:]), '']); i += 1; continue
+        if l.startswith('> 🖼'):
+            flush(); rows.append(['フロー図', '', clean(l[2:]).replace('🖼', '').strip()]); i += 1; continue
+        if l.startswith('> 📸'):
+            flush(); shot += 1
+            rows.append(['画像', f'S-{shot:02d}',
+                         clean(l[2:]).replace('📸', '').replace('スクリーンショット挿入位置：', '').strip()])
+            i += 1; continue
+        if l.startswith('>'):
+            flush(); rows.append(['注意', '', clean(l.lstrip('> '))]); i += 1; continue
+        if l.startswith('|') and i + 1 < len(L) and re.match(r'^\|[\s:|-]+\|$', L[i + 1].strip()):
+            flush(); head = [clean(x) for x in l.strip('|').split('|')]; i += 2
+            rows.append(['表', ' / '.join(x for x in head if x), ''])
+            while i < len(L) and L[i].startswith('|'):
+                cells = [clean(x) for x in L[i].strip('|').split('|')]
+                rows.append(['表の行', '', '　│　'.join(f'{a}：{b}' for a, b in zip(head, cells) if b)])
+                i += 1
+            continue
+        if l.strip().startswith('```'):
+            flush(); i += 1; code = []
+            while i < len(L) and not L[i].strip().startswith('```'):
+                code.append(L[i]); i += 1
+            i += 1; rows.append(['図', '', '\n'.join(code)]); continue
+        if l.strip() in ('---', ''):
+            flush(); i += 1; continue
+        para.append(l); i += 1
+    flush()
+    wb = Workbook(); ws = wb.active; ws.title = 'マニュアル本文'
+    for i2, w in enumerate([10, 38, 88, 8], 1):
+        ws.column_dimensions[get_column_letter(i2)].width = w
+    for i2, v in enumerate(['レベル', '見出し／画像番号', '本文', '掲載'], 1):
+        c = ws.cell(1, i2, v); c.fill = HF; c.font = HFo
+        c.alignment = Alignment(vertical='center', wrap_text=True)
+    YEL2 = PatternFill('solid', fgColor='FFF9C4')
+    for r, v in enumerate(rows, 2):
+        for j, x in enumerate(v + [''], 1):
+            c = ws.cell(r, j, rich(x) if isinstance(x, str) else x)
+            c.alignment = Alignment(vertical='top', wrap_text=True); c.border = BD
+        if v[0] == 'H1':
+            for j in range(1, 5):
+                ws.cell(r, j).fill = H1F; ws.cell(r, j).font = Font(bold=True, color='FFFFFF', size=12)
+        elif v[0] == 'H2':
+            for j in range(1, 5):
+                ws.cell(r, j).fill = H2F; ws.cell(r, j).font = Font(bold=True, size=11)
+        elif v[0] == 'H3':
+            for j in range(1, 5):
+                ws.cell(r, j).fill = H3F; ws.cell(r, j).font = Font(bold=True)
+        elif v[0] == '注意':
+            ws.cell(r, 1).fill = PatternFill('solid', fgColor='FFF9C4')
+        elif v[0] == '画像':
+            ws.cell(r, 1).fill = PatternFill('solid', fgColor='FFE0B2')
+        elif v[0] == 'フロー図':
+            ws.cell(r, 1).fill = PatternFill('solid', fgColor='C8E6C9')
+        ws.cell(r, 4).fill = YEL2
+    dv2 = DataValidation(type='list', formula1='"✓"', allow_blank=True)
+    ws.add_data_validation(dv2); dv2.add(f'D2:D{len(rows) + 1}')
+    ws.freeze_panes = 'C2'; ws.auto_filter.ref = f'A1:D{len(rows) + 1}'
+    wsf = wb.create_sheet('フロー図'); wsf.column_dimensions['A'].width = 110
+    wsf['A1'] = '本文に挿入する図です。PNG と SVG がヘルプページのフォルダにあります。'
+    wsf['A1'].font = Font(size=12, bold=True)
+    pos = 3
+    for name, ttl in [('フロー図_登録の順番.png', '1番　はじめて登録するときの順番'),
+                      ('フロー図_CSVの手順.png', '6番　CSVで取り込むときの5つの手順')]:
+        fp = os.path.join(D, 'ヘルプページ', name)
+        wsf[f'A{pos}'] = ttl; wsf[f'A{pos}'].font = Font(size=13, bold=True, color='2F4858')
+        if os.path.exists(fp):
+            img = XLImage(fp); img.width, img.height = 700, 700
+            wsf.add_image(img, f'A{pos + 1}')
+        pos += 40
+    ws3 = wb.create_sheet('公開手順とチェック')
+    ws3.column_dimensions['A'].width = 92; ws3.column_dimensions['B'].width = 8
+    ws3['A1'] = '本ページは、CSVインポートと初期セットアップが実装・検証を通ってから公開します。'
+    ws3['A1'].font = Font(size=11, bold=True, color='B00000')
+    for i2, v in enumerate(['確認項目', '完了'], 1):
+        c = ws3.cell(3, i2, v); c.fill = HF; c.font = HFo
+    cr = 4
+    for x in re.findall(r'^- \[ \] (.+)$', src, re.M):
+        ws3.cell(cr, 1, rich(x)).alignment = Alignment(vertical='top', wrap_text=True)
+        ws3.cell(cr, 1).border = BD; ws3.cell(cr, 2).fill = YEL2; ws3.cell(cr, 2).border = BD
+        cr += 1
+    dv3 = DataValidation(type='list', formula1='"✓"', allow_blank=True)
+    ws3.add_data_validation(dv3); dv3.add(f'B4:B{cr - 1}')
+    ws3.freeze_panes = 'A4'
+    wb.save(os.path.join(D, 'ヘルプページ', 'ヘルプページ.xlsx'))
+    shutil.copy(os.path.join(D, 'ヘルプページ', 'ヘルプページ.xlsx'), 'excel/')
+    return len(rows), cr - 4
+
+
+_hn, _hc2 = build_help()
+print(f'ヘルプページ.xlsx: 本文{_hn}行 / 掲載前チェック{_hc2}件')
