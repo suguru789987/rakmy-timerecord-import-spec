@@ -37,6 +37,8 @@ def counts():
         '操作系': len(OP), '計算系': len(CA), '検証項目': len(OP) + len(CA),
         'データセット': len(DS), '操作系の列': len(ho), '計算系の列': len(ha),
         'マイルストーン数': len({r[hc.index('マイルストーン')] for r in C}),
+        'スクショ': io.open(os.path.join(B, '20260804_Notion掲載用_CSVで一括登録する.md'),
+                            encoding='utf-8').read().count('📸'),
     }
     for f in '1234':
         rows = [r for r in C if f in [x.strip() for x in r[flow].split('/')]]
@@ -71,6 +73,7 @@ RULES = [
     ('対象外（区分表）',    r'(対象外・検証の前提（実装対象ではない） \| )(\d+)(件 \|)', '対象外'),
     ('MVP必須を先に潰す',   r'(エンジニアはMVP必須の)(\d+)(件を先に潰して)', 'MVP必須'),
     ('リリース可の条件',    r'(\| MVP必須)(\d+)(件がすべて合格 \|)', 'MVP必須'),
+    ('ヘルプのスクショ数',  r'(スクショ挿入位置)(\d+)(箇所)', 'スクショ'),
 ]
 # フロー別の表（1行に 条件数・MVP必須・検証項目 の3つ）
 for _f in '1234':
