@@ -1498,9 +1498,13 @@ canManageEmploymentTypes / canCreateEmployee / canEditEmployee / canCreateManage
 ## 資料を直したら必ず実行する
 
 ```
+python3 sync_docs.py    # TSV → 仕様書の件数・列数を書き直す
 python3 sync_excel.py   # TSV → 配布用エクセル（01・02）を同期
 python3 check_all.py    # 全資料の整合を検査
 ```
+
+> **仕様書に件数や列数を手で書かないでください。** `sync_docs.py` が実データから生成します。
+> 数字を書く場所を増やしたら `sync_docs.py` の `RULES` に1行足します。文言を変えて置換できなくなった場合は、黙って通らずエラーで止まります。
 
 **件数や列数は複数の資料に複製されています。** 受け入れ条件を1件でも直すと、
 仕様書・使い方.xlsx・エクセルの集計が同時に古くなります。目視では追えません。

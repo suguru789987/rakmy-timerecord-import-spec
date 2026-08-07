@@ -115,48 +115,19 @@ N = {
     '計算系の列': len(ha),
 }
 
-# ---------------------------------------------------------------- 4. 資料に書かれた数と突き合わせ
+# ---------------------------------------------------------------- 4. 仕様書の数字
+# 仕様書の件数・列数は sync_docs.py が実データから生成する。
+# ここでは「生成し直した結果と一致するか」だけを見る。数字を1つずつ書いた検査は持たない。
 spec = read('20260803_CSV一括登録機能_仕様書（PdM向け）.md')
-CHECKS = [
-    ('仕様書', r'\*\*何を守るか・なぜか\*\*（(\d+)件）', N['受け入れ条件']),
-    ('仕様書', r'\*\*実装が条件に合致しているかの確認\*\*（(\d+)件）', N['受け入れ条件']),
-    ('仕様書', r'エンジニアはMVP必須の(\d+)件を先に潰して', N['MVP必須']),
-    ('仕様書', r'\| MVP必須(\d+)件がすべて合格 \|', N['MVP必須']),
-    ('仕様書', r'操作手順と期待挙動(\d+)件', N['操作系']),
-    ('仕様書', r'数値・件数・上限の確認(\d+)件', N['計算系']),
-    ('仕様書', r'検証に使うデータ(\d+)件', N['データセット']),
-    ('仕様書', r'検証項目は(\d+)件です', N['検証項目']),
-    ('仕様書', r'操作系（(\d+)列）', N['操作系の列']),
-    ('仕様書', r'計算系（(\d+)列）', N['計算系の列']),
-]
-for doc, pat, want in CHECKS:
-    got_all = re.findall(pat, spec)
-    if not got_all:
-        ng('検査の不備', f'{doc}で「{pat}」が1件も一致しない。文言を変えたら check_all.py も直すこと')
-    for got in got_all:
-        if int(got) != want:
-            ng(doc, f'「{pat}」が {got} だが実データは {want}')
-
-# 実装レベルの件数表
-m = re.search(r'\| \*\*MVP必須\*\* \|[^|]+\| \*\*(\d+)件\*\* \|', spec)
-if not m:
-    ng('検査の不備', '仕様書のMVP区分の表が見つからない（検査が空振りしている）')
-elif int(m.group(1)) != N['MVP必須']:
-    ng('仕様書', f'MVP区分の表が {m.group(1)}件 だが実データは {N["MVP必須"]}件')
-
-# フロー別の件数
-for f in '1234':
-    rows = [r for r in C if f in [x.strip() for x in r[1].split('/')]]
-    mvp = sum(1 for r in rows if r[2] == 'MVP必須')
-    pat = r'\| \*\*' + f + r'\*\* \| [^|]+ \| (\d+)件 \| \*\*(\d+)件\*\* \| (\d+)件 \|'
-    mm = re.search(pat, spec)
-    if not mm:
-        ng('検査の不備', f'仕様書のフロー{f}の件数行が見つからない（検査が空振りしている）')
-    if mm:
-        if int(mm.group(1)) != len(rows):
-            ng('仕様書', f'フロー{f}の受け入れ条件が {mm.group(1)}件 だが実データは {len(rows)}件')
-        if int(mm.group(2)) != mvp:
-            ng('仕様書', f'フロー{f}のMVP必須が {mm.group(2)}件 だが実データは {mvp}件')
+try:
+    sys.path.insert(0, B)
+    import sync_docs
+    if sync_docs.render(spec, sync_docs.counts()) != spec:
+        ng('仕様書', '数字が実データと違う。python3 sync_docs.py を実行すること')
+except SystemExit as e:
+    ng('検査の不備', f'sync_docs.py が数字の位置を見つけられない（仕様書の文言を変えたら RULES も直すこと）: {e}')
+except Exception as e:
+    ng('検査の不備', f'sync_docs.py を実行できない: {type(e).__name__} {e}')
 
 # ---------------------------------------------------------------- 5. ヘルプ（顧客に出す本文）
 help_md = read('20260804_Notion掲載用_CSVで一括登録する.md')
