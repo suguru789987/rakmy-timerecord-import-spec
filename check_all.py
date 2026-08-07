@@ -14,7 +14,9 @@ TSV・仕様書・ヘルプ・配布用エクセル・デスクトップの配�
 import io, os, re, sys, collections
 
 B = os.path.dirname(os.path.abspath(__file__))
-DESK = os.path.expanduser('~/Desktop/タイムレコード_20260805')
+_DESK = os.path.expanduser('~/Desktop/タイムレコード_20260805')
+# 配布先。デスクトップに配布フォルダがあればそこを、無ければリポジトリの excel/ を見る
+DESK = _DESK if os.path.isdir(_DESK) else os.path.join(B, 'excel')
 NG = []
 
 
@@ -518,7 +520,8 @@ if not _m:
 elif int(_m.group(1)) != _shots:
     ng('ヘルプ', f'スクリーンショットの箇所が本文{_shots}件、チェックリスト{_m.group(1)}件で違う')
 for _fig in ['フロー図_CSVの手順.png', 'フロー図_登録の順番.png']:
-    if not os.path.exists(os.path.join(DESK, 'ヘルプページ', _fig)):
+    if not any(os.path.exists(x) for x in
+               [os.path.join(DESK, 'ヘルプページ', _fig), os.path.join(B, _fig)]):
         ng('ヘルプ', f'図 {_fig} がヘルプページのフォルダに無い')
 if help_md.count('🖼') != 2:
     ng('ヘルプ', f'図の挿入位置が{help_md.count("🖼")}箇所（2箇所のはず）')

@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
-"""TSV → 配布用エクセル（01・02）を同期する"""
+"""TSV → 配布用エクセル（01・02・ヘルプページ）を同期する。
+
+出力先:
+  デスクトップに「タイムレコード_20260805」があればそこへ（PdMの手元）。
+  無ければリポジトリの excel/ へ（引き継いだ環境ではこちら）。
+"""
 import io,os,re
 from openpyxl import load_workbook, Workbook
 from openpyxl.styles import Font,Alignment,PatternFill,Border,Side
@@ -7,8 +12,19 @@ from openpyxl.worksheet.datavalidation import DataValidation
 from openpyxl.cell.rich_text import CellRichText,TextBlock
 from openpyxl.cell.text import InlineFont
 from openpyxl.utils import get_column_letter
-os.chdir(os.path.expanduser('~/Projects/rakmy-timerecord-import-spec'))
-D=os.path.expanduser('~/Desktop/タイムレコード_20260805')
+B=os.path.dirname(os.path.abspath(__file__))
+os.chdir(B)
+_DESK=os.path.expanduser('~/Desktop/タイムレコード_20260805')
+D=_DESK if os.path.isdir(_DESK) else os.path.join(B,'excel')
+os.makedirs(D,exist_ok=True)
+os.makedirs(os.path.join(D,'ヘルプページ'),exist_ok=True)
+
+
+def fig(name):
+    """フロー図の場所。配布先に無ければリポジトリ直下を使う"""
+    for c in (os.path.join(D,'ヘルプページ',name), os.path.join(B,name)):
+        if os.path.exists(c): return c
+    return None
 def rich(s):
     if not isinstance(s,str) or '**' not in s: return s
     parts=re.split(r'\*\*(.+?)\*\*', s); out=[]
@@ -172,9 +188,9 @@ def build_help():
     pos = 3
     for name, ttl in [('フロー図_登録の順番.png', '1番　はじめて登録するときの順番'),
                       ('フロー図_CSVの手順.png', '6番　CSVで取り込むときの5つの手順')]:
-        fp = os.path.join(D, 'ヘルプページ', name)
+        fp = fig(name)
         wsf[f'A{pos}'] = ttl; wsf[f'A{pos}'].font = Font(size=13, bold=True, color='2F4858')
-        if os.path.exists(fp):
+        if fp:
             img = XLImage(fp); img.width, img.height = 700, 700
             wsf.add_image(img, f'A{pos + 1}')
         pos += 40
@@ -199,3 +215,34 @@ def build_help():
 
 _hn, _hc2 = build_help()
 print(f'ヘルプページ.xlsx: 本文{_hn}行 / 掲載前チェック{_hc2}件')
+
+# ---- 03 検証用データセット（書式を保って上書き）----
+def sync_dataset():
+    hs, DS = load('20260803_検証用データセット.tsv')
+    fp = os.path.join(D, '20260805_タイムレコード_03_検証用データセット.xlsx')
+    if not os.path.exists(fp):
+        return 0
+    wb = load_workbook(fp, rich_text=True); ws = wb.active
+    hx = {str(ws.cell(1, i).value): i for i in range(1, ws.max_column + 1)}
+    start = 2
+    if 'データセットID' not in hx:
+        hx = {str(ws.cell(2, i).value): i for i in range(1, ws.max_column + 1)}
+        start = 3
+    m = {r[hs['データセットID']]: r for r in DS}
+    n = 0
+    for r in range(start, ws.max_row + 1):
+        k = ws.cell(r, 1).value
+        if k not in m:
+            continue
+        for cname in ['CSVに入力する値', '用途・対応する検証ID', 'テンプレート', '種別', 'フロー']:
+            if cname not in hx or cname not in hs:
+                continue
+            want = m[k][hs[cname]]
+            if str(ws.cell(r, hx[cname]).value or '') != want.replace('**', ''):
+                ws.cell(r, hx[cname]).value = rich(want); n += 1
+    wb.save(fp)
+    shutil.copy(fp, 'excel/')
+    return n
+
+
+print(f'03_検証用データセット.xlsx: {sync_dataset()}セル同期')
