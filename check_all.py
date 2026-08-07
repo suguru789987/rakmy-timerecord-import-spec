@@ -33,46 +33,58 @@ def read(name, base=B):
     return io.open(p, encoding='utf-8').read() if os.path.exists(p) else ''
 
 
-# ---------------------------------------------------------------- 1. 受け入れ条件
-hd, D = load('20260804_受け入れ条件_定義表.tsv')
-hc, C = load('20260804_受け入れ条件_確認表.tsv')
-d = {r[1]: r for r in D}
-c = {r[0]: r for r in C}
-
-if set(d) != set(c):
-    ng('受け入れ条件', f'定義表と確認表で条件IDが違う: {sorted(set(d) ^ set(c))}')
-for k in sorted(set(d) & set(c)):
-    for name, x, y in [('フロー', d[k][2], c[k][1]), ('MVP区分', d[k][5], c[k][2]),
-                       ('マイルストーン', d[k][3], c[k][3]), ('満たすべきこと', d[k][4], c[k][4])]:
-        if x.strip() != y.strip():
-            ng('受け入れ条件', f'{k} の{name}が2表で違う（定義表「{x}」／確認表「{y}」）')
-
-for label, rows, i in [('満たすべきこと', D, 4), ('合致していると言える状態', C, 6)]:
-    g = collections.defaultdict(list)
-    for r in rows:
-        g[r[i].strip()].append(r[1] if rows is D else r[0])
-    for text, ids in g.items():
-        if len(ids) > 1:
-            ng('受け入れ条件', f'{label}が同じ条件が複数: {" ".join(ids)} → {text[:40]}')
-
-# 条件の本文が参照する条件IDが実在するか
-for r in C:
-    for m in re.findall(r'AC-\d+', r[6]):
-        if m not in c:
-            ng('受け入れ条件', f'{r[0]} の合致条件が存在しない {m} を参照している')
-
-# ---------------------------------------------------------------- 2. 検証プラン
-ho, OP = load('20260803_検証プラン_操作系.tsv')
-ha, CA = load('20260803_検証プラン_計算系.tsv')
-hds, DS = load('20260803_検証用データセット.tsv')
-
-
 def col(header, name):
     """列名から位置を引く。見つからなければ検査自体を異常にする（空振り防止）"""
     if name not in header:
         ng('検査の不備', f'列「{name}」が見つからない。列名を変えたら check_all.py も直すこと')
         return None
     return header.index(name)
+
+
+# ---------------------------------------------------------------- 1. 受け入れ条件
+hd, D = load('20260804_受け入れ条件_定義表.tsv')
+hc, C = load('20260804_受け入れ条件_確認表.tsv')
+D_ID, C_ID = col(hd, '条件ID'), col(hc, '条件ID')
+D_FLOW, C_FLOW = col(hd, 'フロー'), col(hc, 'フロー')
+D_LV, C_LV = col(hd, 'MVP区分'), col(hc, 'MVP区分')
+D_MS, C_MS = col(hd, 'マイルストーン'), col(hc, 'マイルストーン')
+D_MUST = col(hd, '満たすべきこと（実装の到達点）')
+C_MUST = col(hc, '満たすべきこと')
+C_LINE = col(hc, '合致していると言える状態')
+C_RISK = col(hd, '崩れると起きること')
+C_HOW = col(hc, '確認方法')
+C_WHERE = col(hc, '実装箇所（画面・機能）')
+D_SRC = col(hd, '仕様の該当箇所')
+d = {r[D_ID]: r for r in D}
+c = {r[C_ID]: r for r in C}
+
+if set(d) != set(c):
+    ng('受け入れ条件', f'定義表と確認表で条件IDが違う: {sorted(set(d) ^ set(c))}')
+for k in sorted(set(d) & set(c)):
+    for name, x, y in [('フロー', d[k][D_FLOW], c[k][C_FLOW]), ('MVP区分', d[k][D_LV], c[k][C_LV]),
+                       ('マイルストーン', d[k][D_MS], c[k][C_MS]),
+                       ('満たすべきこと', d[k][D_MUST], c[k][C_MUST])]:
+        if x.strip() != y.strip():
+            ng('受け入れ条件', f'{k} の{name}が2表で違う（定義表「{x}」／確認表「{y}」）')
+
+for label, rows, i, idi in [('満たすべきこと', D, D_MUST, D_ID), ('合致していると言える状態', C, C_LINE, C_ID)]:
+    g = collections.defaultdict(list)
+    for r in rows:
+        g[r[i].strip()].append(r[idi])
+    for text, ids in g.items():
+        if len(ids) > 1:
+            ng('受け入れ条件', f'{label}が同じ条件が複数: {" ".join(ids)} → {text[:40]}')
+
+# 条件の本文が参照する条件IDが実在するか
+for r in C:
+    for m in re.findall(r'AC-\d+', r[C_LINE]):
+        if m not in c:
+            ng('受け入れ条件', f'{r[C_ID]} の合致条件が存在しない {m} を参照している')
+
+# ---------------------------------------------------------------- 2. 検証プラン
+ho, OP = load('20260803_検証プラン_操作系.tsv')
+ha, CA = load('20260803_検証プラン_計算系.tsv')
+hds, DS = load('20260803_検証用データセット.tsv')
 
 
 io_, ic_ = col(ho, '検証ID'), col(ha, '検証ID')
@@ -87,7 +99,7 @@ for r in C:
     for m in re.findall(r'(?:OP|CA)-\d+', r[ievi]):
         used[m] += 1
         if m not in vids:
-            ng('検証プラン', f'{r[0]} の根拠にある {m} が検証プランに無い')
+            ng('検証プラン', f'{r[C_ID]} の根拠にある {m} が検証プランに無い')
 for v in sorted(vids - set(used)):
     ng('検証プラン', f'{v} はどの受け入れ条件からも参照されていない')
 
@@ -98,10 +110,10 @@ for r in OP + CA:
 for r in DS:
     for m in re.findall(r'(?:OP|CA)-\d+', r[iuse]):
         if m not in vids:
-            ng('検証データ', f'{r[0]} の用途にある {m} が検証プランに無い')
+            ng('検証データ', f'{r[ids_]} の用途にある {m} が検証プランに無い')
 
 # ---------------------------------------------------------------- 3. 実データの数
-lv = collections.Counter(r[2] for r in C)
+lv = collections.Counter(r[C_LV] for r in C)
 N = {
     '受け入れ条件': len(C),
     'MVP必須': lv['MVP必須'],
@@ -190,13 +202,13 @@ def xlsx_pair(name, label, want, col=2):
         ng('配布エクセル', f'{name} に「{label}」の行が見つからない（検査が空振りしている）')
 
 
-ms = collections.Counter(r[3] for r in C)
+ms = collections.Counter(r[C_MS] for r in C)
 if os.path.isdir(DESK):
     for label, want in [('MVP必須', N['MVP必須']), ('リリース必須', N['リリース必須']),
                         ('改善', N['改善'])]:
         xlsx_pair('20260805_タイムレコード_00_定義表.xlsx', label, want)
     for f in '1234':
-        rows = sum(1 for r in C if f in [x.strip() for x in r[1].split('/')])
+        rows = sum(1 for r in C if f in [x.strip() for x in r[C_FLOW].split('/')])
         cells = xlsx_cells('20260805_タイムレコード_00_定義表.xlsx') or []
         hit = [v for _, r, cc, v in cells if cc == 1 and isinstance(v, str) and v.startswith(f'フロー{f} ')]
         if not hit:
@@ -323,7 +335,7 @@ plan2ac = {pv(h, r, '検証ID'): set(re.findall(r'AC-\d+', pv(h, r, '対応す�
 ac2plan = collections.defaultdict(set)
 for r in C:
     for m in re.findall(r'(?:OP|CA)-\d+', r[ievi]):
-        ac2plan[m].add(r[0])
+        ac2plan[m].add(r[C_ID])
 for v, s in plan2ac.items():
     if s != ac2plan.get(v, set()):
         ng('紐付け', f'{v} 条件IDが片側だけ プラン={sorted(s)} 受入条件={sorted(ac2plan.get(v, set()))}')
@@ -340,7 +352,7 @@ if ihelp_c is not None:
                     exp.add(p_)
         got = {x.strip() for x in r[ihelp_c].split('／') if x.strip() and not x.strip().startswith('—')}
         if exp != got:
-            ng('紐付け', f'{r[0]} ヘルプ該当箇所が検証プランと違う 受入条件={sorted(got)} プラン由来={sorted(exp)}')
+            ng('紐付け', f'{r[C_ID]} ヘルプ該当箇所が検証プランと違う 受入条件={sorted(got)} プラン由来={sorted(exp)}')
 
 # データセットの双方向
 # 検証プランは「D1」のようにまとめて参照することがある。その場合 D1-* 全体を指す
@@ -402,14 +414,14 @@ if os.path.isdir(DESK):
     ws = xlsx_sheet('20260805_タイムレコード_01_受入条件表.xlsx')
     if ws is not None:
         hx = {str(ws.cell(28, i).value): i for i in range(1, ws.max_column + 1)}
-        dmap = {r[1]: r for r in D}
-        PAIR = [('実装レベル', lambda k: c[k][2]),
-                ('何を実装するか', lambda k: c[k][4]),
-                ('合格ライン（この数値を満たせば実装完了）', lambda k: c[k][6]),
-                ('実装できていないと起きること', lambda k: dmap[k][6]),
-                ('フロー', lambda k: c[k][1]),
-                ('確認方法', lambda k: c[k][7]),
-                ('対応検証ID', lambda k: c[k][8]),
+        dmap = {r[D_ID]: r for r in D}
+        PAIR = [('実装レベル', lambda k: c[k][C_LV]),
+                ('何を実装するか', lambda k: c[k][C_MUST]),
+                ('合格ライン（この数値を満たせば実装完了）', lambda k: c[k][C_LINE]),
+                ('実装できていないと起きること', lambda k: dmap[k][C_RISK]),
+                ('フロー', lambda k: c[k][C_FLOW]),
+                ('確認方法', lambda k: c[k][C_HOW]),
+                ('対応検証ID', lambda k: c[k][ievi]),
                 ('ヘルプ該当箇所', lambda k: c[k][ihelp_c] if ihelp_c is not None else '')]
         found = 0
         for rr in range(29, ws.max_row + 1):
@@ -535,6 +547,46 @@ for _path in ['20260803_検証プラン_操作系.tsv', '20260803_検証プラ�
                 ng('ヘルプの参照', f'{_r[_idc]} が存在しない {_n}番 を指している')
             elif _txt and _norm(_txt) not in _norm(_sec_name[_n] + _sec_body[_n]):
                 ng('ヘルプの参照', f'{_r[_idc]} の「{_n}番 {_txt}」がヘルプ本文に見当たらない')
+
+
+# ---------------------------------------------------------------- 12. 条件どうしの前提
+# 「この条件は、あの条件が実装されていないと判定できない」という関係を検査する。
+# MVP必須の条件が、後回し（リリース必須・改善）の条件を前提にしていたら、
+# その MVP必須は永久に判定できない。AC-035 と AC-056 で実際に起きた。
+_LV = {'MVP必須': 1, 'リリース必須': 2, '改善': 3, '—': 4}
+_ipre = col(hc, '前提となる条件')
+_ilv = col(hc, 'MVP区分')
+if _ipre is not None and _ilv is not None:
+    for r in C:
+        if r[_ipre].strip().startswith('—'):   # 「—（…が判定する）」は委譲。前提ではない
+            continue
+        for m in re.findall(r'AC-\d+', r[_ipre]):
+            if m not in c:
+                ng('条件の前提', f'{r[0]} が存在しない {m} を前提にしている')
+                continue
+            if m == r[0]:
+                ng('条件の前提', f'{r[0]} が自分自身を前提にしている')
+                continue
+            mine, theirs = _LV.get(r[_ilv], 9), _LV.get(c[m][_ilv], 9)
+            if theirs > mine:
+                ng('条件の前提',
+                   f'{r[0]}[{r[_ilv]}] が {m}[{c[m][_ilv]}] を前提にしている。'
+                   f'前提のほうが後回しでは {r[0]} を判定できない')
+    # 循環
+    _g = {r[C_ID]: (set() if r[_ipre].strip().startswith('—')
+                    else set(re.findall(r'AC-\d+', r[_ipre]))) for r in C}
+    for k0 in _g:
+        seen, stack = set(), [k0]
+        while stack:
+            x = stack.pop()
+            for y in _g.get(x, ()):
+                if y == k0:
+                    ng('条件の前提', f'{k0} の前提が循環している')
+                    stack = []
+                    break
+                if y not in seen:
+                    seen.add(y)
+                    stack.append(y)
 
 # ---------------------------------------------------------------- 出力
 print('=' * 72)
