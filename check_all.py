@@ -64,13 +64,27 @@ for r in C:
 # ---------------------------------------------------------------- 2. 検証プラン
 ho, OP = load('20260803_検証プラン_操作系.tsv')
 ha, CA = load('20260803_検証プラン_計算系.tsv')
-_, DS = load('20260803_検証用データセット.tsv')
-vids = {r[1] for r in OP} | {r[0] for r in CA}
-dids = {r[0] for r in DS}
+hds, DS = load('20260803_検証用データセット.tsv')
+
+
+def col(header, name):
+    """列名から位置を引く。見つからなければ検査自体を異常にする（空振り防止）"""
+    if name not in header:
+        ng('検査の不備', f'列「{name}」が見つからない。列名を変えたら check_all.py も直すこと')
+        return None
+    return header.index(name)
+
+
+io_, ic_ = col(ho, '検証ID'), col(ha, '検証ID')
+ids_ = col(hds, 'データセットID')
+iuse = col(hds, '用途・対応する検証ID')
+ievi = col(hc, '根拠（検証ID）')
+vids = ({r[io_] for r in OP} if io_ is not None else set()) | ({r[ic_] for r in CA} if ic_ is not None else set())
+dids = {r[ids_] for r in DS} if ids_ is not None else set()
 
 used = collections.Counter()
 for r in C:
-    for m in re.findall(r'(?:OP|CA)-\d+', r[8]):
+    for m in re.findall(r'(?:OP|CA)-\d+', r[ievi]):
         used[m] += 1
         if m not in vids:
             ng('検証プラン', f'{r[0]} の根拠にある {m} が検証プランに無い')
@@ -82,7 +96,7 @@ for r in OP + CA:
         if m not in dids:
             ng('検証データ', f'検証プランが存在しない {m} を参照している')
 for r in DS:
-    for m in re.findall(r'(?:OP|CA)-\d+', r[5]):
+    for m in re.findall(r'(?:OP|CA)-\d+', r[iuse]):
         if m not in vids:
             ng('検証データ', f'{r[0]} の用途にある {m} が検証プランに無い')
 
@@ -108,7 +122,7 @@ CHECKS = [
     ('仕様書', r'\*\*実装が条件に合致しているかの確認\*\*（(\d+)件）', N['受け入れ条件']),
     ('仕様書', r'エンジニアはMVP必須の(\d+)件を先に潰して', N['MVP必須']),
     ('仕様書', r'\| MVP必須(\d+)件がすべて合格 \|', N['MVP必須']),
-    ('仕様書', r'操作手順と期待値(\d+)件', N['操作系']),
+    ('仕様書', r'操作手順と期待挙動(\d+)件', N['操作系']),
     ('仕様書', r'数値・件数・上限の確認(\d+)件', N['計算系']),
     ('仕様書', r'検証に使うデータ(\d+)件', N['データセット']),
     ('仕様書', r'検証項目は(\d+)件です', N['検証項目']),
@@ -116,13 +130,18 @@ CHECKS = [
     ('仕様書', r'計算系（(\d+)列）', N['計算系の列']),
 ]
 for doc, pat, want in CHECKS:
-    for got in re.findall(pat, spec):
+    got_all = re.findall(pat, spec)
+    if not got_all:
+        ng('検査の不備', f'{doc}で「{pat}」が1件も一致しない。文言を変えたら check_all.py も直すこと')
+    for got in got_all:
         if int(got) != want:
             ng(doc, f'「{pat}」が {got} だが実データは {want}')
 
 # 実装レベルの件数表
 m = re.search(r'\| \*\*MVP必須\*\* \|[^|]+\| \*\*(\d+)件\*\* \|', spec)
-if m and int(m.group(1)) != N['MVP必須']:
+if not m:
+    ng('検査の不備', '仕様書のMVP区分の表が見つからない（検査が空振りしている）')
+elif int(m.group(1)) != N['MVP必須']:
     ng('仕様書', f'MVP区分の表が {m.group(1)}件 だが実データは {N["MVP必須"]}件')
 
 # フロー別の件数
@@ -131,6 +150,8 @@ for f in '1234':
     mvp = sum(1 for r in rows if r[2] == 'MVP必須')
     pat = r'\| \*\*' + f + r'\*\* \| [^|]+ \| (\d+)件 \| \*\*(\d+)件\*\* \| (\d+)件 \|'
     mm = re.search(pat, spec)
+    if not mm:
+        ng('検査の不備', f'仕様書のフロー{f}の件数行が見つからない（検査が空振りしている）')
     if mm:
         if int(mm.group(1)) != len(rows):
             ng('仕様書', f'フロー{f}の受け入れ条件が {mm.group(1)}件 だが実データは {len(rows)}件')
