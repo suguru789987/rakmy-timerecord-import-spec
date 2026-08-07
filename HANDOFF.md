@@ -194,7 +194,8 @@ https://github.com/suguru789987/rakmy-owner-registration-mock/blob/main/HANDOFF.
 ## 資料を直したら必ず実行する
 
 ```
-python3 check_all.py
+python3 sync_excel.py   # TSV → 配布用エクセル（01・02）を同期
+python3 check_all.py    # 全資料の整合を検査
 ```
 
 **件数や列数は複数の資料に複製されています。** 受け入れ条件を1件でも直すと、

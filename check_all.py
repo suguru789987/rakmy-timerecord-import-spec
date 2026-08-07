@@ -487,6 +487,84 @@ if os.path.isdir(DESK):
             if bad:
                 ng('エクセル', f'{nm} に ** が {len(bad)}セル残っている（太字に変換すること）')
 
+
+# ---------------------------------------------------------------- 11. ヘルプページの中身と参照
+_parts = re.split(r'^## (\d+)\. (.+)$', help_md, flags=re.M)
+_sec_name, _sec_body = {}, {}
+for _i in range(1, len(_parts), 3):
+    _n = int(_parts[_i])
+    _sec_name[_n] = _parts[_i + 1].strip()
+    _sec_body[_n] = _parts[_i + 2]
+if not _sec_name:
+    ng('検査の不備', 'ヘルプ本文から節を1つも切り出せない（見出しの形式を変えたら check_all.py も直すこと）')
+
+
+def _norm(s):
+    return re.sub(r'[\s\u3000*「」（）()]', '', s)
+
+
+# 目次の番号と見出しが、実際の節と一致しているか
+if '## 目次' in help_md and '## 1. ' in help_md:
+    _toc = help_md[help_md.index('## 目次'):help_md.index('## 1. ')]
+    _rows = re.findall(r'^\| \*\*(\d+|その他)\*\* \| ([^|]+) \|', _toc, re.M)
+    if not _rows:
+        ng('検査の不備', 'ヘルプの目次から行を1つも読めない')
+    for _num, _nm in _rows:
+        if _num == 'その他':
+            continue
+        _n, _nm = int(_num), _nm.strip()
+        if _n not in _sec_name:
+            ng('ヘルプ', f'目次の{_n}番に対応する節が無い')
+        elif _sec_name[_n] != _nm:
+            ng('ヘルプ', f'目次「{_nm}」が節「{_sec_name[_n]}」と違う')
+
+# 本文中の範囲参照（6〜10番 など）が節の範囲に収まっているか
+for _lo, _hi in re.findall(r'(\d+)〜(\d+)番', help_md):
+    if int(_lo) not in _sec_name or int(_hi) not in _sec_name:
+        ng('ヘルプ', f'範囲参照 {_lo}〜{_hi}番 が節の範囲外')
+
+# 見出しは3階層まで（ラクミー サービスマニュアルの形式）
+if re.search(r'^#### ', help_md, re.M):
+    ng('ヘルプ', '掲載本文に4階層目の見出し（####）がある。3階層までにすること')
+
+# スクリーンショットと図
+_shots = help_md.count('📸')
+_m = re.search(r'全(\d+)箇所', draft)
+if not _m:
+    ng('検査の不備', '掲載前チェックに「全N箇所」の記載が無い')
+elif int(_m.group(1)) != _shots:
+    ng('ヘルプ', f'スクリーンショットの箇所が本文{_shots}件、チェックリスト{_m.group(1)}件で違う')
+for _fig in ['フロー図_CSVの手順.png', 'フロー図_登録の順番.png']:
+    if not os.path.exists(os.path.join(DESK, 'ヘルプページ', _fig)):
+        ng('ヘルプ', f'図 {_fig} がヘルプページのフォルダに無い')
+if help_md.count('🖼') != 2:
+    ng('ヘルプ', f'図の挿入位置が{help_md.count("🖼")}箇所（2箇所のはず）')
+
+# 検証プラン・受入条件が指すヘルプの節と文言が実在するか
+for _path in ['20260803_検証プラン_操作系.tsv', '20260803_検証プラン_計算系.tsv',
+              '20260804_受け入れ条件_確認表.tsv']:
+    _h, _R = load(_path)
+    if 'ヘルプ該当箇所' not in _h:
+        ng('検査の不備', f'{_path} に「ヘルプ該当箇所」列が無い')
+        continue
+    _ih = _h.index('ヘルプ該当箇所')
+    _idc = _h.index('検証ID') if '検証ID' in _h else _h.index('条件ID')
+    for _r in _R:
+        for _part in _r[_ih].split('／'):
+            _s = _part.strip()
+            if not _s or _s.startswith('—'):
+                continue
+            _mm = re.match(r'(\d+)番\s*(.*)', _s)
+            if not _mm:
+                ng('ヘルプの参照', f'{_r[_idc]} の「{_s}」が「N番 …」の形式でない')
+                continue
+            _n = int(_mm.group(1))
+            _txt = re.sub(r'（.*?）', '', _mm.group(2)).strip()
+            if _n not in _sec_name:
+                ng('ヘルプの参照', f'{_r[_idc]} が存在しない {_n}番 を指している')
+            elif _txt and _norm(_txt) not in _norm(_sec_name[_n] + _sec_body[_n]):
+                ng('ヘルプの参照', f'{_r[_idc]} の「{_n}番 {_txt}」がヘルプ本文に見当たらない')
+
 # ---------------------------------------------------------------- 出力
 print('=' * 72)
 print('  実データ')
