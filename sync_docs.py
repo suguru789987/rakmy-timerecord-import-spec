@@ -101,6 +101,69 @@ def render(text, n):
     return text
 
 
+
+
+# ---------------------------------------------------------------- 成果物URL一覧の生成
+REPO = 'https://github.com/suguru789987/rakmy-timerecord-import-spec'
+INDEX = '成果物URL一覧.md'
+ITEMS = [
+    ('仕様書', [
+        ('仕様書（PdM向け）', '20260803_CSV一括登録機能_仕様書（PdM向け）.md', '何を作るか・なぜか。4フローとケース別の期待値'),
+        ('開発者向け仕様', 'README.md', 'DB・API・画面の詳細。§0〜§11'),
+    ]),
+    ('受け入れ条件', [
+        ('定義表', '20260804_受け入れ条件_定義表.tsv', '何を守るか・なぜか。実装レベルと崩れると起きること'),
+        ('確認表', '20260804_受け入れ条件_確認表.tsv', '合格ラインと判定欄。検証ID・ヘルプ該当箇所つき'),
+        ('エクセル版', 'excel/20260805_タイムレコード_01_受入条件表.xlsx', '上部の到達状況が自動集計。合否を選ぶと更新される'),
+    ]),
+    ('検証プラン', [
+        ('操作系', '20260803_検証プラン_操作系.tsv', '画面を操作して確かめる手順'),
+        ('計算系', '20260803_検証プラン_計算系.tsv', '数値・件数・上限の確認'),
+        ('エクセル版', 'excel/20260805_タイムレコード_02_検証プラン.xlsx', '操作系と計算系を1シートに'),
+    ]),
+    ('検証データセット', [
+        ('データセット', '20260803_検証用データセット.tsv', '前提データ（D0）とCSVに入力する値（D1〜D5）'),
+        ('エクセル版', 'excel/20260805_タイムレコード_03_検証用データセット.xlsx', ''),
+    ]),
+    ('ヘルプページ', [
+        ('掲載本文', '20260804_Notion掲載用_CSVで一括登録する.md', '顧客に出す本文。そのまま貼れる'),
+        ('作業用（チェックリスト付き）', '20260803_ヘルプページ_CSV一括登録_ドラフト.md', '公開手順と掲載前チェックを含む'),
+        ('フロー図（手順）', 'フロー図_CSVの手順.png', ''),
+        ('フロー図（順番）', 'フロー図_登録の順番.png', ''),
+    ]),
+    ('そのほか', [
+        ('引き継ぎノート', 'HANDOFF.md', '受け取り方と3コマンド'),
+        ('判断の記録', 'JUDGMENT_LOG.md', 'PdMの判断46件'),
+        ('プロンプト集', 'プロンプト集.md', 'Claude Code で使う指示の例'),
+        ('実装マイルストーン', '20260804_実装マイルストーン表.tsv', 'M1〜M6の順序と完了条件'),
+        ('トレーサビリティ', '20260803_トレーサビリティ表.tsv', '仕様§→受け入れ条件→検証IDの対応'),
+    ]),
+]
+
+
+def write_index():
+    from urllib.parse import quote
+    L = ['# 成果物のURL一覧', '',
+         f'**リポジトリ**: {REPO}', '',
+         '**このファイルは `python3 sync_docs.py` が自動生成します。手で編集しないでください。**', '',
+         '---', '']
+    miss = []
+    for group, rows in ITEMS:
+        L += [f'## {group}', '', '| 資料 | 内容 | URL |', '|---|---|---|']
+        for name, path, desc in rows:
+            if not os.path.exists(os.path.join(B, path)):
+                miss.append(path)
+                continue
+            L.append(f'| {name} | {desc} | {REPO}/blob/main/{quote(path)} |')
+        L.append('')
+    L += ['---', '', '## まとめて受け取る', '',
+          '```', f'git clone {REPO}.git', 'cd rakmy-timerecord-import-spec',
+          'pip3 install openpyxl', 'python3 check_all.py', '```', '',
+          '**「整合しています」と出れば、資料一式に食い違いはありません。**', '']
+    io.open(os.path.join(B, INDEX), 'w', encoding='utf-8').write('\n'.join(L))
+    return len([r for _, rows in ITEMS for r in rows]) - len(miss), miss
+
+
 def main():
     n = counts()
     p = os.path.join(B, SPEC)
@@ -117,6 +180,8 @@ def main():
     else:
         io.open(p, 'w', encoding='utf-8').write(new)
         print(f'仕様書の数字を書き直しました（{len(RULES)}箇所）')
+    cnt, miss = write_index()
+    print(f'{INDEX}: {cnt}件のURLを生成' + (f'（見つからない: {miss}）' if miss else ''))
     for k in ['受け入れ条件', 'MVP必須', '検証項目', 'データセット', '操作系の列']:
         print(f'  {k:<12} {n[k]}')
 
